@@ -2,19 +2,20 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { User } from "@/models/user.type";
 import type { SignInResponse } from "@/services/types";
 import Api from "@/services/service";
+import { tokenUtils } from "@/utils/tokenUtils";
 
 interface AuthState {
   isLoading: boolean;
-  isInit: boolean;
-  isLoggedIn?: boolean;
+  isInitialized: boolean;
   currentUser?: User;
+  error?: string;
 }
 
 const initialState: AuthState = {
   isLoading: false,
-  isLoggedIn: false,
-  isInit: false,
+  isInitialized: false,
   currentUser: undefined,
+  error: undefined,
 };
 
 export const loginAction = createAsyncThunk<
@@ -38,54 +39,88 @@ export const logoutAction = createAsyncThunk("auth/logout", async () => {
 export const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    resetError: (state) => {
+      state.error = undefined;
+    },
+    clearAuth: (state) => {
+      state.currentUser = undefined;
+      state.isInitialized = true;
+      tokenUtils.clearAuthData();
+    },
+    initializeFromStorage: (state) => {
+      // Check if we have a token marker in localStorage
+      // If yes, we should try to validate it with the server
+      state.isInitialized = tokenUtils.hasTokenMarker();
+    },
+  },
   extraReducers: (builder) => {
     /* loginAction */
     builder.addCase(loginAction.fulfilled, (state, action) => {
       state.currentUser = action.payload.user;
-      state.isLoggedIn = true;
       state.isLoading = false;
+      state.error = undefined;
+      tokenUtils.markTokenExists();
     });
     builder.addCase(loginAction.pending, (state) => {
       state.isLoading = true;
-      state.currentUser = undefined;
+      state.error = undefined;
     });
-    builder.addCase(loginAction.rejected, (state) => {
+    builder.addCase(loginAction.rejected, (state, action) => {
       state.currentUser = undefined;
       state.isLoading = false;
-      state.isLoggedIn = false;
+      state.error = action.error.message || "Login failed";
     });
 
     /* getMeAction */
     builder.addCase(getMeAction.fulfilled, (state, action) => {
       state.currentUser = action.payload;
-      state.isInit = false;
+      state.isInitialized = true;
+      state.isLoading = false;
+      state.error = undefined;
     });
     builder.addCase(getMeAction.pending, (state) => {
-      state.isInit = true;
-      state.currentUser = undefined;
+      state.isLoading = true;
+      state.error = undefined;
     });
-    builder.addCase(getMeAction.rejected, (state) => {
+    builder.addCase(getMeAction.rejected, (state, action) => {
       state.currentUser = undefined;
-      state.isInit = false;
+      state.isInitialized = true;
+      state.isLoading = false;
+      state.error = action.error.message;
+      tokenUtils.removeTokenMarker();
     });
 
     /* logoutAction */
     builder.addCase(logoutAction.fulfilled, (state) => {
       state.currentUser = undefined;
-      state.isLoggedIn = false;
       state.isLoading = false;
+      state.error = undefined;
+      tokenUtils.clearAuthData();
     });
     builder.addCase(logoutAction.pending, (state) => {
       state.isLoading = true;
+      state.error = undefined;
     });
-    builder.addCase(logoutAction.rejected, (state) => {
+    builder.addCase(logoutAction.rejected, (state, action) => {
       state.isLoading = false;
-      state.currentUser = undefined;
-      state.isLoggedIn = false;
+      state.error = action.error.message || "Logout failed";
     });
   },
 });
 
-// export const { setToken } = authSlice.actions;
+export const { resetError, clearAuth, initializeFromStorage } =
+  authSlice.actions;
+
+// Selectors
+export const selectAuth = (state: { auth: AuthState }) => state.auth;
+export const selectIsAuthenticated = (state: { auth: AuthState }) =>
+  !!state.auth.currentUser;
+export const selectCurrentUser = (state: { auth: AuthState }) =>
+  state.auth.currentUser;
+export const selectIsLoading = (state: { auth: AuthState }) =>
+  state.auth.isLoading;
+export const selectIsInitialized = (state: { auth: AuthState }) =>
+  state.auth.isInitialized;
+
 export default authSlice.reducer;

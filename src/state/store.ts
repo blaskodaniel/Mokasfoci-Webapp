@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-// Később ide importálod majd a "slice"-okat
+import authReducer from "@/state/authSlice";
 
 export const store = configureStore({
   reducer: {
-    // Pl.: counter: counterReducer,
+    auth: authReducer,
   },
 });
 

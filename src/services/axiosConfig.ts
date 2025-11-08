@@ -1,7 +1,7 @@
 import { APP_CONFIG } from "@/config";
 import axios from "axios";
 
-const axiosInstance = axios.create({
+export const axiosInstance = axios.create({
   baseURL: APP_CONFIG.BACKEND_URL,
   headers: {
     "Content-Type": "application/json",
@@ -9,4 +9,11 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-export default axiosInstance;
+// Segédfüggvény az Access Token beállításához
+export const setAuthToken = (token: string | null) => {
+  if (token) {
+    axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  } else {
+    delete axiosInstance.defaults.headers.common["Authorization"];
+  }
+};

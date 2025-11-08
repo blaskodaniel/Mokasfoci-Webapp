@@ -1,28 +1,39 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 @import "tailwindcss";
 
 @theme {
-  --font-poppins: "Poppins", sans-serif;
-  --font-family-poppins: var(--font-poppins);
+  --font-montserrat: "Montserrat", sans-serif;
+  --font-family-montserrat: var(--font-montserrat);
 
-  --color-primary: #031d34;
-  --color-secondary: #141717;
-  --color-red: #960018;
-  --color-warning: #f39c11;
+  /* 🌌 Háttérszínek */
+  --color-bg-start: #0d0b1a; /* sötét ibolya-fekete */
+  --color-bg-end: #1a1530; /* mély lilás tónus */
+  --color-bg-gradient: linear-gradient(
+    180deg,
+    var(--color-bg-start) 0%,
+    var(--color-bg-end) 100%
+  );
 
-  --color-blue-900: #00072d;
-  --color-blue-800: #001c55;
-  --color-blue-700: #0a2472;
-  --color-blue-500: #0e6ba8;
-  --color-blue-200: #a6e1fa;
+  /* ⚽️ Kártyák, panelek */
+  --color-surface: #1f1a35; /* enyhén világosabb háttér a kártyákhoz */
+  --color-surface-hover: #292347;
 
-  --color-imdb-yellow: #deb522;
+  /* 🔠 Szövegek */
+  --color-text-primary: #000000;
+  --color-text-secondary: #b6b1d4;
+  --color-text-muted: #807a9b;
+
+  /* 💜 Kiemelések, akcentusok */
+  --color-accent: #6b4bff; /* fő lila-kék akcentus */
+  --color-accent-soft: #8b6bff;
+  --color-highlight: #ff2fd4; /* Messi góljainál használt rózsaszínes-lila */
+
+  /* ⚫️ Elválasztók, kontúrok */
+  --color-border: #2a2543;
 }
 
 @layer base {
   body {
     font-family: var(--font-family-poppins);
-    background-color: var(--color-primary);
-    color: white;
   }
 }
