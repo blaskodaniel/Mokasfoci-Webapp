@@ -21,6 +21,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const response = await Api.refreshToken();
 
         if (response) {
+          console.log("Silent auth sikeres", response);
           const { accessToken, user } = response;
           setAuthData(accessToken, user);
         }

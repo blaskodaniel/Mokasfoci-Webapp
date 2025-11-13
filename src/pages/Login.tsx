@@ -1,20 +1,20 @@
 import React, { useState } from "react";
 import BG from "../assets/img/login_bg.jpg";
-import { useAppDispatch, useAppSelector } from "../state/hooks";
-import { loginAction } from "../state/authSlice";
+import { useAppSelector } from "../state/hooks";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import Api from "@/services/service";
 
 const Login: React.FC = () => {
-  const dispatch = useAppDispatch();
+  const { login } = useAuth();
   const { isLoading } = useAppSelector((state) => state.auth);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: login logic
-    console.log({ username, password });
-    dispatch(loginAction({ username, password }));
+    const response = await Api.login(username, password);
+    login(response.token, response.user);
   };
 
   return (

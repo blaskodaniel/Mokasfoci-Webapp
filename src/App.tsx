@@ -7,15 +7,20 @@ import Layout from "./Layout";
 import ForgotPassword from "@/pages/ForgotPassword";
 import ResetPassword from "@/pages/ResetPassword";
 import { ProtectedLayout } from "./ProtectedLayout";
+import { useAxiosInterceptor } from "./hooks/useAxiosInterceptor";
+import PublicRoute from "./PublicLayout";
 
 function App() {
+  useAxiosInterceptor();
   return (
     <Routes>
-      {/* Public Routes */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password/:token" element={<ResetPassword />} />
+      {/* PUBLIC ROUTES (ha be van lépve → redirect) */}
+      <Route element={<PublicRoute />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+      </Route>
 
       {/* Protected Routes */}
       <Route element={<ProtectedLayout />}>

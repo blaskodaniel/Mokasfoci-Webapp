@@ -19,7 +19,7 @@ const Layout = () => {
 
       {/* Main Content */}
       <div className="md:flex md:justify-center mt-15">
-        <div className="flex-1 max-w-[1280px]">
+        <div className="flex-1 max-w-7xl">
           {/* Tab Content */}
           <div className="flex-1 mt-5">
             <Outlet />

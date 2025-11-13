@@ -40,13 +40,8 @@ const Api = {
   },
 
   async refreshToken(): Promise<{ accessToken: string; user: User } | null> {
-    try {
-      const response = await axiosInstance.post(`/auth/refresh-token`);
-      return response.data;
-    } catch (error) {
-      console.error("Token frissítési hiba", error);
-      return null;
-    }
+    const response = await axiosInstance.post(`/auth/refresh-token`);
+    return response.data;
   },
 };
 

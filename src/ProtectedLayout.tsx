@@ -1,20 +1,20 @@
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import PageLoader from "./components/PageLoader";
-import { useProtectedAuth } from "./hooks/useProtectedAuth";
+import { useAuth } from "./hooks/useAuth";
 
 // Layout for protected routes
 export const ProtectedLayout: React.FC = () => {
-  const { isAuthenticated, shouldShowLoading } = useProtectedAuth();
+  const { user, isLoading } = useAuth();
   const location = useLocation();
 
   // Show loading while checking authentication
-  if (shouldShowLoading) {
+  if (isLoading) {
     return <PageLoader message="Oldal betöltése...." />;
   }
 
   // Redirect to login if not authenticated
-  if (!isAuthenticated) {
+  if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

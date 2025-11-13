@@ -1,4 +1,3 @@
-// src/hooks/useAxiosInterceptor.ts
 import { useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "./useAuth";
@@ -26,6 +25,7 @@ export const useAxiosInterceptor = () => {
 
           try {
             // 3. Megpróbáljuk frissíteni a tokent
+            console.log("Access token lejárt, próbálkozás frissítéssel...");
             const refreshResponse = await Api.refreshToken();
             const { accessToken, user } = refreshResponse!;
 
@@ -34,7 +34,9 @@ export const useAxiosInterceptor = () => {
 
             // 5. Frissítjük az EREDETI kérés fejlécét az új tokennel
             originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
-
+            console.log(
+              "Token frissítve, újrapróbálkozás az eredeti kéréssel."
+            );
             // 6. Újrapróbáljuk az eredeti kérést
             return axiosInstance(originalRequest);
           } catch (refreshError) {
