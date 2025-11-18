@@ -7,14 +7,14 @@ const useMenu = () => {
   const menuList = useMemo(
     () => [
       {
-        name: "Szavazó",
+        name: "Főoldal",
         link: "/fooldal",
         isActive: location.pathname === "/fooldal",
       },
       {
-        name: "Ajánló",
-        link: "/ajanlo",
-        isActive: location.pathname === "/ajanlo",
+        name: "Fogadásaim",
+        link: "/fogadasaim",
+        isActive: location.pathname === "/fogadasaim",
       },
       {
         name: "Profilom",

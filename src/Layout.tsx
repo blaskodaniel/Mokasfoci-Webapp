@@ -2,8 +2,10 @@ import { Outlet, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import MobileMenu from "@/components/MobileMenu";
+import useResponsive from "./hooks/useResponsive";
 
 const Layout = () => {
+  const { isMobile } = useResponsive();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -15,7 +17,9 @@ const Layout = () => {
     <div className="flex flex-col min-h-screen overflow-y-auto bg-secondary">
       {/* Header */}
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
-      <MobileMenu isOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+      {isMobile && (
+        <MobileMenu isOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+      )}
 
       {/* Main Content */}
       <div className="md:flex md:justify-center mt-15">

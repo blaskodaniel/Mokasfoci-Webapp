@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { logoutAction } from "../state/authSlice";
 import { useAppDispatch } from "../state/hooks";
-import Logo from "@/assets/img/logo3.png";
-import { HiOutlineLogout } from "react-icons/hi";
-import { Link, useNavigate } from "react-router-dom";
+import { HiOutlineLogout, HiOutlineMenuAlt3 } from "react-icons/hi";
+import { Link } from "react-router-dom";
 import useMenu from "@/hooks/useMenu";
-import { RiMenu2Fill } from "react-icons/ri";
+import useResponsive from "@/hooks/useResponsive";
 
 const Header = ({
   isMenuOpen,
@@ -14,7 +13,7 @@ const Header = ({
   isMenuOpen: boolean;
   setIsMenuOpen: (isOpen: boolean) => void;
 }) => {
-  const navigate = useNavigate();
+  const { isDesktop } = useResponsive();
   const dispatch = useAppDispatch();
   const { menuList } = useMenu();
   const [scrolled, setScrolled] = useState(false);
@@ -31,22 +30,6 @@ const Header = ({
         scrolled ? "h-10" : "h-16"
       } bg-primary shadow-md flex items-center px-6`}
     >
-      <RiMenu2Fill
-        color="white"
-        size={25}
-        className="sm:hidden cursor-pointer mr-4"
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-      />
-      <div className="rounded-full">
-        <img
-          src={Logo}
-          alt="Logo"
-          onClick={() => navigate("/")}
-          className={`${
-            scrolled ? "h-8" : "h-12"
-          } transition-all duration-300 inline-block mr-2 cursor-pointer`}
-        />
-      </div>
       <div className="hidden sm:block">
         {menuList.map((menu) => (
           <Link
@@ -62,13 +45,22 @@ const Header = ({
           </Link>
         ))}
       </div>
-      <div
-        className="ml-auto text-white cursor-pointer flex items-center gap-2"
-        onClick={() => dispatch(logoutAction())}
-      >
-        <p>Kilépés</p>
-        <HiOutlineLogout size={20} />
-      </div>
+
+      <HiOutlineMenuAlt3
+        color="white"
+        size={25}
+        className="sm:hidden cursor-pointer ml-auto"
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+      />
+      {isDesktop && (
+        <div
+          className="text-white cursor-pointer flex items-center gap-2 ml-auto"
+          onClick={() => dispatch(logoutAction())}
+        >
+          <span>Kilépés</span>
+          <HiOutlineLogout size={20} />
+        </div>
+      )}
     </div>
   );
 };

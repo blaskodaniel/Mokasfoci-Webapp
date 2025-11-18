@@ -6,20 +6,27 @@
   --font-family-montserrat: var(--font-montserrat);
 
   /* 🌌 Háttérszínek */
-  --color-bg-start: #0d0b1a; /* sötét ibolya-fekete */
-  --color-bg-end: #1a1530; /* mély lilás tónus */
+  --color-primary: #060b17;
+  --color-secondary: #0d101a;
+  --color-tertiary: #140c30;
+  --color-quaternary: #14253e;
+
+  --color-start: #0d101a;
+  --color-end: #19202c;
   --color-bg-gradient: linear-gradient(
     180deg,
-    var(--color-bg-start) 0%,
-    var(--color-bg-end) 100%
+    var(--color-start) 0%,
+    var(--color-end) 100%
   );
 
   /* ⚽️ Kártyák, panelek */
-  --color-surface: #1f1a35; /* enyhén világosabb háttér a kártyákhoz */
+  --color-surface: #1f1a35;
+  --color-panel-bg: #1c1b29;
+  --color-panel-header-bg: #2a2543;
   --color-surface-hover: #292347;
 
   /* 🔠 Szövegek */
-  --color-text-primary: #000000;
+  --color-text-primary: #fffcff;
   --color-text-secondary: #b6b1d4;
   --color-text-muted: #807a9b;
 
@@ -30,10 +37,23 @@
 
   /* ⚫️ Elválasztók, kontúrok */
   --color-border: #2a2543;
+
+  /* Gombok */
+  --color-button-bg: #35b67f;
+  --color-button-light: #156f69;
+  --color-button-bg-hover: #2ea36a;
+  --color-button-secondary-bg: #6b4bff;
+  --color-button-secondary-bg-hover: #5a3eda;
 }
 
 @layer base {
+  html {
+    background: var(--color-bg-gradient);
+    background-attachment: fixed;
+  }
+
   body {
     font-family: var(--font-family-poppins);
+    color: var(--color-text-primary);
   }
 }
