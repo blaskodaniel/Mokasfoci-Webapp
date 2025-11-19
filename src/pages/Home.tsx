@@ -1,3 +1,5 @@
+import MatchInLine from "@/components/MatchInLine";
+import MatchWithBets from "@/components/MatchWithBets";
 import Panel from "@/components/Panel";
 import { useUpcomingMatches, useRecentMatches } from "@/hooks/api/useMatches";
 import { useTopScorers } from "@/hooks/api/usePlayers";
@@ -16,7 +18,7 @@ const HomePage = () => {
     data: recentMatches,
     isLoading: recentLoading,
     error: recentError,
-  } = useRecentMatches();
+  } = useRecentMatches(5);
 
   const {
     data: topScorers,
@@ -34,9 +36,7 @@ const HomePage = () => {
         {upcomingMatches && upcomingMatches.length > 0 && (
           <div className="p-1">
             {upcomingMatches.map((match: Match) => (
-              <div key={match._id} className="mb-2">
-                {match.teamA?.name} vs {match.teamB?.name}
-              </div>
+              <MatchInLine key={match._id} match={match} />
             ))}
           </div>
         )}
@@ -70,12 +70,9 @@ const HomePage = () => {
           <div className="p-4 text-red-500">Error loading results</div>
         )}
         {recentMatches && recentMatches.length > 0 && (
-          <div className="p-4">
+          <div className="p-2">
             {recentMatches.slice(0, 5).map((match: Match) => (
-              <div key={match._id} className="mb-2">
-                {match.teamA?.name} {match.goalA || 0} - {match.goalB || 0}{" "}
-                {match.teamB?.name}
-              </div>
+              <MatchWithBets key={match._id} match={match} />
             ))}
           </div>
         )}

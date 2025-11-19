@@ -22,10 +22,10 @@ export const useUpcomingMatches = (limit?: number) => {
 };
 
 // Recent matches hook
-export const useRecentMatches = () => {
+export const useRecentMatches = (limit?: number) => {
   return useQuery<Match[]>({
     queryKey: matchesKeys.recent(),
-    queryFn: () => Api.getRecentMatches(),
+    queryFn: () => Api.getUpcomingMatches({ limit }),
     staleTime: 2 * 60 * 1000, // 2 perc (gyakrabban frissül)
     retry: 2,
   });
