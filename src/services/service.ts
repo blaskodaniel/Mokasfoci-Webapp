@@ -50,14 +50,19 @@ const Api = {
     const validParams = new URLSearchParams({
       ...(params.limit ? { limit: params.limit.toString() } : {}),
     });
-    const response = await axiosInstance.get(`/match/all`, {
+    const response = await axiosInstance.get(`/match/upcoming`, {
       params: validParams,
     });
     return response.data;
   },
 
-  async getRecentMatches(): Promise<Match[]> {
-    const response = await axiosInstance.get(`/matches/recent`);
+  async getRecentMatches(params: { limit?: number }): Promise<Match[]> {
+    const validParams = new URLSearchParams({
+      ...(params.limit ? { limit: params.limit.toString() } : {}),
+    });
+    const response = await axiosInstance.get(`/match/recent`, {
+      params: validParams,
+    });
     return response.data;
   },
 

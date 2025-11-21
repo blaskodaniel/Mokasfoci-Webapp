@@ -1,3 +1,4 @@
+import { APP_CONFIG } from "@/config";
 import type { Match } from "@/models/match.type";
 import { MatchStatus } from "@/utils/enums";
 
@@ -8,14 +9,14 @@ interface MatchRowProps {
 const MatchInLine = ({ match }: MatchRowProps) => {
   return (
     <div
-      className="mb-2 flex justify-center items-center gap-2 p-1 
-    rounded-lg border border-primary bg-tertiary/30"
+      className="mb-1 flex justify-center items-center gap-2 p-1 
+    rounded-md bg-quaternary"
     >
       <div className="flex items-center gap-2">
         <span className="text-sm">{match.teamA?.name}</span>
         {match.teamA?.flag && (
           <img
-            src={`/src/assets/flags/${match.teamA.flag}`}
+            src={`${APP_CONFIG.FLAG_PATH}${match.teamA.flag}`}
             alt={`${match.teamA.name} flag`}
             className="w-5 h-5 object-cover rounded-full"
           />
@@ -37,7 +38,7 @@ const MatchInLine = ({ match }: MatchRowProps) => {
       <div className="flex items-center gap-2">
         {match.teamB?.flag && (
           <img
-            src={`/src/assets/flags/${match.teamB.flag}`}
+            src={`${APP_CONFIG.FLAG_PATH}${match.teamB.flag}`}
             alt={`${match.teamB.name} flag`}
             className="w-5 h-5 object-cover rounded-full"
           />

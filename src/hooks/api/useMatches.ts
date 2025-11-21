@@ -25,18 +25,8 @@ export const useUpcomingMatches = (limit?: number) => {
 export const useRecentMatches = (limit?: number) => {
   return useQuery<Match[]>({
     queryKey: matchesKeys.recent(),
-    queryFn: () => Api.getUpcomingMatches({ limit }),
+    queryFn: () => Api.getRecentMatches({ limit }),
     staleTime: 2 * 60 * 1000, // 2 perc (gyakrabban frissül)
     retry: 2,
-  });
-};
-
-// Team specific matches
-export const useTeamMatches = (teamId: string) => {
-  return useQuery<Match[]>({
-    queryKey: matchesKeys.byTeam(teamId),
-    queryFn: () => Api.getTeamMatches(teamId),
-    enabled: !!teamId, // Csak akkor fut le, ha van teamId
-    staleTime: 5 * 60 * 1000,
   });
 };

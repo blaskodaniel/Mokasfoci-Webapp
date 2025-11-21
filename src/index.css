@@ -56,4 +56,14 @@
     font-family: var(--font-family-poppins);
     color: var(--color-text-primary);
   }
+
+  /* Scrollbar elrejtése */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Safari és Chrome */
+  }
 }

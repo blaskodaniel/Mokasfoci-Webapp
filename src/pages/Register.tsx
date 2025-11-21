@@ -165,7 +165,10 @@ const Register: React.FC = () => {
         {loading && <div className="text-center text-gray-600">Loading...</div>}
       </form>
 
-      <Modal isOpen={isModalOpen} className="min-w-[300px] max-w-md bg-white">
+      <Modal
+        isOpen={isModalOpen}
+        className="min-w-[300px] max-w-md bg-white p-4"
+      >
         <div className="flex flex-col gap-2">
           <div className="flex justify-center">
             <IoIosCheckmarkCircle size={40} className="text-green-700" />

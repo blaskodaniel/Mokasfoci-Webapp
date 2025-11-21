@@ -17,12 +17,11 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
   return (
     <div
-      className={`fixed inset-0 bg-black/80 bg-opacity-10 flex items-center justify-center z-50 ${
-        isOpen ? "block" : "hidden"
-      }`}
+      className={`fixed inset-0 bg-black/80 bg-opacity-10 flex items-start justify-center 
+        pt-0 sm:pt-20 z-50 ${isOpen ? "block" : "hidden"}`}
     >
       <div
-        className={`rounded-lg p-4 shadow-lg relative flex flex-col ${className}`}
+        className={`shadow-lg relative flex flex-col w-full h-full sm:h-auto sm:rounded-lg ${className}`}
       >
         {(onClose || title) && (
           <div
@@ -33,7 +32,7 @@ const Modal: React.FC<ModalProps> = ({
             {title && <h2 className="text-lg font-semibold">{title}</h2>}
             {onClose && (
               <IoCloseOutline
-                color="black"
+                color="white"
                 size={20}
                 onClick={onClose}
                 className="text-gray-600 hover:text-gray-800 cursor-pointer"

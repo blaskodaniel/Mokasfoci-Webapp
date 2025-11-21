@@ -1,4 +1,6 @@
+import { APP_CONFIG } from "@/config";
 import type { Match } from "@/models/match.type";
+import { MatchOutcome, MatchStatus } from "@/utils/enums";
 import { useCallback } from "react";
 
 interface MatchWithBetsProps {
@@ -6,37 +8,37 @@ interface MatchWithBetsProps {
 }
 
 const MatchWithBets = ({ match }: MatchWithBetsProps) => {
-  const isTeamAWin = match.goalA! > match.goalB!;
-  const isTeamBWin = match.goalB! > match.goalA!;
-  const isDraw = match.goalA! === match.goalB!;
+  const isTeamAWin = match.outcome === MatchOutcome.home;
+  const isTeamBWin = match.outcome === MatchOutcome.away;
+  const isDraw = match.outcome === MatchOutcome.draw;
+  const isFinished = match.status === MatchStatus.finished;
 
   const getTeamColor = useCallback(
-    (teamType: string) => {
-      if (!match.goalA || !match.goalB) return "text-white";
-      if (teamType === "A") {
-        if (match.goalA > match.goalB) return "text-white";
-        if (match.goalA < match.goalB) return "text-gray-400";
-      } else {
-        if (match.goalB > match.goalA) return "text-white";
-        if (match.goalB < match.goalA) return "text-gray-400";
-      }
-      return "text-white";
+    (teamType: "A" | "B") => {
+      if (!isFinished) return "text-white";
+
+      const isWinner =
+        (teamType === "A" && isTeamAWin) ||
+        (teamType === "B" && isTeamBWin) ||
+        isDraw;
+
+      return isWinner ? "text-white" : "text-gray-400";
     },
-    [match.goalA, match.goalB]
+    [isFinished, isTeamAWin, isTeamBWin, isDraw]
   );
 
   return (
     <div
-      className="flex justify-between items-center px-2 py-1 border border-primary rounded-lg 
-    mb-2 bg-tertiary/30"
+      className="flex justify-between items-center px-3 py-1 rounded-lg 
+    mb-1 bg-quaternary hover:bg-quaternary/70 transition-colors"
     >
       <div className="flex-1 flex gap-2 flex-col">
         <div className="flex items-center gap-2">
           {match.teamA?.flag && (
             <img
-              src={`/src/assets/flags/${match.teamA.flag}`}
+              src={`${APP_CONFIG.FLAG_PATH}${match.teamA.flag}`}
               alt={`${match.teamA.name} flag`}
-              className="w-5 h-5 object-cover rounded-full"
+              className="w-4 h-4 object-cover rounded-full"
             />
           )}
           <span className={`text-sm ${getTeamColor("A")}`}>
@@ -46,9 +48,9 @@ const MatchWithBets = ({ match }: MatchWithBetsProps) => {
         <div className="flex items-center gap-2">
           {match.teamB?.flag && (
             <img
-              src={`/src/assets/flags/${match.teamB.flag}`}
+              src={`${APP_CONFIG.FLAG_PATH}${match.teamB.flag}`}
               alt={`${match.teamB.name} flag`}
-              className="w-5 h-5 object-cover rounded-full"
+              className="w-4 h-4 object-cover rounded-full"
             />
           )}
           <span className={`text-sm ${getTeamColor("B")}`}>
@@ -64,15 +66,29 @@ const MatchWithBets = ({ match }: MatchWithBetsProps) => {
         <div className="flex flex-col items-center text-xs text-gray-400 gap-0.5">
           <div
             className={`${
-              isTeamAWin ? "bg-white text-black" : "text-gray-400"
+              isFinished && isTeamAWin
+                ? "text-white font-semibold"
+                : "text-gray-400"
             }`}
           >
             {match.oddsAwin}
           </div>
-          <div className={`${isDraw ? "text-white" : "text-gray-400"}`}>
+          <div
+            className={`${
+              isFinished && isDraw
+                ? "text-white font-semibold"
+                : "text-gray-400"
+            }`}
+          >
             {match.oddsDraw}
           </div>
-          <div className={`${isTeamBWin ? "text-white" : "text-gray-400"}`}>
+          <div
+            className={`${
+              isFinished && isTeamBWin
+                ? "text-white font-semibold"
+                : "text-gray-400"
+            }`}
+          >
             {match.oddsBwin}
           </div>
         </div>
