@@ -2,6 +2,8 @@ import type { Match } from "@/models/match.type";
 import type { User } from "../models/user.type";
 import { axiosInstance } from "./axiosConfig";
 import type { SignInResponse } from "./types";
+import type { MatchOutcome } from "@/utils/enums";
+import type { Bet } from "@/models/bet.type";
 
 const Api = {
   async login(username: string, password: string): Promise<SignInResponse> {
@@ -86,6 +88,34 @@ const Api = {
 
   async getTeamPlayers(teamId: string): Promise<User[]> {
     const response = await axiosInstance.get(`/teams/${teamId}/players`);
+    return response.data;
+  },
+
+  async createBet(
+    matchId: string,
+    amount: number,
+    predictedWinner: MatchOutcome
+  ): Promise<{ success: boolean }> {
+    const response = await axiosInstance.post(`/user/bets`, {
+      matchId,
+      amount,
+      outcome: predictedWinner,
+    });
+    return response.data;
+  },
+
+  async getUserBets(): Promise<Bet[]> {
+    const response = await axiosInstance.get(`/user/mybets`);
+    return response.data;
+  },
+
+  async deleteBet(betId: string): Promise<{ success: boolean }> {
+    const response = await axiosInstance.delete(`/bets/${betId}`);
+    return response.data;
+  },
+
+  async updateBet(betId: string, data: Partial<Bet>): Promise<Bet> {
+    const response = await axiosInstance.patch(`/bets/${betId}`, data);
     return response.data;
   },
 };

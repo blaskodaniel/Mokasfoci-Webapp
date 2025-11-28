@@ -1,9 +1,11 @@
-import { useState, type FC } from "react";
+import { useMemo, useState, useEffect, type FC } from "react";
 import Button from "../Button";
 import Modal from "../Modal";
 import WheelPicker from "../WheelPicker";
 import type { Match } from "@/models/match.type";
 import { APP_CONFIG } from "@/config";
+import Api from "@/services/service";
+import { MatchOutcome } from "@/utils/enums";
 
 interface CreateBetModalDesktopProps {
   isModalOpen: boolean;
@@ -16,13 +18,44 @@ const CreateBetModalDesktop: FC<CreateBetModalDesktopProps> = ({
   setIsModalOpen,
   selectedMatch,
 }) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [betValue, setBetValue] = useState<number>(1000);
-  const [selectedTeamId, setSelectedTeamId] = useState<string>("");
+  const [selectedOutcome, setSelectedOutcome] = useState<MatchOutcome | null>(
+    null
+  );
+
+  // Reset state values minden modal megnyitáskor
+  useEffect(() => {
+    if (isModalOpen) {
+      setBetValue(1000);
+      setSelectedOutcome(null);
+    }
+  }, [isModalOpen]);
+
+  const isValidBet = useMemo(
+    () => betValue > 0 && selectedOutcome !== null,
+    [betValue, selectedOutcome]
+  );
 
   if (!selectedMatch) return null;
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
+    if (!selectedOutcome) return;
+
     setIsModalOpen(false);
+    try {
+      setIsLoading(true);
+      console.log({
+        selectedMatchId: selectedMatch._id,
+        betValue,
+        selectedOutcome,
+      });
+      await Api.createBet(selectedMatch._id, betValue, selectedOutcome);
+    } catch (error: unknown) {
+      console.error("Error creating bet:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -59,10 +92,10 @@ const CreateBetModalDesktop: FC<CreateBetModalDesktopProps> = ({
 
         <div className="flex justify-center items-center gap-3 sm:gap-8">
           <div
-            onClick={() => setSelectedTeamId(selectedMatch.teamA?._id || "")}
+            onClick={() => setSelectedOutcome(MatchOutcome.home)}
             className={`px-3 py-1 rounded-md border text-center text-sm font-medium w-min-20 
               cursor-pointer transition-colors duration-300 ${
-                selectedTeamId === selectedMatch.teamA?._id
+                selectedOutcome === MatchOutcome.home
                   ? "bg-button-light text-white border-primary"
                   : "border-gray-300/20 hover:bg-primary/20"
               }`}
@@ -70,10 +103,10 @@ const CreateBetModalDesktop: FC<CreateBetModalDesktopProps> = ({
             {selectedMatch.teamA?.name}
           </div>
           <div
-            onClick={() => setSelectedTeamId("draw")}
+            onClick={() => setSelectedOutcome(MatchOutcome.draw)}
             className={`px-3 py-1 rounded-md border text-center text-sm font-medium w-min-20 
               cursor-pointer transition-colors duration-300 ${
-                selectedTeamId === "draw"
+                selectedOutcome === MatchOutcome.draw
                   ? "bg-button-light text-white border-primary"
                   : "border-gray-300/20 hover:bg-primary/20"
               }`}
@@ -81,10 +114,10 @@ const CreateBetModalDesktop: FC<CreateBetModalDesktopProps> = ({
             döntetlen
           </div>
           <div
-            onClick={() => setSelectedTeamId(selectedMatch.teamB?._id || "")}
+            onClick={() => setSelectedOutcome(MatchOutcome.away)}
             className={`px-3 py-1 rounded-md border text-center text-sm font-medium w-min-20 
               cursor-pointer transition-colors duration-300 ${
-                selectedTeamId === selectedMatch.teamB?._id
+                selectedOutcome === MatchOutcome.away
                   ? "bg-button-light text-white border-primary"
                   : "border-gray-300/20 hover:bg-primary/20"
               }`}
@@ -113,6 +146,8 @@ const CreateBetModalDesktop: FC<CreateBetModalDesktopProps> = ({
             text={`Fogadás ${betValue > 0 ? `- ${betValue} pont` : ""}`}
             onClick={onSubmit}
             className="bg-green-600 hover:bg-green-700 w-full py-3 sm:py-2"
+            disabled={!isValidBet || isLoading}
+            loading={isLoading}
           />
         </div>
       </div>

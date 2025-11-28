@@ -18,8 +18,8 @@ const useMenu = () => {
       },
       {
         name: "Profilom",
-        link: "/profil",
-        isActive: location.pathname === "/profil",
+        link: "/profilom",
+        isActive: location.pathname === "/profilom",
       },
     ],
     [location.pathname]

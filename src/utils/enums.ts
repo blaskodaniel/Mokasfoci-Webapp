@@ -21,3 +21,16 @@ export enum MatchType {
   GroupStageRound2 = "GroupStageRound2",
   GroupStageRound3 = "GroupStageRound3",
 }
+
+export enum CouponStatus {
+  inactive = "inactive",
+  active = "active",
+  closed = "closed",
+  inprogress = "inprogress",
+  processed = "processed",
+}
+
+export enum CouponType {
+  outcomeBet = "outcomeBet",
+  notBetFine = "notBetFine",
+}

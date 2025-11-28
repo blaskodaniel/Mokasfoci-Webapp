@@ -9,6 +9,8 @@ import ResetPassword from "@/pages/ResetPassword";
 import { ProtectedLayout } from "./ProtectedLayout";
 import { useAxiosInterceptor } from "./hooks/useAxiosInterceptor";
 import PublicRoute from "./PublicLayout";
+import MyBetsPage from "./pages/MyBets";
+import MyProfilePage from "./pages/MyProfile";
 
 function App() {
   useAxiosInterceptor();
@@ -27,6 +29,8 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="fooldal" />} />
           <Route path="fooldal" element={<HomePage />} />
+          <Route path="fogadasaim" element={<MyBetsPage />} />
+          <Route path="profilom" element={<MyProfilePage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Route>
