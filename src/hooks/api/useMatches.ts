@@ -10,6 +10,15 @@ export const matchesKeys = {
   byTeam: (teamId: string) => [...matchesKeys.all, "team", teamId] as const,
 };
 
+export const useAllMatches = () => {
+  return useQuery<Match[]>({
+    queryKey: matchesKeys.all,
+    queryFn: () => Api.getAllMatches(),
+    staleTime: 10 * 60 * 1000, // 10 perc
+    retry: 2,
+  });
+};
+
 // Upcoming matches hook
 export const useUpcomingMatches = (limit?: number) => {
   return useQuery<Match[]>({

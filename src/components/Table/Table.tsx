@@ -140,6 +140,8 @@ const Table = <T extends Record<string, unknown>>({
             <div
               key={column.key}
               className={`flex items-center gap-1 text-sm font-medium ${
+                column.className
+              } ${
                 column.sortable
                   ? "cursor-pointer hover:text-button-bg-hover transition-colors"
                   : ""
@@ -167,7 +169,7 @@ const Table = <T extends Record<string, unknown>>({
       </div>
 
       {/* Body */}
-      <div className="relative divide-y divide-primary/20 min-h-[100px]">
+      <div className="relative divide-y divide-primary/20 min-h-[50px]">
         {loading && (
           <div className="absolute inset-0 bg-black/50 pt-10 divide-y text-center text-white">
             <Loader text="Táblázat betöltése..." />
@@ -181,6 +183,7 @@ const Table = <T extends Record<string, unknown>>({
             {!loading && emptyMessage}
           </div>
         ) : (
+          !error &&
           currentData.map((item, index) => (
             <div
               key={index}

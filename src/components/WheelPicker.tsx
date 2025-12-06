@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState, useCallback, useMemo } from "react";
 
 // Timeout típus deklaráció
 declare global {
@@ -9,7 +9,6 @@ declare global {
 
 interface WheelPickerProps {
   values: number[];
-  selectedValue?: number;
   onValueChange: (value: number) => void;
   className?: string;
   defaultValue?: number;
@@ -17,10 +16,9 @@ interface WheelPickerProps {
 
 const WheelPicker = ({
   values,
-  selectedValue,
   onValueChange,
   className,
-  defaultValue,
+  defaultValue = 1000,
 }: WheelPickerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -29,8 +27,7 @@ const WheelPicker = ({
   const itemHeight = 40; // Magasság egy elemnek
   const visibleItems = 5; // Hány elem látható egyszerre
 
-  // Aktuális érték meghatározása (selectedValue vagy defaultValue vagy első elem)
-  const currentValue = selectedValue ?? defaultValue ?? values[0];
+  const currentValue = useMemo(() => defaultValue, [defaultValue]);
   const selectedIndex = values.findIndex((v) => v === currentValue);
 
   const scrollToIndex = (index: number) => {
@@ -50,7 +47,13 @@ const WheelPicker = ({
     const index = Math.round(scrollTop / itemHeight);
     const clampedIndex = Math.max(0, Math.min(index, values.length - 1));
 
+    if (defaultValue !== undefined) {
+      onValueChange(defaultValue);
+      return;
+    }
+
     if (values[clampedIndex] !== currentValue) {
+      console.log("handleScroll:", values[clampedIndex], currentValue);
       onValueChange(values[clampedIndex]);
     }
   };
@@ -183,13 +186,17 @@ const WheelPicker = ({
 
   // Kezdeti pozicionálás - komponens mount-oláskor vagy selectedIndex változásakor
   useEffect(() => {
+    if (defaultValue !== undefined) {
+      onValueChange(defaultValue);
+      return;
+    }
     if (selectedIndex >= 0) {
       // Rögtön az első render után pozicionálunk
       setTimeout(() => {
         scrollToIndex(selectedIndex);
       }, 0);
     }
-  }, [selectedIndex]); // selectedIndex függőség hozzáadva
+  }, [selectedIndex, defaultValue, onValueChange]);
 
   return (
     <div className={`relative ${className}`}>

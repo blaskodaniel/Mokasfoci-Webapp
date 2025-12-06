@@ -1,4 +1,4 @@
-import CreateBetModalDesktop from "@/components/CreateBetModal/Desktop";
+import BetModalDesktop from "@/components/BetModal/Desktop";
 import MatchCard from "@/components/MatchCard";
 import MatchInLine from "@/components/MatchInLine";
 import MatchWithBets from "@/components/MatchWithBets";
@@ -7,11 +7,13 @@ import { useUpcomingMatches, useRecentMatches } from "@/hooks/api/useMatches";
 import { useTopScorers } from "@/hooks/api/usePlayers";
 import type { Match } from "@/models/match.type";
 import type { User } from "@/models/user.type";
+import Api from "@/services/service";
+import type { MatchOutcome } from "@/utils/enums";
 import { useState } from "react";
 
 const HomePage = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     data: upcomingMatches,
@@ -30,6 +32,19 @@ const HomePage = () => {
     isLoading: scorersLoading,
     error: scorersError,
   } = useTopScorers(5);
+
+  const onCreateCoupon = async (betAmount: number, outcome: MatchOutcome) => {
+    if (!selectedMatch) return;
+    try {
+      setIsLoading(true);
+      await Api.createBet(selectedMatch._id, betAmount, outcome);
+      setSelectedMatch(null);
+    } catch (error: unknown) {
+      console.error("Error creating bet:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div>
@@ -104,17 +119,21 @@ const HomePage = () => {
             match={match}
             onClick={() => {
               setSelectedMatch(match);
-              setIsModalOpen(true);
             }}
           />
         ))}
       </section>
 
-      <CreateBetModalDesktop
-        isModalOpen={isModalOpen}
-        setIsModalOpen={setIsModalOpen}
-        selectedMatch={selectedMatch!}
-      />
+      {selectedMatch && (
+        <BetModalDesktop
+          key={selectedMatch._id}
+          match={selectedMatch}
+          isOpen={!!selectedMatch}
+          onClose={() => setSelectedMatch(null)}
+          onSave={onCreateCoupon}
+          loading={isLoading}
+        />
+      )}
     </div>
   );
 };

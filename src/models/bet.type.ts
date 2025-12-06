@@ -6,7 +6,7 @@ export interface Bet {
   _id: string;
   userid: User;
   matchid: Match;
-  bet: number;
+  amount: number;
   odds: number;
   totalWin: number;
   success: boolean;

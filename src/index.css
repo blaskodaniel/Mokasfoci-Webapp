@@ -41,6 +41,7 @@
   /* Gombok */
   --color-button-bg: #35b67f;
   --color-button-light: #156f69;
+  --color-button-light-hover: #1e8e7f;
   --color-button-bg-hover: #2ea36a;
   --color-button-secondary-bg: #6b4bff;
   --color-button-secondary-bg-hover: #5a3eda;
@@ -65,5 +66,12 @@
 
   .scrollbar-hide::-webkit-scrollbar {
     display: none; /* Safari és Chrome */
+  }
+
+  /* Placeholder színek */
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-text-muted); /* #807a9b - szürke */
+    opacity: 1; /* Firefox-hoz */
   }
 }

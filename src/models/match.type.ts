@@ -18,4 +18,5 @@ export interface Match {
   comment?: string | null;
   outcome?: MatchOutcome;
   externalID?: string | null;
+  [key: string]: unknown;
 }

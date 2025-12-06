@@ -110,12 +110,17 @@ const Api = {
   },
 
   async deleteBet(betId: string): Promise<{ success: boolean }> {
-    const response = await axiosInstance.delete(`/bets/${betId}`);
+    const response = await axiosInstance.delete(`/user/bets/${betId}`);
     return response.data;
   },
 
   async updateBet(betId: string, data: Partial<Bet>): Promise<Bet> {
-    const response = await axiosInstance.patch(`/bets/${betId}`, data);
+    const response = await axiosInstance.patch(`/user/bets/${betId}`, data);
+    return response.data;
+  },
+
+  async getAllMatches(): Promise<Match[]> {
+    const response = await axiosInstance.get(`/match/all`);
     return response.data;
   },
 };
