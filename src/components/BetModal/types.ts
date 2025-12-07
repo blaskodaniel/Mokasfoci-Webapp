@@ -4,7 +4,7 @@ import type { MatchOutcome } from "@/utils/enums";
 export interface BetModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (bet: number, outcome: MatchOutcome) => void;
+  onSave: (bet: number, outcome: MatchOutcome, editMode: boolean) => void;
   match: Match;
   loading?: boolean;
   initBetValue?: number;

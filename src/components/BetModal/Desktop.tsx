@@ -114,7 +114,9 @@ const BetModalDesktop: FC<BetModalProps> = ({
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-quaternary sm:relative sm:p-0 sm:bg-transparent sm:mt-6">
           <Button
             text="LÉTREHOZÁS"
-            onClick={() => selectedOutcome && onSave(betValue, selectedOutcome)}
+            onClick={() =>
+              selectedOutcome && onSave(betValue, selectedOutcome, editMode)
+            }
             className="bg-green-600 hover:bg-green-700 w-full py-3 sm:py-2"
             disabled={!isValidBet || loading}
             loading={loading}

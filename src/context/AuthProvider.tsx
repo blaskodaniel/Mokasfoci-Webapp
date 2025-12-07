@@ -18,11 +18,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const checkUserSession = async () => {
       try {
         // Megpróbáljuk frissíteni a tokent a HttpOnly cookie alapján
-        console.log("Silent Auth az app betöltésekor");
         const response = await Api.refreshToken();
 
         if (response) {
-          console.log("Silent auth sikeres", response);
+          console.log("Silent Auth az app betöltésekor sikeres.", response);
           const { accessToken, user } = response;
           setAuthData(accessToken, user);
         }

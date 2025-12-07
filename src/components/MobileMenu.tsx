@@ -4,6 +4,7 @@ import { IoCloseOutline } from "react-icons/io5";
 import { useAppDispatch } from "@/state/hooks";
 import { logoutAction } from "@/state/authSlice";
 import { HiOutlineLogout } from "react-icons/hi";
+import { useAuth } from "@/hooks/useAuth";
 
 const MobileMenu = ({
   isOpen,
@@ -12,6 +13,7 @@ const MobileMenu = ({
   isOpen: boolean;
   setIsMenuOpen: (isOpen: boolean) => void;
 }) => {
+  const { logout } = useAuth();
   const { menuList } = useMenu();
   const dispatch = useAppDispatch();
 
@@ -66,7 +68,10 @@ const MobileMenu = ({
           <div
             className="text-white font-medium cursor-pointer flex items-center justify-end 
             gap-2 border border-border rounded-md p-2  transition-colors w-full pr-4 mb-1"
-            onClick={() => dispatch(logoutAction())}
+            onClick={() => {
+              dispatch(logoutAction());
+              logout();
+            }}
           >
             <span>Kilépés</span>
             <HiOutlineLogout size={20} />

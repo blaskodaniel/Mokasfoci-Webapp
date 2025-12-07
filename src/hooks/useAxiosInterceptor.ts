@@ -20,12 +20,15 @@ export const useAxiosInterceptor = () => {
 
         // 1. Ellenőrizzük, hogy 401-es hiba-e
         // 2. Ellenőrizzük, hogy ez NEM egy újrapróbálkozás-e (kerüljük a végtelen ciklust)
+        console.log(
+          "Axios interceptor elkapta a hibát:",
+          error.response?.status
+        );
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true; // Megjelöljük, hogy ez már újrapróbálkozás lesz
 
           try {
             // 3. Megpróbáljuk frissíteni a tokent
-            console.log("Access token lejárt, próbálkozás frissítéssel...");
             const refreshResponse = await Api.refreshToken();
             const { accessToken, user } = refreshResponse!;
 

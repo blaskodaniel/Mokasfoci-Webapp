@@ -5,6 +5,7 @@ import { HiOutlineLogout, HiOutlineMenuAlt3 } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import useMenu from "@/hooks/useMenu";
 import useResponsive from "@/hooks/useResponsive";
+import { useAuth } from "@/hooks/useAuth";
 
 const Header = ({
   isMenuOpen,
@@ -14,6 +15,7 @@ const Header = ({
   setIsMenuOpen: (isOpen: boolean) => void;
 }) => {
   const { isDesktop } = useResponsive();
+  const { logout } = useAuth();
   const dispatch = useAppDispatch();
   const { menuList } = useMenu();
   const [scrolled, setScrolled] = useState(false);
@@ -55,7 +57,10 @@ const Header = ({
       {isDesktop && (
         <div
           className="text-white cursor-pointer flex items-center gap-2 ml-auto"
-          onClick={() => dispatch(logoutAction())}
+          onClick={() => {
+            dispatch(logoutAction());
+            logout();
+          }}
         >
           <span>Kilépés</span>
           <HiOutlineLogout size={20} />

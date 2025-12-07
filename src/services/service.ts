@@ -39,7 +39,7 @@ const Api = {
   },
 
   async logout(): Promise<void> {
-    await axiosInstance.post(`/logout`, {});
+    await axiosInstance.post(`/auth/logout`, {});
   },
 
   async refreshToken(): Promise<{ accessToken: string; user: User } | null> {
