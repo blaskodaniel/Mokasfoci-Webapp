@@ -123,6 +123,11 @@ const Api = {
     const response = await axiosInstance.get(`/match/all`);
     return response.data;
   },
+
+  async getToplist(): Promise<User[]> {
+    const response = await axiosInstance.get(`/user/toplist`);
+    return response.data;
+  },
 };
 
 export default Api;

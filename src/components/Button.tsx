@@ -2,12 +2,14 @@ import { ImSpinner9 } from "react-icons/im";
 
 const Button = ({
   text,
+  subText,
   onClick,
   className,
   disabled,
   loading,
 }: {
   text: string;
+  subText?: string;
   onClick: () => void;
   className?: string;
   disabled?: boolean;
@@ -27,7 +29,10 @@ const Button = ({
           Mentés...
         </div>
       ) : (
-        <span>{text}</span>
+        <div className="flex flex-col items-center text-white">
+          <span className="text-md font-semibold">{text}</span>
+          {subText && <span className="text-xs font-normal">{subText}</span>}
+        </div>
       )}
     </button>
   );

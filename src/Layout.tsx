@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import MobileMenu from "@/components/MobileMenu";
 import useResponsive from "./hooks/useResponsive";
+import { NotificationContainer } from "./components/Notification";
 
 const Layout = () => {
   const { isMobile } = useResponsive();
@@ -30,6 +31,7 @@ const Layout = () => {
           </div>
 
           {/* Modals */}
+          <NotificationContainer />
         </div>
       </div>
 

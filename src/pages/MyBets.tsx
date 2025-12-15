@@ -1,7 +1,7 @@
 import BetModalDesktop from "@/components/BetModal/Desktop";
 import Table from "@/components/Table/Table";
 import type { Column } from "@/components/Table/types";
-import { useMyBets } from "@/hooks/api/usePlayers";
+import { useMyBets, useDeleteBet, useUpdateBet } from "@/hooks/api/usePlayers";
 import type { Bet } from "@/models/bet.type";
 import type { Match } from "@/models/match.type";
 import { getCouponStatusInfo, potentialWinnings } from "@/utils/common";
@@ -9,11 +9,11 @@ import { MatchOutcome } from "@/utils/enums";
 import { useEffect, useState } from "react";
 import { MdEdit } from "react-icons/md";
 import { IoTrashOutline } from "react-icons/io5";
-import Api from "@/services/service";
 import ConfirmModal from "@/components/ConfirmModal";
+import { useNotification } from "@/hooks/useNotification";
 
 const MyBetsPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const { showSuccess, showError } = useNotification();
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [selectedBet, setSelectedBet] = useState<Bet | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -25,41 +25,51 @@ const MyBetsPage = () => {
     refetch: refetchMyBets,
   } = useMyBets();
 
+  const deleteBetMutation = useDeleteBet();
+  const updateBetMutation = useUpdateBet();
+
   const handleEditRow = (coupon: Bet) => {
     setSelectedMatch(coupon.matchid);
     setSelectedBet(coupon);
   };
 
-  const handleDeleteRow = async (coupon: Bet) => {
-    try {
-      setIsLoading(true);
-      await Api.deleteBet(coupon._id);
-      refetchMyBets();
-      setIsConfirmModalOpen(false);
-      setSelectedBet(null);
-    } catch (error: unknown) {
-      console.error("Error deleting bet:", error);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleDeleteRow = (coupon: Bet) => {
+    deleteBetMutation.mutate(coupon._id, {
+      onSuccess: () => {
+        setIsConfirmModalOpen(false);
+        setSelectedBet(null);
+      },
+      onError: (error) => {
+        console.error("Error deleting bet:", error);
+      },
+    });
   };
 
   const onEditCoupon = async (betAmount: number, outcome: MatchOutcome) => {
     if (!selectedBet) return;
-    try {
-      setIsLoading(true);
-      await Api.updateBet(selectedBet._id, {
-        amount: betAmount,
-        outcome,
-      });
-      refetchMyBets();
-      setSelectedMatch(null);
-      setSelectedBet(null);
-    } catch (error: unknown) {
-      console.error("Error editing coupon:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    updateBetMutation.mutate(
+      {
+        betId: selectedBet._id,
+        data: {
+          amount: betAmount,
+          outcome: outcome,
+        },
+      },
+      {
+        onSuccess: () => {
+          refetchMyBets();
+          setSelectedMatch(null);
+          setSelectedBet(null);
+          setIsConfirmModalOpen(false);
+
+          showSuccess("A fogadás sikeresen frissítve lett.");
+        },
+        onError: (error) => {
+          console.error("Error updating bet:", error);
+          showError("A fogadás frissítése sikertelen volt.");
+        },
+      }
+    );
   };
 
   useEffect(() => {
@@ -166,7 +176,7 @@ const MyBetsPage = () => {
           pageSize={10}
           emptyMessage="Még nincsenek fogadásaid"
           className="mt-4"
-          loading={myBetsLoading}
+          loading={myBetsLoading || deleteBetMutation.isPending}
           error={
             myBetsError?.message &&
             "Valami hiba történt, kérlek próbáld újra később."
@@ -184,7 +194,7 @@ const MyBetsPage = () => {
           initBetValue={selectedBet ? selectedBet.amount : 1000}
           initSelectedOutcome={selectedBet ? selectedBet.outcome : undefined}
           editMode
-          loading={isLoading}
+          loading={updateBetMutation.isPending}
         />
       )}
 

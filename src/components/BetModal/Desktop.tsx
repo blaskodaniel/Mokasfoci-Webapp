@@ -5,6 +5,7 @@ import WheelPicker from "../WheelPicker";
 import { APP_CONFIG } from "@/config";
 import { MatchOutcome } from "@/utils/enums";
 import type { BetModalProps } from "./types";
+import { useAppSelector } from "@/state/hooks";
 
 const BetModalDesktop: FC<BetModalProps> = ({
   isOpen,
@@ -16,15 +17,28 @@ const BetModalDesktop: FC<BetModalProps> = ({
   initSelectedOutcome,
   editMode = false,
 }) => {
+  const { currentUser } = useAppSelector((state) => state.auth);
   const [betValue, setBetValue] = useState<number>(initBetValue);
   const [selectedOutcome, setSelectedOutcome] = useState<MatchOutcome | null>(
     initSelectedOutcome || null
   );
 
+  const userScore = useMemo(() => {
+    return currentUser ? currentUser.data.availableScore : 0;
+  }, [currentUser]);
+
   const isValidBet = useMemo(
     () => betValue > 0 && selectedOutcome !== null,
     [betValue, selectedOutcome]
   );
+
+  const subText = useMemo(() => {
+    if (editMode) return "";
+    if (userScore < 99) {
+      return "Nincs elég pontod a fogadáshoz";
+    }
+    return `Elérhető pontjaid: ${userScore}`;
+  }, [userScore, editMode]);
 
   if (!match) return null;
 
@@ -113,12 +127,17 @@ const BetModalDesktop: FC<BetModalProps> = ({
         {/* Mobile: Sticky button at bottom, Desktop: Regular button */}
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-quaternary sm:relative sm:p-0 sm:bg-transparent sm:mt-6">
           <Button
-            text="LÉTREHOZÁS"
+            text={editMode ? "Mentés" : "LÉTREHOZÁS"}
+            subText={subText}
             onClick={() =>
               selectedOutcome && onSave(betValue, selectedOutcome, editMode)
             }
-            className="bg-green-600 hover:bg-green-700 w-full py-3 sm:py-2"
-            disabled={!isValidBet || loading}
+            className={`${
+              editMode
+                ? "bg-blue-600 hover:bg-blue-700"
+                : "bg-green-600 hover:bg-green-700"
+            } w-full py-3 sm:py-2`}
+            disabled={!isValidBet || loading || (userScore < 99 && !editMode)}
             loading={loading}
           />
         </div>

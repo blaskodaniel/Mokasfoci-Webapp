@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import BG from "../assets/img/login_bg.jpg";
-import { useAppSelector } from "../state/hooks";
+import { useAppDispatch, useAppSelector } from "../state/hooks";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Api from "@/services/service";
+import { getMeAction } from "@/state/authSlice";
 
 const Login: React.FC = () => {
   const { login } = useAuth();
+  const dispatch = useAppDispatch();
   const { isLoading } = useAppSelector((state) => state.auth);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -15,6 +17,7 @@ const Login: React.FC = () => {
     e.preventDefault();
     const response = await Api.login(username, password);
     login(response.token, response.user);
+    dispatch(getMeAction());
   };
 
   return (

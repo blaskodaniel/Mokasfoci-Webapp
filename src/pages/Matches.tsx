@@ -1,15 +1,22 @@
 import BetModalDesktop from "@/components/BetModal/Desktop";
 import Table from "@/components/Table/Table";
 import type { Column } from "@/components/Table/types";
-import { useMyBets } from "@/hooks/api/usePlayers";
+import { useMyBets, useUpdateBet, useCreateBet } from "@/hooks/api/usePlayers";
 import type { Bet } from "@/models/bet.type";
 import type { Match } from "@/models/match.type";
-import { getMatchStatusInfo, potentialWinnings } from "@/utils/common";
+import {
+  getMatchStatusInfo,
+  outcomeText,
+  potentialWinnings,
+} from "@/utils/common";
 import { MatchOutcome } from "@/utils/enums";
 import { useEffect, useState, useMemo } from "react";
-import Api from "@/services/service";
 import { useAllMatches } from "@/hooks/api/useMatches";
 import { format } from "date-fns";
+import { useAppSelector } from "@/state/hooks";
+import { useNotification } from "@/hooks/useNotification";
+import { ApiError } from "@/utils/apiError";
+import { AxiosError } from "axios";
 
 // Extended Match type a user bet-tel
 type MatchWithUserBet = Match & {
@@ -17,7 +24,8 @@ type MatchWithUserBet = Match & {
 };
 
 const MatchesPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const { showSuccess, showError } = useNotification();
+  const { currentUser } = useAppSelector((state) => state.auth);
   const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(
     null
   );
@@ -33,8 +41,10 @@ const MatchesPage = () => {
     data: myBets,
     isLoading: myBetsLoading,
     error: myBetsError,
-    refetch: refetchMyBets,
   } = useMyBets();
+
+  const updateBetMutation = useUpdateBet();
+  const createBetMutation = useCreateBet();
 
   // Matches és myBets összevonása
   const matchesWithBets = useMemo((): MatchWithUserBet[] => {
@@ -51,33 +61,60 @@ const MatchesPage = () => {
     });
   }, [matches, myBets]);
 
-  const onSubmitCoupon = async (
+  const onSubmitCoupon = (
     betAmount: number,
     outcome: MatchOutcome,
     editMode: boolean
   ) => {
     if (!selectedMatch) return;
-    try {
-      setIsLoading(true);
-      if (editMode && selectedMatch.userbet) {
-        await Api.updateBet(selectedMatch.userbet!._id, {
-          amount: betAmount,
-          outcome: outcome,
-        });
-      } else {
-        await Api.createBet(selectedMatch._id, betAmount, outcome);
-      }
-      setSelectedMatch(null);
-      await refreshData();
-    } catch (error: unknown) {
-      console.error("Error creating bet:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  const refreshData = async () => {
-    await Promise.all([refetchMatches(), refetchMyBets()]);
+    if (editMode && selectedMatch.userbet) {
+      updateBetMutation.mutate(
+        {
+          betId: selectedMatch.userbet._id,
+          data: {
+            amount: betAmount,
+            outcome: outcome,
+          },
+        },
+        {
+          onSuccess: () => {
+            setSelectedMatch(null);
+            showSuccess("A fogadás sikeresen frissítve lett.");
+          },
+          onError: (error) => {
+            console.error("Error updating bet:", error);
+            showError("A fogadás frissítése sikertelen volt.");
+          },
+        }
+      );
+    } else {
+      createBetMutation.mutate(
+        {
+          matchId: selectedMatch._id,
+          betAmount,
+          outcome,
+        },
+        {
+          onSuccess: () => {
+            setSelectedMatch(null);
+            showSuccess("A fogadás sikeresen létrehozva lett.");
+          },
+          onError: (error) => {
+            if (error instanceof AxiosError && error.status === 400) {
+              if (
+                error.response?.data.msg === "Don't have enough score to bet"
+              ) {
+                showError("Nincs elég pontod a fogadás létrehozásához.");
+                return;
+              }
+            }
+            console.error("Error creating bet:", error);
+            showError("A fogadás létrehozása sikertelen volt.");
+          },
+        }
+      );
+    }
   };
 
   useEffect(() => {
@@ -151,16 +188,12 @@ const MatchesPage = () => {
         }
 
         const bet = match.userbet;
-        const outcomeText =
-          bet.outcome === MatchOutcome.home
-            ? match.teamA?.name
-            : bet.outcome === MatchOutcome.away
-            ? match.teamB?.name
-            : "Döntetlen";
 
         return (
           <div className="flex flex-col">
-            <span className="text-xs text-blue-400">{outcomeText}</span>
+            <span className="text-xs text-blue-400">
+              {outcomeText(bet, match)}
+            </span>
             <span className="text-xs text-gray-400">
               Tét: {bet.amount} pont
             </span>
@@ -197,15 +230,15 @@ const MatchesPage = () => {
             >
               Fogadás módosítása
             </div>
-          ) : (
+          ) : currentUser && currentUser?.data.availableScore > 99 ? (
             <div
               onClick={() => setSelectedMatch(match)}
               className="px-2 py-1 rounded-md text-center bg-button-light
                hover:bg-button-light-hover cursor-pointer text-xs"
             >
-              Fogadok a mérkőzásre
+              Fogadok a mérkőzésre
             </div>
-          )}
+          ) : null}
         </div>
       ),
       width: "w-24",
@@ -221,7 +254,12 @@ const MatchesPage = () => {
           pageSize={10}
           emptyMessage="Még nincsenek mérkőzések"
           className="mt-4"
-          loading={matchesLoading || myBetsLoading}
+          loading={
+            matchesLoading ||
+            myBetsLoading ||
+            updateBetMutation.isPending ||
+            createBetMutation.isPending
+          }
           error={
             (matchesError?.message || myBetsError?.message) &&
             "Valami hiba történt, kérlek próbáld újra később."
@@ -236,7 +274,7 @@ const MatchesPage = () => {
           isOpen={!!selectedMatch}
           onClose={() => setSelectedMatch(null)}
           onSave={onSubmitCoupon}
-          loading={isLoading}
+          loading={updateBetMutation.isPending || createBetMutation.isPending}
           editMode={!!selectedMatch.userbet}
           initBetValue={selectedMatch.userbet?.amount}
           initSelectedOutcome={selectedMatch.userbet?.outcome}

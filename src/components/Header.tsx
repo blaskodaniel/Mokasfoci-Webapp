@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { logoutAction } from "../state/authSlice";
-import { useAppDispatch } from "../state/hooks";
+import { useAppDispatch, useAppSelector } from "../state/hooks";
 import { HiOutlineLogout, HiOutlineMenuAlt3 } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import useMenu from "@/hooks/useMenu";
 import useResponsive from "@/hooks/useResponsive";
 import { useAuth } from "@/hooks/useAuth";
+import { formatPoints } from "@/utils/common";
 
 const Header = ({
   isMenuOpen,
@@ -18,6 +19,7 @@ const Header = ({
   const { logout } = useAuth();
   const dispatch = useAppDispatch();
   const { menuList } = useMenu();
+  const { currentUser } = useAppSelector((state) => state.auth);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -55,15 +57,21 @@ const Header = ({
         onClick={() => setIsMenuOpen(!isMenuOpen)}
       />
       {isDesktop && (
-        <div
-          className="text-white cursor-pointer flex items-center gap-2 ml-auto"
-          onClick={() => {
-            dispatch(logoutAction());
-            logout();
-          }}
-        >
-          <span>Kilépés</span>
-          <HiOutlineLogout size={20} />
+        <div className="flex items-center gap-2 ml-auto">
+          <div className="text-white px-3 py-1 rounded-full font-bold text-sm">
+            💰 {formatPoints(currentUser?.data.availableScore || 0)}
+          </div>
+          <div className="text-gray-400">|</div>
+          <div
+            className="text-white cursor-pointer flex items-center gap-1 hover:text-yellow-300 transition-colors"
+            onClick={() => {
+              dispatch(logoutAction());
+              logout();
+            }}
+          >
+            <span>Kilépés</span>
+            <HiOutlineLogout size={20} />
+          </div>
         </div>
       )}
     </div>

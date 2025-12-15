@@ -74,4 +74,18 @@
     color: var(--color-text-muted); /* #807a9b - szürke */
     opacity: 1; /* Firefox-hoz */
   }
+
+  /* Progress bar animation for notifications */
+  @keyframes progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .animate-progress {
+    animation: progress linear forwards;
+  }
 }

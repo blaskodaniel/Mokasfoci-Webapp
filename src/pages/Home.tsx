@@ -4,14 +4,17 @@ import MatchInLine from "@/components/MatchInLine";
 import MatchWithBets from "@/components/MatchWithBets";
 import Panel from "@/components/Panel";
 import { useUpcomingMatches, useRecentMatches } from "@/hooks/api/useMatches";
-import { useTopScorers } from "@/hooks/api/usePlayers";
+import { useToplist } from "@/hooks/api/usePlayers";
 import type { Match } from "@/models/match.type";
 import type { User } from "@/models/user.type";
 import Api from "@/services/service";
+import { getMeAction } from "@/state/authSlice";
+import { useAppDispatch } from "@/state/hooks";
 import type { MatchOutcome } from "@/utils/enums";
 import { useState } from "react";
 
 const HomePage = () => {
+  const dispatch = useAppDispatch();
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -28,16 +31,17 @@ const HomePage = () => {
   } = useRecentMatches(5);
 
   const {
-    data: topScorers,
-    isLoading: scorersLoading,
-    error: scorersError,
-  } = useTopScorers(5);
+    data: toplist,
+    isLoading: toplistLoading,
+    error: toplistError,
+  } = useToplist();
 
   const onCreateCoupon = async (betAmount: number, outcome: MatchOutcome) => {
     if (!selectedMatch) return;
     try {
       setIsLoading(true);
       await Api.createBet(selectedMatch._id, betAmount, outcome);
+      dispatch(getMeAction());
       setSelectedMatch(null);
     } catch (error: unknown) {
       console.error("Error creating bet:", error);
@@ -76,19 +80,37 @@ const HomePage = () => {
         <Panel
           title="Top 5 játékos"
           className="flex-1"
-          loading={scorersLoading}
+          loading={toplistLoading}
           error={
-            scorersError?.message ? "Error loading top scorers" : undefined
+            toplistError?.message ? "Error loading top scorers" : undefined
           }
         >
-          {topScorers && topScorers.length > 0 && (
-            <div className="p-4">
-              {topScorers.map((player: User, index: number) => (
+          {toplist && toplist.length > 0 && (
+            <div className="px-4 py-2">
+              <div className="flex justify-between text-xs mb-2">
+                <div className="flex gap-2">
+                  <div>#</div>
+                  <div>Játékos</div>
+                </div>
+                <div className="flex gap-4">
+                  <div>Elérhető</div>
+                  <div>Nyeremény</div>
+                </div>
+              </div>
+              {toplist.slice(0, 5).map((player: User, index: number) => (
                 <div key={player._id} className="mb-2 flex justify-between">
-                  <span>
-                    {index + 1}. {player.name}
-                  </span>
-                  <span>2500 pont</span>
+                  <div className="flex gap-2">
+                    <div>{index + 1}</div>
+                    <div>{player.username}</div>
+                  </div>
+                  <div className="flex gap-4">
+                    <div className="w-16 text-right">
+                      {player.data.availableScore}
+                    </div>
+                    <div className="w-16 text-right">
+                      {player.data.profitScore}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

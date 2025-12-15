@@ -3,12 +3,15 @@ import { setAuthToken } from "@/services/axiosConfig";
 import Api from "@/services/service";
 import React, { useState, useEffect, type ReactNode } from "react";
 import AuthContext from "./AuthContext";
+import { useAppDispatch } from "@/state/hooks";
+import { setCurrentUser } from "@/state/authSlice";
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const dispatch = useAppDispatch();
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true); // App betöltés jelző
@@ -24,6 +27,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           console.log("Silent Auth az app betöltésekor sikeres.", response);
           const { accessToken, user } = response;
           setAuthData(accessToken, user);
+          dispatch(setCurrentUser(user));
         }
       } catch (error: unknown) {
         // Ha hibát kap (pl. 401), az azt jelenti, nincs érvényes session
@@ -35,7 +39,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     checkUserSession();
-  }, []);
+  }, [dispatch]);
 
   // Segédfüggvény az állapot és az Axios header beállítására
   const setAuthData = (token: string | null, user: User | null) => {

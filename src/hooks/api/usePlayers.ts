@@ -2,19 +2,22 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Api from "@/services/service";
 import type { User } from "@/models/user.type";
 import type { Bet } from "@/models/bet.type";
+import { useAppDispatch } from "@/state/hooks";
+import { getMeAction } from "@/state/authSlice";
+import { MatchOutcome } from "@/utils/enums";
 
 // Players query keys
 export const playersKeys = {
   all: ["players"] as const,
-  topScorers: () => [...playersKeys.all, "top-scorers"] as const,
+  toplist: () => [...playersKeys.all, "toplist"] as const,
   myBets: () => [...playersKeys.all, "my-bets"] as const,
 };
 
-// Top scorers hook
-export const useTopScorers = (limit = 10) => {
+// Toplist hook
+export const useToplist = () => {
   return useQuery<User[]>({
-    queryKey: [...playersKeys.topScorers(), limit],
-    queryFn: () => Api.getTopScorers(limit),
+    queryKey: [...playersKeys.toplist()],
+    queryFn: () => Api.getToplist(),
     staleTime: 15 * 60 * 1000, // 15 perc (ritkábban változik)
     retry: 2,
   });
@@ -32,19 +35,49 @@ export const useMyBets = () => {
 
 export const useDeleteBet = () => {
   const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
+
   return useMutation({
     mutationFn: (betId: string) => Api.deleteBet(betId),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: playersKeys.myBets() }),
+    onSuccess: () => {
+      // React Query cache invalidation
+      queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
+      dispatch(getMeAction());
+    },
   });
 };
 
 export const useUpdateBet = () => {
   const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
+
   return useMutation({
     mutationFn: ({ betId, data }: { betId: string; data: Partial<Bet> }) =>
       Api.updateBet(betId, data),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: playersKeys.myBets() }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
+      dispatch(getMeAction());
+    },
+  });
+};
+
+export const useCreateBet = () => {
+  const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
+
+  return useMutation({
+    mutationFn: ({
+      matchId,
+      betAmount,
+      outcome,
+    }: {
+      matchId: string;
+      betAmount: number;
+      outcome: MatchOutcome;
+    }) => Api.createBet(matchId, betAmount, outcome),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
+      dispatch(getMeAction());
+    },
   });
 };

@@ -1,7 +1,7 @@
 export class ApiError extends Error {
-  status: boolean;
+  status: number;
 
-  constructor(message: string, status: boolean) {
+  constructor(message: string, status: number) {
     super(message);
     this.status = status;
     this.name = "ApiError";

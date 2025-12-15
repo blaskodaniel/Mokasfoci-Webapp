@@ -53,6 +53,9 @@ export const authSlice = createSlice({
       // If yes, we should try to validate it with the server
       state.isInitialized = tokenUtils.hasTokenMarker();
     },
+    setCurrentUser: (state, action) => {
+      state.currentUser = action.payload;
+    },
   },
   extraReducers: (builder) => {
     /* loginAction */
@@ -75,7 +78,7 @@ export const authSlice = createSlice({
     /* getMeAction */
     builder.addCase(getMeAction.fulfilled, (state, action) => {
       state.currentUser = action.payload;
-      state.isInitialized = true;
+      // state.isInitialized = true;
       state.isLoading = false;
       state.error = undefined;
     });
@@ -85,10 +88,10 @@ export const authSlice = createSlice({
     });
     builder.addCase(getMeAction.rejected, (state, action) => {
       state.currentUser = undefined;
-      state.isInitialized = true;
+      // state.isInitialized = true;
       state.isLoading = false;
       state.error = action.error.message;
-      tokenUtils.removeTokenMarker();
+      // tokenUtils.removeTokenMarker();
     });
 
     /* logoutAction */
@@ -109,7 +112,7 @@ export const authSlice = createSlice({
   },
 });
 
-export const { resetError, clearAuth, initializeFromStorage } =
+export const { resetError, clearAuth, initializeFromStorage, setCurrentUser } =
   authSlice.actions;
 
 // Selectors

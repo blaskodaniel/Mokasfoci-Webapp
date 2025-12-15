@@ -12,6 +12,7 @@ import PublicRoute from "./PublicLayout";
 import MyBetsPage from "./pages/MyBets";
 import MyProfilePage from "./pages/MyProfile";
 import MatchesPage from "./pages/Matches";
+import ToplistPage from "./pages/Toplist";
 
 function App() {
   useAxiosInterceptor();
@@ -33,6 +34,7 @@ function App() {
           <Route path="fogadasaim" element={<MyBetsPage />} />
           <Route path="profilom" element={<MyProfilePage />} />
           <Route path="merkozesek" element={<MatchesPage />} />
+          <Route path="toplista" element={<ToplistPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Route>

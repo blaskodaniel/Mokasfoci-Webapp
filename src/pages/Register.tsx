@@ -180,7 +180,11 @@ const Register: React.FC = () => {
             Most már bejelentkezhetsz.
           </div>
           <div className="flex justify-center">
-            <Button text="Bejelentkezés" onClick={() => navigate("/login")} />
+            <Button
+              className="bg-button-bg px-4 py-2 rounded hover:bg-primary-700 transition"
+              text="Bejelentkezés"
+              onClick={() => navigate("/login")}
+            />
           </div>
         </div>
       </Modal>
