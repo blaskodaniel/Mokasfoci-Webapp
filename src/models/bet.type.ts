@@ -14,5 +14,6 @@ export interface Bet {
   outcome: MatchOutcome;
   date: string;
   type: CouponType;
+  isFavoriteTeam: boolean;
   [key: string]: unknown;
 }

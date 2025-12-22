@@ -13,6 +13,8 @@ import MyBetsPage from "./pages/MyBets";
 import MyProfilePage from "./pages/MyProfile";
 import MatchesPage from "./pages/Matches";
 import ToplistPage from "./pages/Toplist";
+import MatchDetailPage from "./pages/MatchDetail";
+import MyTransactions from "./pages/MyTransactions";
 
 function App() {
   useAxiosInterceptor();
@@ -34,7 +36,10 @@ function App() {
           <Route path="fogadasaim" element={<MyBetsPage />} />
           <Route path="profilom" element={<MyProfilePage />} />
           <Route path="merkozesek" element={<MatchesPage />} />
+          <Route path="merkozesek/:id" element={<MatchDetailPage />} />
           <Route path="toplista" element={<ToplistPage />} />
+          <Route path="transactions" element={<MyTransactions />} />
+
           <Route path="*" element={<NotFound />} />
         </Route>
       </Route>

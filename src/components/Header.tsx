@@ -58,9 +58,15 @@ const Header = ({
       />
       {isDesktop && (
         <div className="flex items-center gap-2 ml-auto">
-          <div className="text-white px-3 py-1 rounded-full font-bold text-sm">
-            💰 {formatPoints(currentUser?.data.availableScore || 0)}
+          <div className="flex flex-col items-end">
+            <div className="text-xs text-right px-3">
+              {currentUser?.username}
+            </div>
+            <div className={`text-white px-3 rounded-full font-bold text-sm`}>
+              💰 {formatPoints(currentUser?.data.availableScore || 0)}
+            </div>
           </div>
+
           <div className="text-gray-400">|</div>
           <div
             className="text-white cursor-pointer flex items-center gap-1 hover:text-yellow-300 transition-colors"
@@ -69,7 +75,7 @@ const Header = ({
               logout();
             }}
           >
-            <span>Kilépés</span>
+            <span></span>
             <HiOutlineLogout size={20} />
           </div>
         </div>

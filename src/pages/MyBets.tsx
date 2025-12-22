@@ -5,12 +5,13 @@ import { useMyBets, useDeleteBet, useUpdateBet } from "@/hooks/api/usePlayers";
 import type { Bet } from "@/models/bet.type";
 import type { Match } from "@/models/match.type";
 import { getCouponStatusInfo, potentialWinnings } from "@/utils/common";
-import { MatchOutcome } from "@/utils/enums";
+import { CouponStatus, MatchOutcome, MatchStatus } from "@/utils/enums";
 import { useEffect, useState } from "react";
-import { MdEdit } from "react-icons/md";
+import { MdEdit, MdOutlinePriceCheck } from "react-icons/md";
 import { IoTrashOutline } from "react-icons/io5";
 import ConfirmModal from "@/components/ConfirmModal";
 import { useNotification } from "@/hooks/useNotification";
+import { Link } from "react-router-dom";
 
 const MyBetsPage = () => {
   const { showSuccess, showError } = useNotification();
@@ -80,13 +81,26 @@ const MyBetsPage = () => {
     {
       header: "Mérkőzés",
       key: "match",
-      render: (bet) => (
-        <span className="font-semibold">
-          {bet?.matchid?.teamA?.name || ""} - {bet.matchid?.teamB?.name || ""}
-        </span>
-      ),
+      render: (bet) => {
+        const canViewDetails = bet.matchid?.status !== MatchStatus.enabled;
+        const matchName = `${bet.matchid?.teamA?.name || ""} - ${
+          bet.matchid?.teamB?.name || ""
+        }`;
+
+        if (canViewDetails)
+          return (
+            <Link
+              to={`/merkozesek/${bet.matchid?._id}`}
+              className="font-semibold text-amber-400 hover:underline"
+            >
+              {matchName}
+            </Link>
+          );
+
+        return <span className="font-semibold">{matchName}</span>;
+      },
       sortable: true,
-      // width: "w-48",
+      width: "w-48",
     },
     {
       header: "Kimenetel",
@@ -121,9 +135,30 @@ const MyBetsPage = () => {
         <span
           className={`${
             getCouponStatusInfo(bet.status).color
-          } px-2 py-1 rounded text-xs`}
+          } px-2 py-1 rounded text-xs ${
+            getCouponStatusInfo(bet.status).className
+          }`}
         >
           {getCouponStatusInfo(bet.status).text}
+        </span>
+      ),
+      sortable: true,
+      width: "w-24",
+    },
+    {
+      header: "Eredmény",
+      key: "result",
+      render: (bet) => (
+        <span className="text-gray-400">
+          {bet.status === CouponStatus.closed && bet.success === true ? (
+            <div className="flex items-center gap-2 text-green-600">
+              Nyert <MdOutlinePriceCheck className="text-green-600" size={20} />
+            </div>
+          ) : bet.status === CouponStatus.closed && bet.success === false ? (
+            <span className="text-red-400">Vesztett</span>
+          ) : (
+            "-"
+          )}
         </span>
       ),
       sortable: true,
@@ -133,34 +168,60 @@ const MyBetsPage = () => {
       header: "Nyeremény",
       key: "custom_key",
       valueBySort: (bet) => potentialWinnings(bet.amount, bet.odds),
-      render: (bet) => (
-        <span className="text-gray-400">
-          {potentialWinnings(bet.amount, bet.odds)}
-        </span>
-      ),
+      render: (bet) => {
+        const shouldShowPotentialWinnings =
+          bet.status === CouponStatus.active ||
+          (bet.status === CouponStatus.closed && bet.success);
+
+        return (
+          <span className="text-gray-400">
+            {shouldShowPotentialWinnings
+              ? potentialWinnings(bet.amount, bet.odds)
+              : 0}
+          </span>
+        );
+      },
+      sortable: true,
+      width: "w-24",
+    },
+    {
+      header: "Profit",
+      key: "profit",
+      render: (bet) => {
+        if (bet.status === CouponStatus.closed && bet.success) {
+          return (
+            <span className="text-green-600">
+              {potentialWinnings(bet.amount, bet.odds) - bet.amount}
+            </span>
+          );
+        } else {
+          return <span className="text-gray-400">0</span>;
+        }
+      },
       sortable: true,
       width: "w-24",
     },
     {
       header: "",
       key: "actions",
-      render: (coupon) => (
-        <div className="flex gap-4">
-          <MdEdit
-            className="cursor-pointer"
-            size={15}
-            onClick={() => handleEditRow(coupon)}
-          />
-          <IoTrashOutline
-            className="cursor-pointer text-red-500"
-            size={15}
-            onClick={() => {
-              setSelectedBet(coupon);
-              setIsConfirmModalOpen(true);
-            }}
-          />
-        </div>
-      ),
+      render: (coupon) =>
+        coupon.status === CouponStatus.active ? (
+          <div className="flex gap-4">
+            <MdEdit
+              className="cursor-pointer"
+              size={15}
+              onClick={() => handleEditRow(coupon)}
+            />
+            <IoTrashOutline
+              className="cursor-pointer text-red-500"
+              size={15}
+              onClick={() => {
+                setSelectedBet(coupon);
+                setIsConfirmModalOpen(true);
+              }}
+            />
+          </div>
+        ) : null,
       sortable: false,
       width: "w-24",
       className: "justify-center",

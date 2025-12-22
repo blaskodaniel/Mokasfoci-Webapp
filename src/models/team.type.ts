@@ -1,6 +1,6 @@
 export interface Team {
   _id: string;
-  name?: string | null;
+  name: string;
   flag?: string | null;
   win?: number | null;
   draw?: number | null;

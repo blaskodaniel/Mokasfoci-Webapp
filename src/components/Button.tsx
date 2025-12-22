@@ -7,20 +7,24 @@ const Button = ({
   className,
   disabled,
   loading,
+  type = "button",
+  icon,
 }: {
   text: string;
   subText?: string;
-  onClick: () => void;
+  onClick?: () => void;
   className?: string;
   disabled?: boolean;
   loading?: boolean;
+  type?: "button" | "submit" | "reset";
+  icon?: React.ReactNode;
 }) => {
   return (
     <button
-      type="submit"
+      type={type}
       className={`font-semibold rounded 
        transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
-      onClick={onClick}
+      onClick={() => onClick?.()}
       disabled={disabled || loading}
     >
       {loading ? (
@@ -30,7 +34,10 @@ const Button = ({
         </div>
       ) : (
         <div className="flex flex-col items-center text-white">
-          <span className="text-md font-semibold">{text}</span>
+          <div className="flex items-center gap-1">
+            {icon && <span>{icon}</span>}
+            <span className="text-md font-semibold">{text}</span>
+          </div>
           {subText && <span className="text-xs font-normal">{subText}</span>}
         </div>
       )}

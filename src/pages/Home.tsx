@@ -1,28 +1,41 @@
 import BetModalDesktop from "@/components/BetModal/Desktop";
 import MatchCard from "@/components/MatchCard";
-import MatchInLine from "@/components/MatchInLine";
 import MatchWithBets from "@/components/MatchWithBets";
 import Panel from "@/components/Panel";
-import { useUpcomingMatches, useRecentMatches } from "@/hooks/api/useMatches";
-import { useToplist } from "@/hooks/api/usePlayers";
+import {
+  useUpcomingMatches,
+  useRecentMatches,
+  matchesKeys,
+} from "@/hooks/api/useMatches";
+import { useToplist, playersKeys } from "@/hooks/api/usePlayers";
 import type { Match } from "@/models/match.type";
 import type { User } from "@/models/user.type";
 import Api from "@/services/service";
 import { getMeAction } from "@/state/authSlice";
 import { useAppDispatch } from "@/state/hooks";
 import type { MatchOutcome } from "@/utils/enums";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 
 const HomePage = () => {
   const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Frissítjük az összes query-t amikor a komponens mount-olódik
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: matchesKeys.upcoming() });
+    queryClient.invalidateQueries({ queryKey: matchesKeys.recent() });
+    queryClient.invalidateQueries({ queryKey: playersKeys.toplist() });
+  }, [queryClient]);
 
   const {
     data: upcomingMatches,
     isLoading: upcomingLoading,
     error: upcomingError,
-  } = useUpcomingMatches(5);
+  } = useUpcomingMatches(3);
 
   const {
     data: recentMatches,
@@ -66,7 +79,7 @@ const HomePage = () => {
           {upcomingMatches && upcomingMatches.length > 0 && (
             <div className="p-1">
               {upcomingMatches.map((match: Match) => (
-                <MatchInLine key={match._id} match={match} />
+                <MatchWithBets key={match._id} match={match} />
               ))}
             </div>
           )}
@@ -97,11 +110,14 @@ const HomePage = () => {
                   <div>Nyeremény</div>
                 </div>
               </div>
+              <hr className="my-2 border-gray-700" />
               {toplist.slice(0, 5).map((player: User, index: number) => (
-                <div key={player._id} className="mb-2 flex justify-between">
-                  <div className="flex gap-2">
-                    <div>{index + 1}</div>
-                    <div>{player.username}</div>
+                <div key={player._id} className="flex justify-between">
+                  <div className="flex gap-2 items-center">
+                    <div className="bg-black/20 text-xs rounded-full px-1.5 py-1">
+                      {index + 1}.
+                    </div>
+                    <div className="text-yellow-300">{player.username}</div>
                   </div>
                   <div className="flex gap-4">
                     <div className="w-16 text-right">
@@ -128,7 +144,13 @@ const HomePage = () => {
           {recentMatches && recentMatches.length > 0 && (
             <div className="p-2">
               {recentMatches.slice(0, 5).map((match: Match) => (
-                <MatchWithBets key={match._id} match={match} />
+                <Link
+                  to={`/merkozesek/${match._id}`}
+                  key={match._id}
+                  className="block mb-2 last:mb-0"
+                >
+                  <MatchWithBets match={match} />
+                </Link>
               ))}
             </div>
           )}

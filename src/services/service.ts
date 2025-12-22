@@ -1,9 +1,11 @@
-import type { Match } from "@/models/match.type";
+import type { Match, MatchDetail } from "@/models/match.type";
 import type { User } from "../models/user.type";
 import { axiosInstance } from "./axiosConfig";
 import type { SignInResponse } from "./types";
 import type { MatchOutcome } from "@/utils/enums";
 import type { Bet } from "@/models/bet.type";
+import type { Transaction } from "@/models/transaction.type";
+import type { Team } from "@/models/team.type";
 
 const Api = {
   async login(username: string, password: string): Promise<SignInResponse> {
@@ -126,6 +128,21 @@ const Api = {
 
   async getToplist(): Promise<User[]> {
     const response = await axiosInstance.get(`/user/toplist`);
+    return response.data;
+  },
+
+  async getMatchDetails(matchId: string): Promise<MatchDetail> {
+    const response = await axiosInstance.get(`/match/details/${matchId}`);
+    return response.data;
+  },
+
+  async getUserTransactions(): Promise<Transaction[]> {
+    const response = await axiosInstance.get(`/user/mytransactions`);
+    return response.data;
+  },
+
+  async getTeams(): Promise<Team[]> {
+    const response = await axiosInstance.get(`/team/all`);
     return response.data;
   },
 };

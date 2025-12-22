@@ -1,17 +1,23 @@
 import type { Bet } from "@/models/bet.type";
-import { CouponStatus, MatchOutcome, MatchStatus } from "./enums";
+import { CouponStatus, MatchOutcome, MatchStatus, MatchType } from "./enums";
 import type { Match } from "@/models/match.type";
 
 export const getCouponStatusInfo = (
   status: CouponStatus
-): { color: string; text: string } => {
+): { color: string; text: string; className?: string } => {
   switch (status) {
     case CouponStatus.active:
-      return { color: "bg-green-600", text: "Aktív" };
+      return { color: "bg-green-600", text: "Aktív", className: "" };
     case CouponStatus.inactive:
-      return { color: "bg-gray-600", text: "Inaktív" };
+      return { color: "bg-gray-600", text: "Inaktív", className: "" };
+    case CouponStatus.closed:
+      return { color: "bg-gray-600", text: "Lezárva", className: "" };
     case CouponStatus.inprogress:
-      return { color: "bg-red-600", text: "Folyamatban" };
+      return {
+        color: "bg-red-600",
+        text: "Játékban",
+        className: "animate-pulse",
+      };
     default:
       return { color: "bg-yellow-600", text: "Ismeretlen" };
   }
@@ -19,16 +25,41 @@ export const getCouponStatusInfo = (
 
 export const getMatchStatusInfo = (
   status: MatchStatus | null
-): { color: string; text: string } => {
+): { color: string; text: string; className?: string } => {
   switch (status) {
     case MatchStatus.enabled:
-      return { color: "bg-green-600", text: "Aktív" };
-    case MatchStatus.disabled:
-      return { color: "bg-gray-600", text: "Inaktív" };
+      return { color: "", text: "", className: "" };
+    case MatchStatus.finished:
+      return { color: "bg-gray-600", text: "Vége", className: "" };
     case MatchStatus.playing:
-      return { color: "bg-red-600", text: "Folyamatban" };
+      return {
+        color: "bg-red-600",
+        text: "LIVE",
+        className: "animate-pulse text-white",
+      };
     default:
       return { color: "bg-yellow-600", text: "Ismeretlen" };
+  }
+};
+
+export const getMatchTypeText = (type: MatchType): string => {
+  switch (type) {
+    case MatchType.Final:
+      return "Döntő";
+    case MatchType.Semifinal:
+      return "Elődöntő";
+    case MatchType.Quarterfinal:
+      return "Negyedöntő";
+    case MatchType.RoundOf16:
+      return "Nyolcaddöntő";
+    case MatchType.GroupStageRound1:
+      return "Csoportkör 1. forduló";
+    case MatchType.GroupStageRound2:
+      return "Csoportkör 2. forduló";
+    case MatchType.GroupStageRound3:
+      return "Csoportkör 3. forduló";
+    default:
+      return type;
   }
 };
 

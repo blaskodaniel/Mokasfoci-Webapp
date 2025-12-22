@@ -29,13 +29,13 @@ const ToplistPage = () => {
     },
     {
       header: "Elérhető pont",
-      key: "availableScore",
+      key: "data.availableScore",
       render: (user) => <div>{user?.data.availableScore}</div>,
       sortable: true,
     },
     {
       header: "Nyeremény",
-      key: "profitScore",
+      key: "data.profitScore",
       render: (user) => <div>{user?.data.profitScore}</div>,
       sortable: true,
     },

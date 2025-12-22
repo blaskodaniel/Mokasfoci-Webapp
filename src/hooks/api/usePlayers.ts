@@ -5,12 +5,14 @@ import type { Bet } from "@/models/bet.type";
 import { useAppDispatch } from "@/state/hooks";
 import { getMeAction } from "@/state/authSlice";
 import { MatchOutcome } from "@/utils/enums";
+import type { Transaction } from "@/models/transaction.type";
 
 // Players query keys
 export const playersKeys = {
   all: ["players"] as const,
   toplist: () => [...playersKeys.all, "toplist"] as const,
   myBets: () => [...playersKeys.all, "my-bets"] as const,
+  myTransactions: () => [...playersKeys.all, "my-transactions"] as const,
 };
 
 // Toplist hook
@@ -79,5 +81,14 @@ export const useCreateBet = () => {
       queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
       dispatch(getMeAction());
     },
+  });
+};
+
+export const useMyTransactions = () => {
+  return useQuery<Transaction[]>({
+    queryKey: playersKeys.myTransactions(),
+    queryFn: () => Api.getUserTransactions(),
+    staleTime: 15 * 60 * 1000, // 15 perc (ritkábban változik)
+    retry: 2,
   });
 };

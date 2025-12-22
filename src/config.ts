@@ -4,3 +4,17 @@ export const APP_CONFIG = {
 };
 
 export const APP_NAME = "FIFAWorldCup26";
+export const GROUPS = [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+];

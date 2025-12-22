@@ -22,7 +22,6 @@ const MatchCard = ({ match, onClick }: MatchCardProps) => {
               className="w-12 h-12 object-cover rounded-full"
             />
           )}
-          <span className="text-lg">{match.teamA?.name}</span>
         </div>
         <div className="flex-1 justify-center items-center flex flex-col gap-2">
           <div className="flex justify-center items-center text-sm text-gray-400">
@@ -45,7 +44,6 @@ const MatchCard = ({ match, onClick }: MatchCardProps) => {
               className="w-12 h-12 object-cover rounded-full"
             />
           )}
-          <span className="text-lg">{match.teamB?.name}</span>
         </div>
       </div>
     </div>

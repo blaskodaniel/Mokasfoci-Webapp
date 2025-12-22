@@ -6,17 +6,18 @@ import type { Bet } from "@/models/bet.type";
 import type { Match } from "@/models/match.type";
 import {
   getMatchStatusInfo,
+  getMatchTypeText,
   outcomeText,
   potentialWinnings,
 } from "@/utils/common";
-import { MatchOutcome } from "@/utils/enums";
+import { MatchOutcome, MatchStatus } from "@/utils/enums";
 import { useEffect, useState, useMemo } from "react";
 import { useAllMatches } from "@/hooks/api/useMatches";
 import { format } from "date-fns";
 import { useAppSelector } from "@/state/hooks";
 import { useNotification } from "@/hooks/useNotification";
-import { ApiError } from "@/utils/apiError";
 import { AxiosError } from "axios";
+import { Link } from "react-router-dom";
 
 // Extended Match type a user bet-tel
 type MatchWithUserBet = Match & {
@@ -41,6 +42,7 @@ const MatchesPage = () => {
     data: myBets,
     isLoading: myBetsLoading,
     error: myBetsError,
+    refetch: refetchMyBets,
   } = useMyBets();
 
   const updateBetMutation = useUpdateBet();
@@ -119,22 +121,54 @@ const MatchesPage = () => {
 
   useEffect(() => {
     refetchMatches();
-  }, [refetchMatches]);
+    refetchMyBets();
+  }, [refetchMatches, refetchMyBets]);
 
   const columns: Column<MatchWithUserBet>[] = [
     {
       header: "Mérkőzés",
       key: "match",
+      render: (match) => {
+        const matchName = `${match.teamA?.name || ""} - ${
+          match.teamB?.name || ""
+        }`;
+        const canViewDetails = match.status !== MatchStatus.enabled;
+
+        return (
+          <div className="flex flex-col">
+            {canViewDetails ? (
+              <Link
+                to={`/merkozesek/${match._id}`}
+                className="font-semibold text-amber-400 hover:underline"
+              >
+                {matchName}
+              </Link>
+            ) : (
+              <span className="font-semibold text-white">{matchName}</span>
+            )}
+            <span className="text-xs text-gray-500 mt-1">
+              {getMatchTypeText(match.type)}
+            </span>
+          </div>
+        );
+      },
+      sortable: false,
+      width: "w-4xl",
+    },
+    {
+      header: "Eredmény",
+      key: "result",
       render: (match) => (
-        <div className="flex flex-col">
-          <span className="font-semibold">
-            {match?.teamA?.name || ""} - {match.teamB?.name || ""}
-          </span>
-          <span className="text-xs text-gray-500">{match.type}</span>
+        <div className="flex flex-col items-center">
+          <div className="text-sm text-white">
+            {match.status === MatchStatus.finished
+              ? `${match.goalA} - ${match.goalB}`
+              : ""}
+          </div>
         </div>
       ),
-      sortable: true,
-      width: "w-4xl",
+      sortable: false,
+      width: "w-24",
     },
     {
       header: "Státusz",
@@ -143,7 +177,9 @@ const MatchesPage = () => {
         <span
           className={`${
             getMatchStatusInfo(match.status).color
-          } px-2 py-1 rounded text-xs`}
+          } px-2 py-1 rounded text-xs ${
+            getMatchStatusInfo(match.status).className
+          }`}
         >
           {getMatchStatusInfo(match.status).text}
         </span>
@@ -197,9 +233,14 @@ const MatchesPage = () => {
             <span className="text-xs text-gray-400">
               Tét: {bet.amount} pont
             </span>
-            <span className="text-xs text-green-400">
-              Nyeremény: {potentialWinnings(bet.amount, bet.odds)} pont
-            </span>
+            {match.status === MatchStatus.finished && bet.success && (
+              <span className="text-xs text-green-400">
+                Nyeremény:{potentialWinnings(bet.amount, bet.odds)} pont
+              </span>
+            )}
+            {match.status === MatchStatus.finished && !bet.success && (
+              <span className="text-xs text-red-400">Vesztett</span>
+            )}
           </div>
         );
       },
@@ -211,7 +252,7 @@ const MatchesPage = () => {
       key: "date",
       render: (match) => (
         <span className="text-gray-400 text-xs">
-          {match.date && format(new Date(match.date), "yyyy-MM-dd HH:mm")}
+          {match.date && format(new Date(match.date), "MMM dd HH:mm")}
         </span>
       ),
       sortable: true,
@@ -220,27 +261,39 @@ const MatchesPage = () => {
     {
       header: "",
       key: "actions",
-      render: (match) => (
-        <div className="flex gap-2">
-          {match.userbet ? (
+      render: (match) => {
+        const hasUserBet = !!match.userbet;
+        const isMatchEnabled = match.status === MatchStatus.enabled;
+        const hasEnoughScore =
+          currentUser && currentUser.data.availableScore > 99;
+
+        // Ha van fogadás és a mérkőzés aktív
+        if (hasUserBet && isMatchEnabled) {
+          return (
             <div
               onClick={() => setSelectedMatch(match)}
-              className="px-2 py-1 rounded-md text-center text-xs bg-button-secondary-bg
-               text-shadow-button-secondary-bg-hover cursor-pointer"
+              className="px-2 py-1 rounded-md text-center text-xs bg-button-secondary-bg hover:bg-button-secondary-bg-hover cursor-pointer"
             >
               Fogadás módosítása
             </div>
-          ) : currentUser && currentUser?.data.availableScore > 99 ? (
+          );
+        }
+
+        // Ha nincs fogadás, van elég pont és a mérkőzés aktív
+        if (!hasUserBet && hasEnoughScore && isMatchEnabled) {
+          return (
             <div
               onClick={() => setSelectedMatch(match)}
-              className="px-2 py-1 rounded-md text-center bg-button-light
-               hover:bg-button-light-hover cursor-pointer text-xs"
+              className="px-2 py-1 rounded-md text-center bg-button-light hover:bg-button-light-hover cursor-pointer text-xs"
             >
               Fogadok a mérkőzésre
             </div>
-          ) : null}
-        </div>
-      ),
+          );
+        }
+
+        // Minden más esetben üres
+        return null;
+      },
       width: "w-24",
     },
   ];
