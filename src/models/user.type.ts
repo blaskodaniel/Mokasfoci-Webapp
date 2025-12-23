@@ -1,21 +1,20 @@
 import type { UserRole } from "@/state/enums";
-import type { Team } from "./team.type";
 
 interface UserData {
-  teamid: Team;
-  winteamid: Team;
-  A: Team;
-  B: Team;
-  C: Team;
-  D: Team;
-  E: Team;
-  F: Team;
-  G: Team;
-  H: Team;
-  I: Team;
-  J: Team;
-  K: Team;
-  L: Team;
+  teamid: string;
+  winteamid: string;
+  A: string;
+  B: string;
+  C: string;
+  D: string;
+  E: string;
+  F: string;
+  G: string;
+  H: string;
+  I: string;
+  J: string;
+  K: string;
+  L: string;
   profitScore: number;
   availableScore: number;
   notbetcount: number;

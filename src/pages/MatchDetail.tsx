@@ -17,6 +17,7 @@ import Loader from "@/components/Loader";
 import { APP_CONFIG } from "@/config";
 import { format } from "date-fns";
 import { MatchStatus } from "@/utils/enums";
+import UserDisplay from "@/components/UserDisplay";
 
 const MatchDetailPage = () => {
   const { id } = useParams();
@@ -63,9 +64,7 @@ const MatchDetailPage = () => {
       header: "Játékos",
       key: "user",
       render: (bet) => (
-        <span className="font-semibold">
-          {bet.userid?.username || "Ismeretlen játékos"}
-        </span>
+        <UserDisplay user={bet.userid!} showAvatar={true} avatarSize="sm" />
       ),
       sortable: true,
       // width: "w-48",

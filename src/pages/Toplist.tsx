@@ -2,6 +2,7 @@ import Table from "@/components/Table/Table";
 import type { Column } from "@/components/Table/types";
 import { useToplist } from "@/hooks/api/usePlayers";
 import type { User } from "@/models/user.type";
+import UserDisplay from "@/components/UserDisplay";
 
 const ToplistPage = () => {
   const {
@@ -22,7 +23,7 @@ const ToplistPage = () => {
       header: "Játékos",
       key: "username",
       render: (user) => (
-        <div className="font-semibold">{user?.username || ""}</div>
+        <UserDisplay user={user} showAvatar={true} avatarSize="sm" />
       ),
       sortable: true,
       width: "w-40",

@@ -6,6 +6,7 @@ import { useAppDispatch } from "@/state/hooks";
 import { getMeAction } from "@/state/authSlice";
 import { MatchOutcome } from "@/utils/enums";
 import type { Transaction } from "@/models/transaction.type";
+import type { DefaultAvatar, UpdateUserProfileBody } from "@/services/types";
 
 // Players query keys
 export const playersKeys = {
@@ -13,6 +14,7 @@ export const playersKeys = {
   toplist: () => [...playersKeys.all, "toplist"] as const,
   myBets: () => [...playersKeys.all, "my-bets"] as const,
   myTransactions: () => [...playersKeys.all, "my-transactions"] as const,
+  getDefaultAvatars: () => [...playersKeys.all, "default-avatars"] as const,
 };
 
 // Toplist hook
@@ -90,5 +92,55 @@ export const useMyTransactions = () => {
     queryFn: () => Api.getUserTransactions(),
     staleTime: 15 * 60 * 1000, // 15 perc (ritkábban változik)
     retry: 2,
+  });
+};
+
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
+
+  return useMutation({
+    mutationFn: (data: UpdateUserProfileBody) => Api.updateProfile(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: playersKeys.all });
+      dispatch(getMeAction());
+    },
+  });
+};
+
+export const useGetDefaultAvatar = () => {
+  return useQuery<DefaultAvatar[]>({
+    queryKey: playersKeys.getDefaultAvatars(),
+    queryFn: () => Api.getDefaultAvatars(),
+    staleTime: Infinity,
+    retry: 2,
+  });
+};
+
+export const useUploadAvatar = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (formData: FormData) => {
+      return Api.uploadAvatar(formData);
+    },
+    onSuccess: () => {
+      // cache-t invalidáljuk
+      queryClient.invalidateQueries({ queryKey: playersKeys.all });
+    },
+  });
+};
+
+export const useUpdateAvatar = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (avatarFilename: string) => {
+      return Api.updateAvatar(avatarFilename);
+    },
+    onSuccess: () => {
+      // cache-t invalidáljuk
+      queryClient.invalidateQueries({ queryKey: playersKeys.all });
+    },
   });
 };

@@ -1,7 +1,11 @@
 import type { Match, MatchDetail } from "@/models/match.type";
 import type { User } from "../models/user.type";
 import { axiosInstance } from "./axiosConfig";
-import type { SignInResponse } from "./types";
+import type {
+  DefaultAvatar,
+  SignInResponse,
+  UpdateUserProfileBody,
+} from "./types";
 import type { MatchOutcome } from "@/utils/enums";
 import type { Bet } from "@/models/bet.type";
 import type { Transaction } from "@/models/transaction.type";
@@ -143,6 +147,38 @@ const Api = {
 
   async getTeams(): Promise<Team[]> {
     const response = await axiosInstance.get(`/team/all`);
+    return response.data;
+  },
+
+  async updateProfile(
+    data: UpdateUserProfileBody
+  ): Promise<{ success: boolean }> {
+    const response = await axiosInstance.patch(`/user/profile`, data);
+    return response.data;
+  },
+
+  async updateAvatar(
+    avatarFilename: string
+  ): Promise<{ avatar: string; message: string }> {
+    const response = await axiosInstance.patch(`/user/avatar`, {
+      avatarFilename,
+    });
+    return response.data;
+  },
+
+  async uploadAvatar(
+    formData: FormData
+  ): Promise<{ avatar: string; message: string }> {
+    const response = await axiosInstance.post(`/user/avatar/upload`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  },
+
+  async getDefaultAvatars(): Promise<DefaultAvatar[]> {
+    const response = await axiosInstance.get(`/user/avatars/default`);
     return response.data;
   },
 };

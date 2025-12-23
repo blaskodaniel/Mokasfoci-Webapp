@@ -1,7 +1,7 @@
 import Table from "@/components/Table/Table";
 import type { Column } from "@/components/Table/types";
 import { useMyTransactions } from "@/hooks/api/usePlayers";
-
+import { IoArrowBack } from "react-icons/io5";
 import type { Transaction } from "@/models/transaction.type";
 import { useEffect } from "react";
 
@@ -64,7 +64,15 @@ const MyTransactions = () => {
   ];
   return (
     <div>
-      <div className="text-white text-2xl">Tranzakcióim</div>
+      <div className="flex gap-3 items-center">
+        <IoArrowBack
+          size={23}
+          className="cursor-pointer"
+          onClick={() => window.history.back()}
+        />
+        <div className="text-white text-2xl">Tranzakcióim</div>
+      </div>
+
       <section>
         <Table
           data={myTransactions || []}

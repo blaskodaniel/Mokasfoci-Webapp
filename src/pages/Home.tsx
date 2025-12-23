@@ -17,6 +17,7 @@ import type { MatchOutcome } from "@/utils/enums";
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import UserDisplay from "@/components/UserDisplay";
 
 const HomePage = () => {
   const dispatch = useAppDispatch();
@@ -65,7 +66,7 @@ const HomePage = () => {
 
   return (
     <div>
-      <div className="flex flex-col md:flex-row gap-3 px-4">
+      <div className="flex flex-col md:flex-row gap-3 px-1 sm:px-4">
         <Panel
           title="Legközelebbi mérkőzések"
           className="flex-1"
@@ -91,7 +92,7 @@ const HomePage = () => {
         </Panel>
 
         <Panel
-          title="Top 5 játékos"
+          title="Top 3 játékos"
           className="flex-1"
           loading={toplistLoading}
           error={
@@ -111,24 +112,30 @@ const HomePage = () => {
                 </div>
               </div>
               <hr className="my-2 border-gray-700" />
-              {toplist.slice(0, 5).map((player: User, index: number) => (
-                <div key={player._id} className="flex justify-between">
-                  <div className="flex gap-2 items-center">
-                    <div className="bg-black/20 text-xs rounded-full px-1.5 py-1">
-                      {index + 1}.
+              <div className="space-y-3">
+                {toplist.slice(0, 3).map((player: User, index: number) => (
+                  <div key={player._id} className="flex justify-between">
+                    <div className="flex gap-2 items-center">
+                      <div className="bg-black/20 text-xs rounded-full px-1.5 py-1">
+                        {index + 1}.
+                      </div>
+                      <UserDisplay
+                        user={player}
+                        showAvatar={true}
+                        avatarSize="xs"
+                      />
                     </div>
-                    <div className="text-yellow-300">{player.username}</div>
+                    <div className="flex gap-4 items-center">
+                      <div className="w-16 text-right">
+                        {player.data.availableScore}
+                      </div>
+                      <div className="w-16 text-right">
+                        {player.data.profitScore}
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex gap-4">
-                    <div className="w-16 text-right">
-                      {player.data.availableScore}
-                    </div>
-                    <div className="w-16 text-right">
-                      {player.data.profitScore}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
         </Panel>
@@ -156,16 +163,19 @@ const HomePage = () => {
           )}
         </Panel>
       </div>
-      <section className="flex mt-6 px-4 gap-4 flex-wrap">
-        {upcomingMatches?.slice(0, 3).map((match: Match) => (
-          <MatchCard
-            key={match._id}
-            match={match}
-            onClick={() => {
-              setSelectedMatch(match);
-            }}
-          />
-        ))}
+      <section className="px-4 mt-4">
+        <h1 className="text-3xl font-bold text-white">Ajánló</h1>
+        <section className="flex mt-6 px-4 gap-4 flex-wrap">
+          {upcomingMatches?.slice(0, 3).map((match: Match) => (
+            <MatchCard
+              key={match._id}
+              match={match}
+              onClick={() => {
+                setSelectedMatch(match);
+              }}
+            />
+          ))}
+        </section>
       </section>
 
       {selectedMatch && (
