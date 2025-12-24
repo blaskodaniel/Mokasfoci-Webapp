@@ -18,6 +18,7 @@ import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import UserDisplay from "@/components/UserDisplay";
+import { formatPoints } from "@/utils/common";
 
 const HomePage = () => {
   const dispatch = useAppDispatch();
@@ -126,11 +127,11 @@ const HomePage = () => {
                       />
                     </div>
                     <div className="flex gap-4 items-center">
-                      <div className="w-16 text-right">
-                        {player.data.availableScore}
+                      <div className="w-16 text-right text-sm">
+                        {formatPoints(player.data.availableScore, false)}
                       </div>
-                      <div className="w-16 text-right">
-                        {player.data.profitScore}
+                      <div className="w-16 text-right text-sm">
+                        {formatPoints(player.data.profitScore, false)}
                       </div>
                     </div>
                   </div>
@@ -163,8 +164,8 @@ const HomePage = () => {
           )}
         </Panel>
       </div>
-      <section className="px-4 mt-4">
-        <h1 className="text-3xl font-bold text-white">Ajánló</h1>
+      <section className="mt-6">
+        <h1 className="text-2xl font-bold text-white px-4">Kiemelt</h1>
         <section className="flex mt-6 px-4 gap-4 flex-wrap">
           {upcomingMatches?.slice(0, 3).map((match: Match) => (
             <MatchCard
