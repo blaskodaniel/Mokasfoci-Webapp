@@ -35,3 +35,14 @@ export interface DefaultAvatar {
   name: string;
   path: string;
 }
+
+export interface BalanceHistoryEntry {
+  date: string;
+  balance: number;
+}
+
+export interface WinLostStats {
+  won: number;
+  lost: number;
+  winRatePercentage: number;
+}

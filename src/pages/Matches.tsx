@@ -27,9 +27,7 @@ type MatchWithUserBet = Match & {
 const MatchesPage = () => {
   const { showSuccess, showError } = useNotification();
   const { currentUser } = useAppSelector((state) => state.auth);
-  const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(
-    null
-  );
+  const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(null);
 
   const {
     data: matches,
@@ -63,11 +61,7 @@ const MatchesPage = () => {
     });
   }, [matches, myBets]);
 
-  const onSubmitCoupon = (
-    betAmount: number,
-    outcome: MatchOutcome,
-    editMode: boolean
-  ) => {
+  const onSubmitCoupon = (betAmount: number, outcome: MatchOutcome, editMode: boolean) => {
     if (!selectedMatch) return;
 
     if (editMode && selectedMatch.userbet) {
@@ -104,10 +98,11 @@ const MatchesPage = () => {
           },
           onError: (error) => {
             if (error instanceof AxiosError && error.status === 400) {
-              if (
-                error.response?.data.msg === "Don't have enough score to bet"
-              ) {
+              if (error.response?.data.msg === "Don't have enough score to bet") {
                 showError("Nincs elég pontod a fogadás létrehozásához.");
+                return;
+              } else if (error.response?.data.msg === "The match has already started") {
+                showError("A mérkőzés már elkezdődött, nem lehet fogadni rá.");
                 return;
               }
             }
@@ -129,9 +124,7 @@ const MatchesPage = () => {
       header: "Mérkőzés",
       key: "match",
       render: (match) => {
-        const matchName = `${match.teamA?.name || ""} - ${
-          match.teamB?.name || ""
-        }`;
+        const matchName = `${match.teamA?.name || ""} - ${match.teamB?.name || ""}`;
         const canViewDetails = match.status !== MatchStatus.enabled;
 
         return (
@@ -146,9 +139,7 @@ const MatchesPage = () => {
             ) : (
               <span className="font-semibold text-white">{matchName}</span>
             )}
-            <span className="text-xs text-gray-500 mt-1">
-              {getMatchTypeText(match.type)}
-            </span>
+            <span className="text-xs text-gray-500 mt-1">{getMatchTypeText(match.type)}</span>
           </div>
         );
       },
@@ -161,9 +152,7 @@ const MatchesPage = () => {
       render: (match) => (
         <div className="flex flex-col items-center">
           <div className="text-sm text-white">
-            {match.status === MatchStatus.finished
-              ? `${match.goalA} - ${match.goalB}`
-              : ""}
+            {match.status === MatchStatus.finished ? `${match.goalA} - ${match.goalB}` : ""}
           </div>
         </div>
       ),
@@ -175,9 +164,7 @@ const MatchesPage = () => {
       key: "status",
       render: (match) => (
         <span
-          className={`${
-            getMatchStatusInfo(match.status).color
-          } px-2 py-1 rounded text-xs ${
+          className={`${getMatchStatusInfo(match.status).color} px-2 py-1 rounded text-xs ${
             getMatchStatusInfo(match.status).className
           }`}
         >
@@ -191,27 +178,21 @@ const MatchesPage = () => {
     {
       header: "Hazai",
       key: "oddsAwin",
-      render: (match) => (
-        <span className="text-gray-400">{match.oddsAwin}</span>
-      ),
+      render: (match) => <span className="text-gray-400">{match.oddsAwin}</span>,
       sortable: true,
       width: "w-24",
     },
     {
       header: "Döntetlen",
       key: "oddsDraw",
-      render: (match) => (
-        <span className="text-gray-400">{match.oddsDraw}</span>
-      ),
+      render: (match) => <span className="text-gray-400">{match.oddsDraw}</span>,
       sortable: true,
       width: "w-24",
     },
     {
       header: "Vendég",
       key: "oddsBwin",
-      render: (match) => (
-        <span className="text-gray-400">{match.oddsBwin}</span>
-      ),
+      render: (match) => <span className="text-gray-400">{match.oddsBwin}</span>,
       sortable: true,
       width: "w-24",
     },
@@ -227,12 +208,8 @@ const MatchesPage = () => {
 
         return (
           <div className="flex flex-col">
-            <span className="text-xs text-blue-400">
-              {outcomeText(bet, match)}
-            </span>
-            <span className="text-xs text-gray-400">
-              Tét: {bet.amount} pont
-            </span>
+            <span className="text-xs text-blue-400">{outcomeText(bet, match)}</span>
+            <span className="text-xs text-gray-400">Tét: {bet.amount} pont</span>
             {match.status === MatchStatus.finished && bet.success && (
               <span className="text-xs text-green-400">
                 Nyeremény:{potentialWinnings(bet.amount, bet.odds)} pont
@@ -264,8 +241,7 @@ const MatchesPage = () => {
       render: (match) => {
         const hasUserBet = !!match.userbet;
         const isMatchEnabled = match.status === MatchStatus.enabled;
-        const hasEnoughScore =
-          currentUser && currentUser.data.availableScore > 99;
+        const hasEnoughScore = currentUser && currentUser.data.availableScore > 99;
 
         // Ha van fogadás és a mérkőzés aktív
         if (hasUserBet && isMatchEnabled) {

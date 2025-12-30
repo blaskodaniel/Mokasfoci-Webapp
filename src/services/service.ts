@@ -2,9 +2,11 @@ import type { Match, MatchDetail } from "@/models/match.type";
 import type { User } from "../models/user.type";
 import { axiosInstance } from "./axiosConfig";
 import type {
+  BalanceHistoryEntry,
   DefaultAvatar,
   SignInResponse,
   UpdateUserProfileBody,
+  WinLostStats,
 } from "./types";
 import type { MatchOutcome } from "@/utils/enums";
 import type { Bet } from "@/models/bet.type";
@@ -81,9 +83,7 @@ const Api = {
 
   // Players endpoints
   async getTopScorers(limit = 10): Promise<User[]> {
-    const response = await axiosInstance.get(
-      `/players/top-scorers?limit=${limit}`
-    );
+    const response = await axiosInstance.get(`/players/top-scorers?limit=${limit}`);
     return response.data;
   },
 
@@ -150,25 +150,19 @@ const Api = {
     return response.data;
   },
 
-  async updateProfile(
-    data: UpdateUserProfileBody
-  ): Promise<{ success: boolean }> {
+  async updateProfile(data: UpdateUserProfileBody): Promise<{ success: boolean }> {
     const response = await axiosInstance.patch(`/user/profile`, data);
     return response.data;
   },
 
-  async updateAvatar(
-    avatarFilename: string
-  ): Promise<{ avatar: string; message: string }> {
+  async updateAvatar(avatarFilename: string): Promise<{ avatar: string; message: string }> {
     const response = await axiosInstance.patch(`/user/avatar`, {
       avatarFilename,
     });
     return response.data;
   },
 
-  async uploadAvatar(
-    formData: FormData
-  ): Promise<{ avatar: string; message: string }> {
+  async uploadAvatar(formData: FormData): Promise<{ avatar: string; message: string }> {
     const response = await axiosInstance.post(`/user/avatar/upload`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -179,6 +173,21 @@ const Api = {
 
   async getDefaultAvatars(): Promise<DefaultAvatar[]> {
     const response = await axiosInstance.get(`/user/avatars/default`);
+    return response.data;
+  },
+
+  async getBalanceHistory(params: { from?: string; to?: string }): Promise<BalanceHistoryEntry[]> {
+    const response = await axiosInstance.get(`/user/stats/balance-history`, {
+      params: {
+        from: params.from,
+        to: params.to,
+      },
+    });
+    return response.data;
+  },
+
+  async getWinLostStats(): Promise<WinLostStats> {
+    const response = await axiosInstance.get(`/user/stats/win-loss`);
     return response.data;
   },
 };

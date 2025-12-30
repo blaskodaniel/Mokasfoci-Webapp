@@ -2,11 +2,7 @@ import BetModalDesktop from "@/components/BetModal/Desktop";
 import MatchCard from "@/components/MatchCard";
 import MatchWithBets from "@/components/MatchWithBets";
 import Panel from "@/components/Panel";
-import {
-  useUpcomingMatches,
-  useRecentMatches,
-  matchesKeys,
-} from "@/hooks/api/useMatches";
+import { useUpcomingMatches, useRecentMatches, matchesKeys } from "@/hooks/api/useMatches";
 import { useToplist, playersKeys } from "@/hooks/api/usePlayers";
 import type { Match } from "@/models/match.type";
 import type { User } from "@/models/user.type";
@@ -19,6 +15,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import UserDisplay from "@/components/UserDisplay";
 import { formatPoints } from "@/utils/common";
+import BalanceHistoryChart from "@/components/Charts/BalanceHistoryChart";
+import WinLostChart from "@/components/Charts/WinLostChart";
 
 const HomePage = () => {
   const dispatch = useAppDispatch();
@@ -39,17 +37,9 @@ const HomePage = () => {
     error: upcomingError,
   } = useUpcomingMatches(3);
 
-  const {
-    data: recentMatches,
-    isLoading: recentLoading,
-    error: recentError,
-  } = useRecentMatches(5);
+  const { data: recentMatches, isLoading: recentLoading, error: recentError } = useRecentMatches(5);
 
-  const {
-    data: toplist,
-    isLoading: toplistLoading,
-    error: toplistError,
-  } = useToplist();
+  const { data: toplist, isLoading: toplistLoading, error: toplistError } = useToplist();
 
   const onCreateCoupon = async (betAmount: number, outcome: MatchOutcome) => {
     if (!selectedMatch) return;
@@ -72,11 +62,7 @@ const HomePage = () => {
           title="Legközelebbi mérkőzések"
           className="flex-1"
           loading={upcomingLoading}
-          error={
-            upcomingError?.message
-              ? "Error loading upcoming matches"
-              : undefined
-          }
+          error={upcomingError?.message ? "Error loading upcoming matches" : undefined}
         >
           {upcomingMatches && upcomingMatches.length > 0 && (
             <div className="p-1">
@@ -86,9 +72,7 @@ const HomePage = () => {
             </div>
           )}
           {upcomingMatches && upcomingMatches.length === 0 && (
-            <div className="p-4 text-gray-500">
-              Nincsenek közelgő mérkőzések
-            </div>
+            <div className="p-4 text-gray-500">Nincsenek közelgő mérkőzések</div>
           )}
         </Panel>
 
@@ -96,9 +80,7 @@ const HomePage = () => {
           title="Top 3 játékos"
           className="flex-1"
           loading={toplistLoading}
-          error={
-            toplistError?.message ? "Error loading top scorers" : undefined
-          }
+          error={toplistError?.message ? "Error loading top scorers" : undefined}
         >
           {toplist && toplist.length > 0 && (
             <div className="px-4 py-2">
@@ -120,11 +102,7 @@ const HomePage = () => {
                       <div className="bg-black/20 text-xs rounded-full px-1.5 py-1">
                         {index + 1}.
                       </div>
-                      <UserDisplay
-                        user={player}
-                        showAvatar={true}
-                        avatarSize="xs"
-                      />
+                      <UserDisplay user={player} showAvatar={true} avatarSize="xs" />
                     </div>
                     <div className="flex gap-4 items-center">
                       <div className="w-16 text-right text-sm">
@@ -145,9 +123,7 @@ const HomePage = () => {
           title="Legutóbbi eredmények"
           className="flex-1"
           loading={recentLoading}
-          error={
-            recentError?.message ? "Error loading recent results" : undefined
-          }
+          error={recentError?.message ? "Error loading recent results" : undefined}
         >
           {recentMatches && recentMatches.length > 0 && (
             <div className="p-2">
@@ -164,6 +140,16 @@ const HomePage = () => {
           )}
         </Panel>
       </div>
+
+      <div className="flex flex-col sm:flex-row gap-3 pt-8">
+        <div className="flex-1">
+          <BalanceHistoryChart />
+        </div>
+        <div className="flex-1">
+          <WinLostChart />
+        </div>
+      </div>
+
       <section className="mt-6">
         <h1 className="text-2xl font-bold text-white px-4">Kiemelt</h1>
         <section className="flex mt-6 px-4 gap-4 flex-wrap">

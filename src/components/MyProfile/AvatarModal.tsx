@@ -1,8 +1,4 @@
-import {
-  useGetDefaultAvatar,
-  useUpdateAvatar,
-  useUploadAvatar,
-} from "@/hooks/api/usePlayers";
+import { useGetDefaultAvatar, useUpdateAvatar, useUploadAvatar } from "@/hooks/api/usePlayers";
 import Modal from "../Modal";
 import type { DefaultAvatar } from "@/services/types";
 import { APP_CONFIG } from "@/config";
@@ -13,13 +9,7 @@ import { useNotification } from "@/hooks/useNotification";
 import { useAppDispatch } from "@/state/hooks";
 import { getMeAction } from "@/state/authSlice";
 
-const AvatarModal = ({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) => {
+const AvatarModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const { showSuccess, showError } = useNotification();
   const dispatch = useAppDispatch();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -106,6 +96,8 @@ const AvatarModal = ({
     };
   }, [previewImage]);
 
+  console.log(APP_CONFIG);
+
   return (
     <Modal
       isOpen={isOpen}
@@ -169,11 +161,7 @@ const AvatarModal = ({
               {/* Preview image */}
               {previewImage && (
                 <div className="w-16 h-16 rounded-full overflow-hidden">
-                  <img
-                    src={previewImage}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={previewImage} alt="Preview" className="w-full h-full object-cover" />
                 </div>
               )}
             </div>

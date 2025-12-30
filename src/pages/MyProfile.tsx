@@ -106,6 +106,7 @@ const MyProfilePage = () => {
     return teams.map((team) => ({
       value: team._id,
       label: team.name,
+      group: team.groupid.name
     }));
   }, [teams]);
 
@@ -320,7 +321,7 @@ const MyProfilePage = () => {
                 key={group}
                 name={group}
                 control={control}
-                options={teamOptions}
+                options={teamOptions.filter((option) => option.group.toUpperCase() === group.toUpperCase() )}
                 label={`${group} csoport`}
                 placeholder={`${group}`}
                 error={errors[group as keyof ProfileFormData]?.message}

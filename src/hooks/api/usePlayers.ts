@@ -6,7 +6,12 @@ import { useAppDispatch } from "@/state/hooks";
 import { getMeAction } from "@/state/authSlice";
 import { MatchOutcome } from "@/utils/enums";
 import type { Transaction } from "@/models/transaction.type";
-import type { DefaultAvatar, UpdateUserProfileBody } from "@/services/types";
+import type {
+  BalanceHistoryEntry,
+  DefaultAvatar,
+  UpdateUserProfileBody,
+  WinLostStats,
+} from "@/services/types";
 
 // Players query keys
 export const playersKeys = {
@@ -15,6 +20,7 @@ export const playersKeys = {
   myBets: () => [...playersKeys.all, "my-bets"] as const,
   myTransactions: () => [...playersKeys.all, "my-transactions"] as const,
   getDefaultAvatars: () => [...playersKeys.all, "default-avatars"] as const,
+  getBalanceHistory: () => [...playersKeys.all, "balance-history"] as const,
 };
 
 // Toplist hook
@@ -142,5 +148,23 @@ export const useUpdateAvatar = () => {
       // cache-t invalidáljuk
       queryClient.invalidateQueries({ queryKey: playersKeys.all });
     },
+  });
+};
+
+export const useBalanceHistory = (from?: string, to?: string) => {
+  return useQuery<BalanceHistoryEntry[]>({
+    queryKey: playersKeys.getBalanceHistory(),
+    queryFn: () => Api.getBalanceHistory({ from, to }),
+    staleTime: 15 * 60 * 1000, // 15 perc
+    retry: 2,
+  });
+};
+
+export const useWinLostStats = () => {
+  return useQuery<WinLostStats>({
+    queryKey: playersKeys.all,
+    queryFn: () => Api.getWinLostStats(),
+    staleTime: 15 * 60 * 1000, // 15 perc
+    retry: 2,
   });
 };

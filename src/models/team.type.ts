@@ -1,5 +1,8 @@
+import type { Group } from "./group.type";
+
 export interface Team {
   _id: string;
+  groupid: Group
   name: string;
   flag?: string | null;
   win?: number | null;
@@ -9,4 +12,6 @@ export interface Team {
   getgoal?: number | null;
   kickgoal?: number | null;
   active?: boolean | null;
+  isTournamentWinner?: boolean;
+  [key: string]: unknown;
 }
