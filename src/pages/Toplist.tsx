@@ -3,13 +3,14 @@ import type { Column } from "@/components/Table/types";
 import { useToplist } from "@/hooks/api/usePlayers";
 import type { User } from "@/models/user.type";
 import UserDisplay from "@/components/UserDisplay";
+import UserDetailsModal from "@/components/UserDetailsModal";
+import { useState } from "react";
 
 const ToplistPage = () => {
-  const {
-    data: toplist,
-    isLoading: toplistLoading,
-    error: toplistError,
-  } = useToplist();
+  const [isUserDetailsModalOpen, setIsUserDetailsModalOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState("");
+
+  const { data: toplist, isLoading: toplistLoading, error: toplistError } = useToplist();
 
   const columns: Column<User>[] = [
     {
@@ -23,7 +24,15 @@ const ToplistPage = () => {
       header: "Játékos",
       key: "username",
       render: (user) => (
-        <UserDisplay user={user} showAvatar={true} avatarSize="sm" />
+        <UserDisplay
+          user={user}
+          showAvatar={true}
+          avatarSize="sm"
+          onClick={() => {
+            setSelectedUserId(user._id);
+            setIsUserDetailsModalOpen(true);
+          }}
+        />
       ),
       sortable: true,
       width: "w-40",
@@ -52,12 +61,17 @@ const ToplistPage = () => {
           emptyMessage="Még nincsenek mérkőzések"
           className="mt-4"
           loading={toplistLoading}
-          error={
-            toplistError?.message &&
-            "Valami hiba történt, kérlek próbáld újra később."
-          }
+          error={toplistError?.message && "Valami hiba történt, kérlek próbáld újra később."}
         />
       </section>
+
+      {selectedUserId && (
+        <UserDetailsModal
+          isOpen={isUserDetailsModalOpen}
+          onClose={() => setIsUserDetailsModalOpen(false)}
+          userId={selectedUserId}
+        />
+      )}
     </div>
   );
 };

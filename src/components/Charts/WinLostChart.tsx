@@ -30,8 +30,8 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   return null;
 };
 
-export const WinLostChart = () => {
-  const { data, isLoading, isError } = useWinLostStats();
+export const WinLostChart = ({ userId }: { userId?: string }) => {
+  const { data, isLoading, isError } = useWinLostStats(userId);
 
   if (isLoading) {
     return (

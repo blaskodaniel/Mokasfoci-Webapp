@@ -8,13 +8,7 @@ type ModalProps = {
   className?: string;
 };
 
-const Modal: React.FC<ModalProps> = ({
-  isOpen,
-  onClose,
-  title,
-  children,
-  className,
-}) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, className }) => {
   return (
     <div
       className={`fixed inset-0 bg-black/80 bg-opacity-10 flex items-start justify-center 
@@ -23,22 +17,19 @@ const Modal: React.FC<ModalProps> = ({
       <div
         className={`shadow-lg relative flex flex-col w-full h-full sm:h-auto sm:rounded-lg ${className}`}
       >
-        {(onClose || title) && (
-          <div
-            className={`flex ${
-              title ? "justify-between" : "justify-end"
-            } items-center mb-4`}
-          >
+        {title && (
+          <div className={`flex ${title ? "justify-between" : "justify-end"} items-center mb-4`}>
             {title && <h2 className="text-lg font-semibold">{title}</h2>}
-            {onClose && (
-              <IoCloseOutline
-                color="white"
-                size={20}
-                onClick={onClose}
-                className="text-gray-600 hover:text-gray-800 cursor-pointer"
-              />
-            )}
           </div>
+        )}
+
+        {onClose && (
+          <IoCloseOutline
+            color="white"
+            size={20}
+            onClick={onClose}
+            className="absolute top-5 right-5 text-gray-600 hover:text-gray-800 cursor-pointer"
+          />
         )}
 
         <div>{children}</div>

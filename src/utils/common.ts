@@ -7,7 +7,7 @@ export const getCouponStatusInfo = (
 ): { color: string; text: string; className?: string } => {
   switch (status) {
     case CouponStatus.active:
-      return { color: "bg-green-600", text: "Aktív", className: "" };
+      return { color: "bg-green-600", text: "Játékban", className: "" };
     case CouponStatus.inactive:
       return { color: "bg-gray-600", text: "Inaktív", className: "" };
     case CouponStatus.closed:
@@ -71,8 +71,8 @@ export const outcomeText = (bet: Bet, match: Match) =>
   bet.outcome === MatchOutcome.home
     ? match.teamA?.name
     : bet.outcome === MatchOutcome.away
-    ? match.teamB?.name
-    : "Döntetlen";
+      ? match.teamB?.name
+      : "Döntetlen";
 
 /**
  * Formázza a nagy számokat olvashatóbb formátumba

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import BG from "../assets/img/login_bg.jpg";
 import { useAppDispatch, useAppSelector } from "../state/hooks";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,21 +20,16 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div
-      className="min-h-screen flex justify-center bg-cover bg-center px-5"
-      style={{ backgroundImage: `url(${BG})` }}
-    >
+    <div className="min-h-screen flex justify-center bg-cover bg-center px-3 sm:px-5">
       <form
         onSubmit={handleSubmit}
-        className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md flex flex-col gap-6 h-fit mt-20"
+        className="px-4 py-4 sm:p-8 w-full max-w-md flex flex-col gap-6 h-fit mt-20"
       >
+        <h2 className="text-2xl font-bold text-center text-text-primary mb-4">Bejelentkezés</h2>
         {/* <img src={AppLogo} alt="WatchTogether Logo" className="h-25 mx-auto " /> */}
 
         <div className="flex flex-col gap-2">
-          <label
-            htmlFor="username"
-            className="text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="username" className="text-sm font-medium text-white-700">
             Felhasználónév
           </label>
           <input
@@ -44,15 +38,13 @@ const Login: React.FC = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
-            className="text-black border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            className="text-white border border-gray-300/20 rounded px-3 py-2
+            focus:outline-none focus:ring-2 focus:ring-purple-400"
             placeholder="Felhasználónév"
           />
         </div>
         <div className="flex flex-col gap-2">
-          <label
-            htmlFor="password"
-            className="text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="password" className="text-sm font-medium text-white-700">
             Jelszó
           </label>
           <input
@@ -61,23 +53,21 @@ const Login: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="text-black border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            className="text-white border border-gray-300/20 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
             placeholder="Jelszó"
           />
         </div>
         <button
           type="submit"
-          className="bg-purple-600 text-white font-semibold py-2 rounded hover:bg-purple-700 transition"
+          className="bg-button-light text-white font-semibold py-2 rounded hover:bg-button-light-hover 
+          transition cursor-pointer"
         >
           Bejelentkezés
         </button>
-        <Link to="/register" className="text-purple-700 text-center">
+        <Link to="/register" className="text-text-primary text-center">
           Regisztráció
         </Link>
-        <Link
-          to="/forgot-password"
-          className="text-blue-900 text-center text-xs"
-        >
+        <Link to="/forgot-password" className="text-text-muted text-center text-xs">
           Elfelejtettem a jelszavam
         </Link>
         {isLoading && <p>Loading...</p>}

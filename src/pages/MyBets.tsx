@@ -12,8 +12,12 @@ import { IoTrashOutline } from "react-icons/io5";
 import ConfirmModal from "@/components/ConfirmModal";
 import { useNotification } from "@/hooks/useNotification";
 import { Link } from "react-router-dom";
+import { format } from "date-fns";
+import useResponsive from "@/hooks/useResponsive";
+import MyBetsMobileView from "@/components/MyBets/MobileView";
 
 const MyBetsPage = () => {
+  const { isDesktop, isMobile } = useResponsive();
   const { showSuccess, showError } = useNotification();
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [selectedBet, setSelectedBet] = useState<Bet | null>(null);
@@ -83,9 +87,7 @@ const MyBetsPage = () => {
       key: "match",
       render: (bet) => {
         const canViewDetails = bet.matchid?.status !== MatchStatus.enabled;
-        const matchName = `${bet.matchid?.teamA?.name || ""} - ${
-          bet.matchid?.teamB?.name || ""
-        }`;
+        const matchName = `${bet.matchid?.teamA?.name || ""} - ${bet.matchid?.teamB?.name || ""}`;
 
         if (canViewDetails)
           return (
@@ -110,8 +112,8 @@ const MyBetsPage = () => {
           {bet.outcome === MatchOutcome.home
             ? bet?.matchid?.teamA?.name
             : bet.outcome === MatchOutcome.away
-            ? bet?.matchid?.teamB?.name
-            : "Döntetlen"}
+              ? bet?.matchid?.teamB?.name
+              : "Döntetlen"}
         </span>
       ),
       sortable: true,
@@ -133,9 +135,7 @@ const MyBetsPage = () => {
       key: "status",
       render: (bet) => (
         <span
-          className={`${
-            getCouponStatusInfo(bet.status).color
-          } px-2 py-1 rounded text-xs ${
+          className={`${getCouponStatusInfo(bet.status).color} px-2 py-1 rounded text-xs ${
             getCouponStatusInfo(bet.status).className
           }`}
         >
@@ -170,14 +170,11 @@ const MyBetsPage = () => {
       valueBySort: (bet) => potentialWinnings(bet.amount, bet.odds),
       render: (bet) => {
         const shouldShowPotentialWinnings =
-          bet.status === CouponStatus.active ||
-          (bet.status === CouponStatus.closed && bet.success);
+          bet.status === CouponStatus.active || (bet.status === CouponStatus.closed && bet.success);
 
         return (
           <span className="text-gray-400">
-            {shouldShowPotentialWinnings
-              ? potentialWinnings(bet.amount, bet.odds)
-              : 0}
+            {shouldShowPotentialWinnings ? potentialWinnings(bet.amount, bet.odds) : 0}
           </span>
         );
       },
@@ -202,16 +199,23 @@ const MyBetsPage = () => {
       width: "w-24",
     },
     {
+      header: "Létrehozva",
+      key: "date",
+      render: (bet) => (
+        <span className="text-gray-400 text-xs">
+          {bet.date && format(new Date(bet.date), "MMM dd HH:mm")}
+        </span>
+      ),
+      sortable: true,
+      width: "w-32",
+    },
+    {
       header: "",
       key: "actions",
       render: (coupon) =>
         coupon.status === CouponStatus.active ? (
           <div className="flex gap-4">
-            <MdEdit
-              className="cursor-pointer"
-              size={15}
-              onClick={() => handleEditRow(coupon)}
-            />
+            <MdEdit className="cursor-pointer" size={15} onClick={() => handleEditRow(coupon)} />
             <IoTrashOutline
               className="cursor-pointer text-red-500"
               size={15}
@@ -227,23 +231,29 @@ const MyBetsPage = () => {
       className: "justify-center",
     },
   ];
+
   return (
-    <div>
-      <div className="text-white text-2xl">Összess fogadásom</div>
-      <section>
-        <Table
-          data={myBets || []}
-          columns={columns}
-          pageSize={10}
-          emptyMessage="Még nincsenek fogadásaid"
-          className="mt-4"
-          loading={myBetsLoading || deleteBetMutation.isPending}
-          error={
-            myBetsError?.message &&
-            "Valami hiba történt, kérlek próbáld újra később."
-          }
-        />
-      </section>
+    <div className="px-2">
+      <div className="text-white text-2xl">Fogadásaim</div>
+
+      {isDesktop && (
+        <section>
+          <Table
+            data={myBets || []}
+            columns={columns}
+            pageSize={10}
+            emptyMessage="Még nincsenek fogadásaid"
+            className="mt-4"
+            loading={myBetsLoading || deleteBetMutation.isPending}
+            error={myBetsError?.message && "Valami hiba történt, kérlek próbáld újra később."}
+          />
+        </section>
+      )}
+      {isMobile && (
+        <section className="pb-3 pt-2">
+          <MyBetsMobileView bets={myBets || []} onEdit={handleEditRow} onDelete={handleDeleteRow} />
+        </section>
+      )}
 
       {selectedMatch && (
         <BetModalDesktop

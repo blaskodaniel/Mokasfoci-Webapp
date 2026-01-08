@@ -17,6 +17,7 @@ import UserDisplay from "@/components/UserDisplay";
 import { formatPoints } from "@/utils/common";
 import BalanceHistoryChart from "@/components/Charts/BalanceHistoryChart";
 import WinLostChart from "@/components/Charts/WinLostChart";
+import ScoreByMatchChart from "@/components/Charts/ScoreByMatchChart";
 
 const HomePage = () => {
   const dispatch = useAppDispatch();
@@ -61,11 +62,12 @@ const HomePage = () => {
         <Panel
           title="Legközelebbi mérkőzések"
           className="flex-1"
+          wrapperClassName="p-1"
           loading={upcomingLoading}
           error={upcomingError?.message ? "Error loading upcoming matches" : undefined}
         >
           {upcomingMatches && upcomingMatches.length > 0 && (
-            <div className="p-1">
+            <div className="px-1 py-3">
               {upcomingMatches.map((match: Match) => (
                 <MatchWithBets key={match._id} match={match} />
               ))}
@@ -83,7 +85,7 @@ const HomePage = () => {
           error={toplistError?.message ? "Error loading top scorers" : undefined}
         >
           {toplist && toplist.length > 0 && (
-            <div className="px-4 py-2">
+            <div className="px-2 py-4">
               <div className="flex justify-between text-xs mb-2">
                 <div className="flex gap-2">
                   <div>#</div>
@@ -94,7 +96,7 @@ const HomePage = () => {
                   <div>Nyeremény</div>
                 </div>
               </div>
-              <hr className="my-2 border-gray-700" />
+              <hr className="my-2 border-gray-700/30" />
               <div className="space-y-3">
                 {toplist.slice(0, 3).map((player: User, index: number) => (
                   <div key={player._id} className="flex justify-between">
@@ -102,13 +104,18 @@ const HomePage = () => {
                       <div className="bg-black/20 text-xs rounded-full px-1.5 py-1">
                         {index + 1}.
                       </div>
-                      <UserDisplay user={player} showAvatar={true} avatarSize="xs" />
+                      <UserDisplay
+                        user={player}
+                        showAvatar={true}
+                        avatarSize="xs"
+                        nameClassName="text-sm"
+                      />
                     </div>
                     <div className="flex gap-4 items-center">
-                      <div className="w-16 text-right text-sm">
+                      <div className="w-16 text-right text-xs">
                         {formatPoints(player.data.availableScore, false)}
                       </div>
-                      <div className="w-16 text-right text-sm">
+                      <div className="w-16 text-right text-xs">
                         {formatPoints(player.data.profitScore, false)}
                       </div>
                     </div>
@@ -131,7 +138,7 @@ const HomePage = () => {
                 <Link
                   to={`/merkozesek/${match._id}`}
                   key={match._id}
-                  className="block mb-2 last:mb-0"
+                  className="block mb-2 last:mb-0 border-b last:border-0 border-gray-700/30"
                 >
                   <MatchWithBets match={match} />
                 </Link>
@@ -148,6 +155,10 @@ const HomePage = () => {
         <div className="flex-1">
           <WinLostChart />
         </div>
+      </div>
+
+      <div>
+        <ScoreByMatchChart />
       </div>
 
       <section className="mt-6">

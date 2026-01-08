@@ -4,8 +4,10 @@ import { axiosInstance } from "./axiosConfig";
 import type {
   BalanceHistoryEntry,
   DefaultAvatar,
+  ScoreByMatch,
   SignInResponse,
   UpdateUserProfileBody,
+  UserDetails,
   WinLostStats,
 } from "./types";
 import type { MatchOutcome } from "@/utils/enums";
@@ -176,18 +178,42 @@ const Api = {
     return response.data;
   },
 
-  async getBalanceHistory(params: { from?: string; to?: string }): Promise<BalanceHistoryEntry[]> {
+  async getBalanceHistory(params: {
+    from?: string;
+    to?: string;
+    userId?: string;
+  }): Promise<BalanceHistoryEntry[]> {
     const response = await axiosInstance.get(`/user/stats/balance-history`, {
       params: {
         from: params.from,
         to: params.to,
+        userid: params.userId,
       },
     });
     return response.data;
   },
 
-  async getWinLostStats(): Promise<WinLostStats> {
-    const response = await axiosInstance.get(`/user/stats/win-loss`);
+  async getWinLostStats(userId?: string): Promise<WinLostStats> {
+    const response = await axiosInstance.get(`/user/stats/win-loss`, {
+      params: {
+        userid: userId,
+      },
+    });
+    return response.data;
+  },
+
+  async getScoreByMatches(): Promise<ScoreByMatch[]> {
+    const response = await axiosInstance.get(`/user/stats/score-by-matches`);
+    return response.data;
+  },
+
+  async getPlayerDetails(userId: string): Promise<UserDetails> {
+    const response = await axiosInstance.get(`/user/${userId}`);
+    return response.data;
+  },
+
+  async getConfigs(): Promise<Record<string, string>> {
+    const response = await axiosInstance.get(`/config/all`);
     return response.data;
   },
 };

@@ -10,7 +10,8 @@ interface MatchCardProps {
 const MatchCard = ({ match, onClick }: MatchCardProps) => {
   return (
     <div
-      className="w-full sm:w-100 bg-black/20 px-4 py-6 rounded-lg mb-4 flex flex-col gap-4 cursor-pointer hover:bg-black/30 transition-colors"
+      className="w-full sm:w-100 bg-black/20 px-4 py-6 rounded-lg flex flex-col gap-4 
+      cursor-pointer hover:bg-black/30 transition-colors"
       onClick={() => onClick?.(match)}
     >
       <div className="flex">
@@ -25,15 +26,10 @@ const MatchCard = ({ match, onClick }: MatchCardProps) => {
         </div>
         <div className="flex-1 justify-center items-center flex flex-col gap-2">
           <div className="flex justify-center items-center text-sm text-gray-400">
-            {match.date
-              ? format(new Date(match.date), "LLL dd HH:mm")
-              : "nincs dátum"}
+            {match.date ? format(new Date(match.date), "LLL dd") : "nincs dátum"}
           </div>
-          <div className="text-xl text-gray-400">vs.</div>
-          <div className="flex gap-3">
-            <div className="text-sm">{match.oddsAwin}</div>
-            <div className="text-sm">{match.oddsDraw}</div>
-            <div className="text-sm">{match.oddsBwin}</div>
+          <div className="text-xl text-white font-bold">
+            {match.date ? format(new Date(match.date), "HH:mm") : "nincs dátum"}
           </div>
         </div>
         <div className="flex-1 flex flex-col justify-center items-center gap-4">
@@ -45,6 +41,11 @@ const MatchCard = ({ match, onClick }: MatchCardProps) => {
             />
           )}
         </div>
+      </div>
+      <div className="flex gap-3 border-t border-gray-700/30 pt-3 text-gray-400 text-center">
+        <div className="text-sm flex-1 border-r border-gray-700/30">{match.oddsAwin}</div>
+        <div className="text-sm flex-1 border-r border-gray-700/30">{match.oddsDraw}</div>
+        <div className="text-sm flex-1">{match.oddsBwin}</div>
       </div>
     </div>
   );

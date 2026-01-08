@@ -19,15 +19,12 @@ const Panel = ({
 }: PanelProps) => {
   return (
     <div
-      className={`relative bg-panel-bg border border-primary rounded-md overflow-hidden w-full ${wrapperClassName}`}
+      className={`relative bg-panel-bg border border-primary/20 rounded-md overflow-hidden 
+        w-full ${wrapperClassName}`}
     >
-      <div className="bg-surface pl-3 py-2 rounded-t-md font-medium text-sm border-b border-primary/50">
-        {title}
-      </div>
+      <div className="pl-2 py-2 rounded-t-md font-light text-sm text-gray-300">{title}</div>
       {error && <div className="p-4 text-red-500">{error}</div>}
-      <div
-        className={`relative py-2 ${loading ? "min-h-40" : ""} ${className}`}
-      >
+      <div className={`relative ${loading ? "min-h-40" : ""} ${className}`}>
         {loading && (
           <div
             className="absolute inset-0 flex items-center 
@@ -38,11 +35,7 @@ const Panel = ({
         )}
         {children}
       </div>
-      {footer && (
-        <div className="bg-primary pl-2 py-1 rounded-b-md text-xs">
-          {footer}
-        </div>
-      )}
+      {footer && <div className="bg-primary pl-2 py-1 rounded-b-md text-xs">{footer}</div>}
     </div>
   );
 };

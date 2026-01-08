@@ -9,6 +9,7 @@ import type { Transaction } from "@/models/transaction.type";
 import type {
   BalanceHistoryEntry,
   DefaultAvatar,
+  ScoreByMatch,
   UpdateUserProfileBody,
   WinLostStats,
 } from "@/services/types";
@@ -21,6 +22,9 @@ export const playersKeys = {
   myTransactions: () => [...playersKeys.all, "my-transactions"] as const,
   getDefaultAvatars: () => [...playersKeys.all, "default-avatars"] as const,
   getBalanceHistory: () => [...playersKeys.all, "balance-history"] as const,
+  getWinLostStats: (userId?: string) => [...playersKeys.all, "win-loss-stats", userId] as const,
+  getScoreByMatches: () => [...playersKeys.all, "score-by-matches"] as const,
+  getPlayerDetails: (userId: string) => [...playersKeys.all, "player-details", userId] as const,
 };
 
 // Toplist hook
@@ -151,19 +155,37 @@ export const useUpdateAvatar = () => {
   });
 };
 
-export const useBalanceHistory = (from?: string, to?: string) => {
+export const useBalanceHistory = (from?: string, to?: string, userId?: string) => {
   return useQuery<BalanceHistoryEntry[]>({
     queryKey: playersKeys.getBalanceHistory(),
-    queryFn: () => Api.getBalanceHistory({ from, to }),
+    queryFn: () => Api.getBalanceHistory({ from, to, userId }),
     staleTime: 15 * 60 * 1000, // 15 perc
     retry: 2,
   });
 };
 
-export const useWinLostStats = () => {
+export const useWinLostStats = (userId?: string) => {
   return useQuery<WinLostStats>({
-    queryKey: playersKeys.all,
-    queryFn: () => Api.getWinLostStats(),
+    queryKey: playersKeys.getWinLostStats(userId),
+    queryFn: () => Api.getWinLostStats(userId),
+    staleTime: 15 * 60 * 1000, // 15 perc
+    retry: 2,
+  });
+};
+
+export const useScoreByMatches = () => {
+  return useQuery<ScoreByMatch[]>({
+    queryKey: playersKeys.getScoreByMatches(),
+    queryFn: () => Api.getScoreByMatches(),
+    staleTime: 15 * 60 * 1000, // 15 perc
+    retry: 2,
+  });
+};
+
+export const useGetPlayerDetails = (userId: string) => {
+  return useQuery({
+    queryKey: playersKeys.getPlayerDetails(userId),
+    queryFn: () => Api.getPlayerDetails(userId),
     staleTime: 15 * 60 * 1000, // 15 perc
     retry: 2,
   });

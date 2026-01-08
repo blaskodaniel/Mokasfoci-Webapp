@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import BG from "../assets/img/login_bg.jpg";
 import Api from "../services/service";
 import { Link, useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
@@ -38,8 +37,7 @@ const Register: React.FC = () => {
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
         setError(
-          err.response?.data?.message ||
-            "Hiba történt a regisztráció során. Kérlek, próbáld újra."
+          err.response?.data?.message || "Hiba történt a regisztráció során. Kérlek, próbáld újra."
         );
       } else {
         setError("Hiba történt a regisztráció során. Kérlek, próbáld újra.");
@@ -54,22 +52,11 @@ const Register: React.FC = () => {
   }, []);
 
   return (
-    <div
-      className="min-h-screen flex justify-center bg-cover bg-center px-5"
-      style={{ backgroundImage: `url(${BG})` }}
-    >
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md flex flex-col gap-4 h-fit mt-15"
-      >
-        <h2 className="text-2xl font-bold text-center text-purple-700">
-          Regisztráció
-        </h2>
+    <div className="min-h-screen flex justify-center bg-cover bg-center px-3 sm:px-5">
+      <form onSubmit={handleSubmit} className="p-4 w-full max-w-md flex flex-col gap-4 h-fit mt-10">
+        <h2 className="text-2xl font-bold text-center text-text-primary mb-4">Regisztráció</h2>
         <div className="flex flex-col gap-2">
-          <label
-            htmlFor="username"
-            className="text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="username" className="text-sm font-medium text-white-700">
             Felhasználónév
           </label>
           <input
@@ -78,12 +65,12 @@ const Register: React.FC = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
-            className="text-black border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="text-white border border-gray-300/20  rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             placeholder="Felhasználónév"
           />
         </div>
         <div className="flex flex-col gap-2">
-          <label htmlFor="email" className="text-sm font-medium text-gray-700">
+          <label htmlFor="email" className="text-sm font-medium text-white-700">
             Email cím
           </label>
           <input
@@ -92,15 +79,12 @@ const Register: React.FC = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="text-black border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="text-white border border-gray-300/20  rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             placeholder="Email cím"
           />
         </div>
         <div className="flex flex-col gap-2">
-          <label
-            htmlFor="password"
-            className="text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="password" className="text-sm font-medium text-white-700">
             Jelszó
           </label>
           <input
@@ -109,15 +93,12 @@ const Register: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="text-black border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="text-white border border-gray-300/20  rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             placeholder="Jelszó"
           />
         </div>
         <div className="flex flex-col gap-2">
-          <label
-            htmlFor="confirmPassword"
-            className="text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="confirmPassword" className="text-sm font-medium text-white-700">
             Jelszó megerősítése
           </label>
           <input
@@ -126,15 +107,12 @@ const Register: React.FC = () => {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
-            className="text-black border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="text-white border border-gray-300/20  rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             placeholder="Jelszó megerősítése"
           />
         </div>
         <div className="flex flex-col gap-2">
-          <label
-            htmlFor="invitationCode"
-            className="text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="invitationCode" className="text-sm font-medium text-white-700">
             Meghívó kód
           </label>
           <input
@@ -143,39 +121,29 @@ const Register: React.FC = () => {
             value={invitationCode}
             onChange={(e) => setInvitationCode(e.target.value)}
             required
-            className="text-black border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="text-white border border-gray-300/20  rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             placeholder="Meghívó kód"
           />
         </div>
-        {error && (
-          <div className="text-red-600 text-sm text-center">{error}</div>
-        )}
+        {error && <div className="text-red-600 text-sm text-center">{error}</div>}
         <button
           type="submit"
-          className="bg-purple-600 text-white font-semibold py-2 rounded hover:bg-blue-700 transition"
+          className="bg-button-light text-white font-semibold py-2 rounded hover:bg-button-light-hover transition"
         >
           Regisztráció
         </button>
-        <Link
-          to="/login"
-          className="text-purple-700 hover:underline text-center"
-        >
+        <Link to="/login" className="text-text-primary hover:underline text-center">
           Bejelentkezés
         </Link>
         {loading && <div className="text-center text-gray-600">Loading...</div>}
       </form>
 
-      <Modal
-        isOpen={isModalOpen}
-        className="min-w-[300px] max-w-md bg-white p-4"
-      >
+      <Modal isOpen={isModalOpen} className="min-w-[300px] max-w-md bg-white p-4">
         <div className="flex flex-col gap-2">
           <div className="flex justify-center">
             <IoIosCheckmarkCircle size={40} className="text-green-700" />
           </div>
-          <div className="text-center text-2xl text-green-700">
-            Sikeres regisztráció!
-          </div>
+          <div className="text-center text-2xl text-green-700">Sikeres regisztráció!</div>
           <div className="text-center text-gray-600 text-sm mt-3 mb-3">
             Most már bejelentkezhetsz.
           </div>

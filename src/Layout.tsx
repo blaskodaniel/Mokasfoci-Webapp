@@ -18,12 +18,10 @@ const Layout = () => {
     <div className="flex flex-col min-h-screen overflow-y-auto bg-secondary">
       {/* Header */}
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
-      {isMobile && (
-        <MobileMenu isOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
-      )}
+      {isMobile && <MobileMenu isOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />}
 
       {/* Main Content */}
-      <div className="md:flex md:justify-center mt-15">
+      <div className="md:flex md:justify-center mt-12 sm:mt-15 px-1">
         <div className="flex-1 max-w-7xl">
           {/* Tab Content */}
           <div className="flex-1 mt-5">

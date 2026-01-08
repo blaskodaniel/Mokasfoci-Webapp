@@ -18,9 +18,7 @@ const MatchWithBets = ({ match }: MatchWithBetsProps) => {
       if (!isFinished) return "text-white";
 
       const isWinner =
-        (teamType === "A" && isTeamAWin) ||
-        (teamType === "B" && isTeamBWin) ||
-        isDraw;
+        (teamType === "A" && isTeamAWin) || (teamType === "B" && isTeamBWin) || isDraw;
 
       return isWinner ? "text-white" : "text-gray-400";
     },
@@ -29,8 +27,8 @@ const MatchWithBets = ({ match }: MatchWithBetsProps) => {
 
   return (
     <div
-      className="flex justify-between items-center px-3 py-1 rounded-lg 
-    mb-1 bg-quaternary hover:bg-quaternary/70 transition-colors"
+      className="flex justify-between items-center px-1 pb-2 first:pt-0 pt-2 border-b last:border-0
+     border-gray-700/30 hover:bg-primary/10 transition-colors"
     >
       <div className="flex-1 flex gap-2 flex-col">
         <div className="flex items-center gap-2">
@@ -41,9 +39,7 @@ const MatchWithBets = ({ match }: MatchWithBetsProps) => {
               className="w-4 h-4 object-cover rounded-full"
             />
           )}
-          <span className={`text-sm ${getTeamColor("A")}`}>
-            {match.teamA?.name}
-          </span>
+          <span className={`text-sm ${getTeamColor("A")}`}>{match.teamA?.name}</span>
         </div>
         <div className="flex items-center gap-2">
           {match.teamB?.flag && (
@@ -53,9 +49,7 @@ const MatchWithBets = ({ match }: MatchWithBetsProps) => {
               className="w-4 h-4 object-cover rounded-full"
             />
           )}
-          <span className={`text-sm ${getTeamColor("B")}`}>
-            {match.teamB?.name}
-          </span>
+          <span className={`text-sm ${getTeamColor("B")}`}>{match.teamB?.name}</span>
         </div>
       </div>
       <div className="flex items-center gap-5 flex-1 justify-end">
@@ -65,29 +59,15 @@ const MatchWithBets = ({ match }: MatchWithBetsProps) => {
         </div>
         <div className="flex flex-col items-center text-xs text-gray-400 gap-0.5">
           <div
-            className={`${
-              isFinished && isTeamAWin
-                ? "text-white font-semibold"
-                : "text-gray-400"
-            }`}
+            className={`${isFinished && isTeamAWin ? "text-white font-semibold" : "text-gray-400"}`}
           >
             {match.oddsAwin}
           </div>
-          <div
-            className={`${
-              isFinished && isDraw
-                ? "text-white font-semibold"
-                : "text-gray-400"
-            }`}
-          >
+          <div className={`${isFinished && isDraw ? "text-white font-semibold" : "text-gray-400"}`}>
             {match.oddsDraw}
           </div>
           <div
-            className={`${
-              isFinished && isTeamBWin
-                ? "text-white font-semibold"
-                : "text-gray-400"
-            }`}
+            className={`${isFinished && isTeamBWin ? "text-white font-semibold" : "text-gray-400"}`}
           >
             {match.oddsBwin}
           </div>

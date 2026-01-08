@@ -7,6 +7,7 @@ interface UserDisplayProps {
   className?: string;
   avatarSize?: "xs" | "sm" | "md" | "lg";
   nameClassName?: string;
+  onClick?: () => void;
 }
 
 const UserDisplay = ({
@@ -15,6 +16,7 @@ const UserDisplay = ({
   className = "",
   avatarSize = "md",
   nameClassName = "",
+  onClick,
 }: UserDisplayProps) => {
   const getAvatarUrl = () => {
     if (user?.avatar && user.avatar.trim() !== "") {
@@ -51,8 +53,7 @@ const UserDisplay = ({
             onError={(e) => {
               // Ha a kép betöltése sikertelen, fallback karakter
               e.currentTarget.style.display = "none";
-              const fallbackDiv = e.currentTarget
-                .nextElementSibling as HTMLElement;
+              const fallbackDiv = e.currentTarget.nextElementSibling as HTMLElement;
               if (fallbackDiv) {
                 fallbackDiv.style.display = "flex";
               }
@@ -66,7 +67,10 @@ const UserDisplay = ({
           </div>
         </div>
       )}
-      <div className={`font-semibold ${nameClassName}`}>
+      <div
+        className={`font-semibold truncate ${nameClassName} ${onClick ? "cursor-pointer" : ""}`}
+        onClick={() => onClick && onClick()}
+      >
         {user?.username || ""}
       </div>
     </div>
