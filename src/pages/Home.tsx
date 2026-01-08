@@ -3,9 +3,8 @@ import MatchCard from "@/components/MatchCard";
 import MatchWithBets from "@/components/MatchWithBets";
 import Panel from "@/components/Panel";
 import { useUpcomingMatches, useRecentMatches, matchesKeys } from "@/hooks/api/useMatches";
-import { useToplist, playersKeys } from "@/hooks/api/usePlayers";
+import { playersKeys } from "@/hooks/api/usePlayers";
 import type { Match } from "@/models/match.type";
-import type { User } from "@/models/user.type";
 import Api from "@/services/service";
 import { getMeAction } from "@/state/authSlice";
 import { useAppDispatch } from "@/state/hooks";
@@ -13,13 +12,12 @@ import type { MatchOutcome } from "@/utils/enums";
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import UserDisplay from "@/components/UserDisplay";
-import { formatPoints } from "@/utils/common";
-import BalanceHistoryChart from "@/components/Charts/BalanceHistoryChart";
-import WinLostChart from "@/components/Charts/WinLostChart";
-import ScoreByMatchChart from "@/components/Charts/ScoreByMatchChart";
+import ToplistWidget from "@/components/Widgets/ToplistWidget";
+import Slider from "@/components/Slider";
+import useResponsive from "@/hooks/useResponsive";
 
 const HomePage = () => {
+  const { isMobile } = useResponsive();
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
@@ -40,8 +38,6 @@ const HomePage = () => {
 
   const { data: recentMatches, isLoading: recentLoading, error: recentError } = useRecentMatches(5);
 
-  const { data: toplist, isLoading: toplistLoading, error: toplistError } = useToplist();
-
   const onCreateCoupon = async (betAmount: number, outcome: MatchOutcome) => {
     if (!selectedMatch) return;
     try {
@@ -58,6 +54,23 @@ const HomePage = () => {
 
   return (
     <div>
+      <section className="mt-6 mb-5">
+        <h1 className="text-2xl font-bold text-white px-4">Kiemelt</h1>
+        <section className="mt-6 px-4">
+          <Slider itemsPerView={isMobile ? 1 : 3} gap={16}>
+            {upcomingMatches?.slice(0, 3).map((match: Match) => (
+              <MatchCard
+                key={match._id}
+                match={match}
+                onClick={() => {
+                  setSelectedMatch(match);
+                }}
+              />
+            ))}
+          </Slider>
+        </section>
+      </section>
+
       <div className="flex flex-col md:flex-row gap-3 px-1 sm:px-4">
         <Panel
           title="Legközelebbi mérkőzések"
@@ -78,53 +91,7 @@ const HomePage = () => {
           )}
         </Panel>
 
-        <Panel
-          title="Top 3 játékos"
-          className="flex-1"
-          loading={toplistLoading}
-          error={toplistError?.message ? "Error loading top scorers" : undefined}
-        >
-          {toplist && toplist.length > 0 && (
-            <div className="px-2 py-4">
-              <div className="flex justify-between text-xs mb-2">
-                <div className="flex gap-2">
-                  <div>#</div>
-                  <div>Játékos</div>
-                </div>
-                <div className="flex gap-4">
-                  <div>Elérhető</div>
-                  <div>Nyeremény</div>
-                </div>
-              </div>
-              <hr className="my-2 border-gray-700/30" />
-              <div className="space-y-3">
-                {toplist.slice(0, 3).map((player: User, index: number) => (
-                  <div key={player._id} className="flex justify-between">
-                    <div className="flex gap-2 items-center">
-                      <div className="bg-black/20 text-xs rounded-full px-1.5 py-1">
-                        {index + 1}.
-                      </div>
-                      <UserDisplay
-                        user={player}
-                        showAvatar={true}
-                        avatarSize="xs"
-                        nameClassName="text-sm"
-                      />
-                    </div>
-                    <div className="flex gap-4 items-center">
-                      <div className="w-16 text-right text-xs">
-                        {formatPoints(player.data.availableScore, false)}
-                      </div>
-                      <div className="w-16 text-right text-xs">
-                        {formatPoints(player.data.profitScore, false)}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </Panel>
+        <ToplistWidget />
 
         <Panel
           title="Legutóbbi eredmények"
@@ -147,34 +114,6 @@ const HomePage = () => {
           )}
         </Panel>
       </div>
-
-      <div className="flex flex-col sm:flex-row gap-3 pt-8">
-        <div className="flex-1">
-          <BalanceHistoryChart />
-        </div>
-        <div className="flex-1">
-          <WinLostChart />
-        </div>
-      </div>
-
-      <div>
-        <ScoreByMatchChart />
-      </div>
-
-      <section className="mt-6">
-        <h1 className="text-2xl font-bold text-white px-4">Kiemelt</h1>
-        <section className="flex mt-6 px-4 gap-4 flex-wrap">
-          {upcomingMatches?.slice(0, 3).map((match: Match) => (
-            <MatchCard
-              key={match._id}
-              match={match}
-              onClick={() => {
-                setSelectedMatch(match);
-              }}
-            />
-          ))}
-        </section>
-      </section>
 
       {selectedMatch && (
         <BetModalDesktop

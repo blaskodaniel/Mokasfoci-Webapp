@@ -18,6 +18,7 @@ import { useAppSelector } from "@/state/hooks";
 import { useNotification } from "@/hooks/useNotification";
 import { AxiosError } from "axios";
 import { Link } from "react-router-dom";
+import Calendar from "@/components/Calendar";
 
 // Extended Match type a user bet-tel
 type MatchWithUserBet = Match & {
@@ -28,6 +29,7 @@ const MatchesPage = () => {
   const { showSuccess, showError } = useNotification();
   const { currentUser } = useAppSelector((state) => state.auth);
   const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
 
   const {
     data: matches,
@@ -275,7 +277,8 @@ const MatchesPage = () => {
   ];
   return (
     <div>
-      <div className="text-white text-2xl">Mérkőzések</div>
+      <div className="text-white text-center sm:text-left text-2xl pb-2">Mérkőzések</div>
+      <Calendar onDateSelect={(date) => setSelectedDate(date)} selectedDate={selectedDate} />
       <section>
         <Table
           data={matchesWithBets}

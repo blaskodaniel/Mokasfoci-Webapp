@@ -5,10 +5,7 @@ import { useAppSelector } from "@/state/hooks";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  profileFormSchema,
-  type ProfileFormData,
-} from "@/utils/profileFormSchema";
+import { profileFormSchema, type ProfileFormData } from "@/utils/profileFormSchema";
 import { useAllTeams } from "@/hooks/api/useTeams";
 import { useEffect, useMemo, useState } from "react";
 import { APP_CONFIG, DEFAULT_AVATAR_URL, GROUPS } from "@/config";
@@ -19,6 +16,9 @@ import { useNotification } from "@/hooks/useNotification";
 import type { UpdateUserProfileBody } from "@/services/types";
 import AvatarModal from "@/components/MyProfile/AvatarModal";
 import useResponsive from "@/hooks/useResponsive";
+import BalanceHistoryChart from "@/components/Charts/BalanceHistoryChart";
+import WinLostChart from "@/components/Charts/WinLostChart";
+import ScoreByMatchChart from "@/components/Charts/ScoreByMatchChart";
 
 const MyProfilePage = () => {
   const navigate = useNavigate();
@@ -106,7 +106,7 @@ const MyProfilePage = () => {
     return teams.map((team) => ({
       value: team._id,
       label: team.name,
-      group: team.groupid.name
+      group: team.groupid.name,
     }));
   }, [teams]);
 
@@ -212,8 +212,7 @@ const MyProfilePage = () => {
                   onError={(e) => {
                     // Ha a kép betöltése sikertelen, fallback karakter
                     e.currentTarget.style.display = "none";
-                    const fallbackDiv = e.currentTarget
-                      .nextElementSibling as HTMLElement;
+                    const fallbackDiv = e.currentTarget.nextElementSibling as HTMLElement;
                     if (fallbackDiv) {
                       fallbackDiv.style.display = "flex";
                     }
@@ -238,9 +237,7 @@ const MyProfilePage = () => {
 
           {/* User Info */}
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-semibold text-white mb-2">
-              {currentUser?.username}
-            </h2>
+            <h2 className="text-2xl font-semibold text-white mb-2">{currentUser?.username}</h2>
             <p className="text-gray-400">{currentUser?.email}</p>
           </div>
 
@@ -250,9 +247,7 @@ const MyProfilePage = () => {
               className="bg-linear-to-br from-green-500/20 to-green-600/20 
             rounded-xl p-2 sm:p-4 border border-green-500/30"
             >
-              <div className="text-green-400 text-sm font-medium mb-1">
-                Felhasználható
-              </div>
+              <div className="text-green-400 text-sm font-medium mb-1">Felhasználható</div>
               <div className="text-white text-xl font-bold">
                 {formatPoints(currentUser?.data?.availableScore || 0, false)}{" "}
                 <span className="text-xs">pont</span>
@@ -262,9 +257,7 @@ const MyProfilePage = () => {
               className="bg-linear-to-br from-yellow-500/20 to-yellow-600/20 
             rounded-xl p-2 sm:p-4 border border-yellow-500/30"
             >
-              <div className="text-yellow-400 text-sm font-medium mb-1">
-                Nyeremény
-              </div>
+              <div className="text-yellow-400 text-sm font-medium mb-1">Nyeremény</div>
               <div className="text-white text-xl font-bold">
                 {formatPoints(currentUser?.data?.profitScore || 0, false)}{" "}
                 <span className="text-xs">pont</span>
@@ -275,10 +268,7 @@ const MyProfilePage = () => {
       </div>
 
       {/* Form Section */}
-      <form
-        onSubmit={handleSubmit(onSubmitForm)}
-        className="mx-auto px-6 space-y-8"
-      >
+      <form onSubmit={handleSubmit(onSubmitForm)} className="mx-auto px-6 space-y-8">
         {/* Basic Info Section */}
         <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
           <h3 className="text-xl font-semibold text-white mb-6">Alapadatok</h3>
@@ -312,16 +302,16 @@ const MyProfilePage = () => {
 
         {/* Group Winners Section */}
         <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
-          <h3 className="text-xl font-semibold text-white mb-6">
-            Csoportgyőztesek
-          </h3>
+          <h3 className="text-xl font-semibold text-white mb-6">Csoportgyőztesek</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
             {GROUPS.map((group) => (
               <Select
                 key={group}
                 name={group}
                 control={control}
-                options={teamOptions.filter((option) => option.group.toUpperCase() === group.toUpperCase() )}
+                options={teamOptions.filter(
+                  (option) => option.group.toUpperCase() === group.toUpperCase()
+                )}
                 label={`${group} csoport`}
                 placeholder={`${group}`}
                 error={errors[group as keyof ProfileFormData]?.message}
@@ -342,11 +332,21 @@ const MyProfilePage = () => {
         </div>
       </form>
 
+      <div className="flex flex-col sm:flex-row gap-3 pt-8">
+        <div className="flex-1">
+          <BalanceHistoryChart />
+        </div>
+        <div className="flex-1">
+          <WinLostChart />
+        </div>
+      </div>
+
+      <div>
+        <ScoreByMatchChart />
+      </div>
+
       {isOpenAvatarModal && (
-        <AvatarModal
-          isOpen={isOpenAvatarModal}
-          onClose={() => setIsOpenAvatarModal(false)}
-        />
+        <AvatarModal isOpen={isOpenAvatarModal} onClose={() => setIsOpenAvatarModal(false)} />
       )}
     </div>
   );
