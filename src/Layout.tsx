@@ -8,11 +8,19 @@ import { NotificationContainer } from "./components/Notification";
 const Layout = () => {
   const { isMobile } = useResponsive();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [version, setVersion] = useState("1.0.0");
   const location = useLocation();
 
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location]);
+
+  useEffect(() => {
+    fetch("/version.json")
+      .then((res) => res.json())
+      .then((data) => setVersion(data.version))
+      .catch(() => setVersion("1.0.0"));
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen overflow-y-auto bg-secondary">
@@ -34,7 +42,9 @@ const Layout = () => {
       </div>
 
       {/* Footer */}
-      {/* <Footer /> */}
+      <footer className="mt-auto py-4 text-center text-xs text-gray-500 border-t border-gray-700">
+        <div>© 2026 Mokasfoci | v{version}</div>
+      </footer>
     </div>
   );
 };
