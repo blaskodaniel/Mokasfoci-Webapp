@@ -277,7 +277,7 @@ const MatchesPage = () => {
   ];
   return (
     <div>
-      <div className="text-white text-center sm:text-left text-2xl pb-2">Mérkőzések</div>
+      <div className="text-white text-center sm:text-left text-xl sm:text-2xl pb-2">Mérkőzések</div>
       <Calendar onDateSelect={(date) => setSelectedDate(date)} selectedDate={selectedDate} />
       <section>
         <Table

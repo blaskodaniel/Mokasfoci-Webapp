@@ -55,7 +55,7 @@ const HomePage = () => {
   return (
     <div>
       <section className="mt-6 mb-5">
-        <h1 className="text-2xl font-bold text-white px-4">Kiemelt</h1>
+        <h1 className="text-2xl font-bold text-white px-4 hidden sm:block">Kiemelt</h1>
         <section className="mt-6 px-4">
           <Slider itemsPerView={isMobile ? 1 : 3} gap={16}>
             {upcomingMatches?.slice(0, 3).map((match: Match) => (

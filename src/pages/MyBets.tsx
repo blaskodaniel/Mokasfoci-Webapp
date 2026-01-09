@@ -234,7 +234,7 @@ const MyBetsPage = () => {
 
   return (
     <div className="px-2">
-      <div className="text-white text-2xl">Fogadásaim</div>
+      <div className="text-white text-center sm:text-left text-xl sm:text-2xl">Fogadásaim</div>
 
       {isDesktop && (
         <section>
