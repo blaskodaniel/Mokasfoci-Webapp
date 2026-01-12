@@ -1,6 +1,6 @@
 import BetModalDesktop from "@/components/BetModal/Desktop";
 import MatchCard from "@/components/MatchCard";
-import MatchWithBets from "@/components/MatchWithBets";
+import MatchListItem from "@/components/MatchListItem";
 import Panel from "@/components/Panel";
 import { useUpcomingMatches, useRecentMatches, matchesKeys } from "@/hooks/api/useMatches";
 import { playersKeys } from "@/hooks/api/usePlayers";
@@ -71,7 +71,7 @@ const HomePage = () => {
         </section>
       </section>
 
-      <div className="flex flex-col md:flex-row gap-3 px-1 sm:px-4">
+      <div className="flex flex-col md:flex-row gap-3 px-1 sm:px-4 mb-3">
         <Panel
           title="Legközelebbi mérkőzések"
           className="flex-1"
@@ -82,7 +82,7 @@ const HomePage = () => {
           {upcomingMatches && upcomingMatches.length > 0 && (
             <div className="px-1 py-3">
               {upcomingMatches.map((match: Match) => (
-                <MatchWithBets key={match._id} match={match} />
+                <MatchListItem key={match._id} match={match} />
               ))}
             </div>
           )}
@@ -107,7 +107,7 @@ const HomePage = () => {
                   key={match._id}
                   className="block mb-2 last:mb-0 border-b last:border-0 border-gray-700/30"
                 >
-                  <MatchWithBets match={match} />
+                  <MatchListItem match={match} />
                 </Link>
               ))}
             </div>

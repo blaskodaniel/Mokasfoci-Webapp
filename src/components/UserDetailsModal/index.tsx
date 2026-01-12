@@ -54,7 +54,7 @@ const UserDetailsModal: FC<UserDetailsModalProps> = ({ isOpen, onClose, userId }
             {/* User Info */}
             <div className="flex flex-col justify-center ml-6">
               <h2 className="text-xl sm:text-2xl font-semibold text-white">
-                {playerDetails?.username}
+                {playerDetails?.name || playerDetails?.username}
               </h2>
               <p className="text-gray-400 text-xs">{playerDetails?.email}</p>
               {playerDetails?.data.winteamid && (

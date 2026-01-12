@@ -7,14 +7,26 @@ export const matchesKeys = {
   all: ["matches"] as const,
   upcoming: () => [...matchesKeys.all, "upcoming"] as const,
   recent: () => [...matchesKeys.all, "recent"] as const,
-  getDetails: (matchId: string) =>
-    [...matchesKeys.all, "details", matchId] as const,
+  getDetails: (matchId: string) => [...matchesKeys.all, "details", matchId] as const,
 };
 
-export const useAllMatches = () => {
+export const useAllMatches = ({
+  sortBy,
+  sortOrder,
+  startDate,
+  endDate,
+}: {
+  sortBy?: string;
+  sortOrder?: string;
+  startDate?: Date;
+  endDate?: Date;
+}) => {
   return useQuery<Match[]>({
-    queryKey: matchesKeys.all,
-    queryFn: () => Api.getAllMatches(),
+    queryKey: [
+      ...matchesKeys.all,
+      { sortBy, sortOrder, startDate: startDate?.toISOString(), endDate: endDate?.toISOString() },
+    ],
+    queryFn: () => Api.getAllMatches({ sortBy, sortOrder, startDate, endDate }),
     staleTime: 1 * 60 * 1000, // 10 perc
     retry: 2,
     refetchOnWindowFocus: true,

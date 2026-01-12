@@ -127,8 +127,25 @@ const Api = {
     return response.data;
   },
 
-  async getAllMatches(): Promise<Match[]> {
-    const response = await axiosInstance.get(`/match/all`);
+  async getAllMatches({
+    sortBy,
+    sortOrder,
+    startDate,
+    endDate,
+  }: {
+    sortBy?: string;
+    sortOrder?: string;
+    startDate?: Date;
+    endDate?: Date;
+  }): Promise<Match[]> {
+    const response = await axiosInstance.get(`/match/all`, {
+      params: {
+        sortBy,
+        sortOrder,
+        startDate: startDate ? startDate.toISOString() : undefined,
+        endDate: endDate ? endDate.toISOString() : undefined,
+      },
+    });
     return response.data;
   },
 

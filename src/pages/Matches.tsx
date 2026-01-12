@@ -1,5 +1,4 @@
 import BetModalDesktop from "@/components/BetModal/Desktop";
-import Table from "@/components/Table/Table";
 import type { Column } from "@/components/Table/types";
 import { useMyBets, useUpdateBet, useCreateBet } from "@/hooks/api/usePlayers";
 import type { Bet } from "@/models/bet.type";
@@ -19,6 +18,9 @@ import { useNotification } from "@/hooks/useNotification";
 import { AxiosError } from "axios";
 import { Link } from "react-router-dom";
 import Calendar from "@/components/Calendar";
+import useResponsive from "@/hooks/useResponsive";
+import MatchesDesktopView from "@/components/Matches/DesktopView.tsx";
+import MatchesMobileView from "@/components/Matches/MobileView";
 
 // Extended Match type a user bet-tel
 type MatchWithUserBet = Match & {
@@ -26,17 +28,23 @@ type MatchWithUserBet = Match & {
 };
 
 const MatchesPage = () => {
+  const { isDesktop } = useResponsive();
   const { showSuccess, showError } = useNotification();
   const { currentUser } = useAppSelector((state) => state.auth);
   const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
   const {
     data: matches,
     isLoading: matchesLoading,
     error: matchesError,
     refetch: refetchMatches,
-  } = useAllMatches();
+  } = useAllMatches({
+    sortBy: "date",
+    sortOrder: "asc",
+    startDate: selectedDate,
+    endDate: selectedDate,
+  });
 
   const {
     data: myBets,
@@ -52,7 +60,7 @@ const MatchesPage = () => {
   const matchesWithBets = useMemo((): MatchWithUserBet[] => {
     if (!matches || !myBets) return matches || [];
 
-    return matches.map((match) => {
+    const combined = matches.map((match) => {
       // Megkeressük a user bet-et ehhez a match-hez
       const userBet = myBets.find((bet) => bet.matchid._id === match._id);
 
@@ -60,6 +68,23 @@ const MatchesPage = () => {
         ...match,
         userbet: userBet,
       };
+    });
+
+    // Rendezés státusz szerint: playing -> enabled -> többi
+    return combined.sort((a, b) => {
+      if (a.status === MatchStatus.playing && b.status !== MatchStatus.playing) {
+        return -1;
+      }
+      if (a.status !== MatchStatus.playing && b.status === MatchStatus.playing) {
+        return 1;
+      }
+      if (a.status === MatchStatus.enabled && b.status !== MatchStatus.enabled) {
+        return -1;
+      }
+      if (a.status !== MatchStatus.enabled && b.status === MatchStatus.enabled) {
+        return 1;
+      }
+      return 0;
     });
   }, [matches, myBets]);
 
@@ -279,25 +304,43 @@ const MatchesPage = () => {
     <div>
       <div className="text-white text-center sm:text-left text-xl sm:text-2xl pb-2">Mérkőzések</div>
       <Calendar onDateSelect={(date) => setSelectedDate(date)} selectedDate={selectedDate} />
-      <section>
-        <Table
-          data={matchesWithBets}
-          columns={columns}
-          pageSize={10}
-          emptyMessage="Még nincsenek mérkőzések"
-          className="mt-4"
-          loading={
-            matchesLoading ||
-            myBetsLoading ||
-            updateBetMutation.isPending ||
-            createBetMutation.isPending
-          }
-          error={
-            (matchesError?.message || myBetsError?.message) &&
-            "Valami hiba történt, kérlek próbáld újra később."
-          }
-        />
-      </section>
+      {isDesktop && (
+        <section>
+          <MatchesDesktopView
+            matchesWithBets={matchesWithBets}
+            columns={columns}
+            error={
+              (matchesError?.message || myBetsError?.message) &&
+              "Valami hiba történt, kérlek próbáld újra később."
+            }
+            loading={
+              matchesLoading ||
+              myBetsLoading ||
+              updateBetMutation.isPending ||
+              createBetMutation.isPending
+            }
+          />
+        </section>
+      )}
+
+      {!isDesktop && (
+        <section>
+          <MatchesMobileView
+            matchesWithBets={matchesWithBets}
+            error={
+              (matchesError?.message || myBetsError?.message) &&
+              "Valami hiba történt, kérlek próbáld újra később."
+            }
+            loading={
+              matchesLoading ||
+              myBetsLoading ||
+              updateBetMutation.isPending ||
+              createBetMutation.isPending
+            }
+            onSelectMatch={(match) => setSelectedMatch(match)}
+          />
+        </section>
+      )}
 
       {selectedMatch && (
         <BetModalDesktop

@@ -5,13 +5,16 @@ import { format } from "date-fns";
 interface MatchCardProps {
   match: Match;
   onClick?: (match: Match) => void;
+  className?: string;
+  flagSize?: "small" | "large";
 }
 
-const MatchCard = ({ match, onClick }: MatchCardProps) => {
+const MatchCard = ({ match, onClick, className, flagSize = "large" }: MatchCardProps) => {
+  const defaultWrapperClass = "px-4 py-6";
   return (
     <div
-      className="w-full sm:w-100 bg-black/20 px-4 py-6 rounded-lg flex flex-col gap-4 
-      cursor-pointer hover:bg-black/30 transition-colors"
+      className={`w-full sm:w-100 bg-black/20 rounded-lg flex flex-col gap-4 
+      cursor-pointer hover:bg-black/30 transition-colors ${className || defaultWrapperClass}`}
       onClick={() => onClick?.(match)}
     >
       <div className="flex">
@@ -20,7 +23,11 @@ const MatchCard = ({ match, onClick }: MatchCardProps) => {
             <img
               src={`${APP_CONFIG.FLAG_PATH}${match.teamA.flag}`}
               alt={`${match.teamA.name} flag`}
-              className="w-12 h-12 object-cover rounded-full"
+              className={
+                flagSize === "small"
+                  ? "w-8 h-8 object-cover rounded-full"
+                  : "w-12 h-12 object-cover rounded-full"
+              }
             />
           )}
         </div>

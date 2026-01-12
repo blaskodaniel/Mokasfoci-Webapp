@@ -49,7 +49,7 @@ const Header = ({
             />
           </div>
           <div className="flex flex-col">
-            <div className="text-xs">{currentUser?.username}</div>
+            <div className="text-xs">{currentUser?.name || currentUser?.username}</div>
             <div className={`text-white rounded-full font-bold text-sm`}>
               {formatPoints(currentUser?.data.availableScore || 0)}
             </div>
