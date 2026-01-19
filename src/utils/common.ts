@@ -1,5 +1,5 @@
 import type { Bet } from "@/models/bet.type";
-import { CouponStatus, MatchOutcome, MatchStatus, MatchType } from "./enums";
+import { CouponStatus, MatchOutcome, MatchStatus, MatchType, TransactionType } from "./enums";
 import type { Match } from "@/models/match.type";
 
 export const getCouponStatusInfo = (
@@ -60,6 +60,38 @@ export const getMatchTypeText = (type: MatchType): string => {
       return "Csoportkör 3. forduló";
     default:
       return type;
+  }
+};
+
+export const getTransactionTypeColors: Record<string, string> = {
+  bet: "bg-blue-500 text-white",
+  win: "bg-green-500 text-white",
+  penalty: "bg-red-500 text-white",
+  refund: "bg-yellow-500 text-black",
+  initial: "bg-gray-500 text-white",
+  correction: "bg-purple-500 text-white",
+  betModification: "bg-pink-500 text-white",
+  reward: "bg-orange-500 text-white",
+};
+
+export const getTransactionTypeText = (type: TransactionType) => {
+  switch (type) {
+    case TransactionType.bet:
+      return "tét";
+    case TransactionType.win:
+      return "nyeremény";
+    case TransactionType.correction:
+      return "korrekció";
+    case TransactionType.betModification:
+      return "tét módosítás";
+    case TransactionType.initial:
+      return "kezdő összeg";
+    case TransactionType.penalty:
+      return "büntetés";
+    case TransactionType.refund:
+      return "visszatérítés";
+    case TransactionType.reward:
+      return "jutalom";
   }
 };
 

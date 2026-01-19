@@ -4,9 +4,7 @@ import { useNotification } from "@/hooks/useNotification";
 import { NotificationItem } from "./NotificationItem";
 
 const NotificationContainer = () => {
-  const notifications = useAppSelector(
-    (state) => state.notifications.notifications
-  );
+  const notifications = useAppSelector((state) => state.notifications.notifications);
   const { hideNotification } = useNotification();
   const timeoutRefs = useRef<Map<string, number>>(new Map());
 
@@ -14,11 +12,7 @@ const NotificationContainer = () => {
     const timeouts = timeoutRefs.current;
 
     notifications.forEach((notification) => {
-      if (
-        notification.autoClose &&
-        notification.duration &&
-        !timeouts.has(notification.id)
-      ) {
+      if (notification.autoClose && notification.duration && !timeouts.has(notification.id)) {
         const timeout = setTimeout(() => {
           hideNotification(notification.id);
           timeouts.delete(notification.id);

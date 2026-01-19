@@ -8,6 +8,7 @@ export const matchesKeys = {
   upcoming: () => [...matchesKeys.all, "upcoming"] as const,
   recent: () => [...matchesKeys.all, "recent"] as const,
   getDetails: (matchId: string) => [...matchesKeys.all, "details", matchId] as const,
+  getLive: () => [...matchesKeys.all, "live"] as const,
 };
 
 export const useAllMatches = ({
@@ -49,6 +50,16 @@ export const useRecentMatches = (limit?: number) => {
   return useQuery<Match[]>({
     queryKey: matchesKeys.recent(),
     queryFn: () => Api.getRecentMatches({ limit }),
+    staleTime: 2 * 60 * 1000, // 2 perc (gyakrabban frissül)
+    retry: 2,
+  });
+};
+
+// Live matches
+export const useLiveMatches = () => {
+  return useQuery<Match[]>({
+    queryKey: matchesKeys.getLive(),
+    queryFn: () => Api.getLiveMatches(),
     staleTime: 2 * 60 * 1000, // 2 perc (gyakrabban frissül)
     retry: 2,
   });

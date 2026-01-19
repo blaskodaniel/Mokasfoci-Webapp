@@ -5,8 +5,12 @@ import type { User } from "@/models/user.type";
 import UserDisplay from "@/components/UserDisplay";
 import UserDetailsModal from "@/components/UserDetailsModal";
 import { useState } from "react";
+import useResponsive from "@/hooks/useResponsive";
+import { formatNumber } from "@/utils/common";
+import ToplistMobileView from "@/components/Toplist/MobileView";
 
 const ToplistPage = () => {
+  const { isMobile } = useResponsive();
   const [isUserDetailsModalOpen, setIsUserDetailsModalOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState("");
 
@@ -18,7 +22,7 @@ const ToplistPage = () => {
       key: "position",
       render: (_, i) => <div>{i + 1}</div>,
       sortable: true,
-      width: "w-24",
+      width: isMobile ? "w-8" : "w-24",
     },
     {
       header: "Játékos",
@@ -35,34 +39,46 @@ const ToplistPage = () => {
         />
       ),
       sortable: true,
-      width: "w-40",
     },
     {
-      header: "Elérhető pont",
+      header: "Felhaszn.",
       key: "data.availableScore",
-      render: (user) => <div>{user?.data.availableScore}</div>,
+      render: (user) => <div>{formatNumber(user?.data.availableScore)}</div>,
       sortable: true,
     },
     {
       header: "Nyeremény",
       key: "data.profitScore",
-      render: (user) => <div>{user?.data.profitScore}</div>,
+      render: (user) => <div>{formatNumber(user?.data.profitScore)}</div>,
       sortable: true,
     },
   ];
   return (
-    <div>
+    <div className="px-1.5">
       <div className="text-white text-2xl">Toplista</div>
       <section>
-        <Table
-          data={toplist || []}
-          columns={columns}
-          pageSize={10}
-          emptyMessage="Még nincsenek mérkőzések"
-          className="mt-4"
-          loading={toplistLoading}
-          error={toplistError?.message && "Valami hiba történt, kérlek próbáld újra később."}
-        />
+        {!isMobile && (
+          <Table
+            data={toplist || []}
+            columns={columns}
+            pageSize={10}
+            emptyMessage="Még nincsenek mérkőzések"
+            className="mt-4"
+            loading={toplistLoading}
+            error={toplistError?.message && "Valami hiba történt, kérlek próbáld újra később."}
+          />
+        )}
+        {isMobile && (
+          <ToplistMobileView
+            users={toplist || []}
+            loading={toplistLoading}
+            error={toplistError?.message && "Valami hiba történt, kérlek próbáld újra később."}
+            onSelect={(userId: string) => {
+              setSelectedUserId(userId);
+              setIsUserDetailsModalOpen(true);
+            }}
+          />
+        )}
       </section>
 
       {selectedUserId && (

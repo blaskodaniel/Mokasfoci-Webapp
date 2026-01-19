@@ -55,9 +55,7 @@ const Table = <T extends Record<string, unknown>>({
       const aStr = String(aValue);
       const bStr = String(bValue);
 
-      return sortDirection === "asc"
-        ? aStr.localeCompare(bStr)
-        : bStr.localeCompare(aStr);
+      return sortDirection === "asc" ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
     });
   }, [data, sortKey, sortDirection]);
 
@@ -107,8 +105,15 @@ const Table = <T extends Record<string, unknown>>({
           // Ha Tailwind class (pl. w-48), konvertáljuk CSS értékre
           if (col.width.startsWith("w-")) {
             const sizeMap: Record<string, string> = {
+              "w-8": "2rem",
+              "w-12": "3rem",
+              "w-16": "4rem",
+              "w-20": "5rem",
               "w-24": "6rem",
+              "w-28": "7rem",
               "w-32": "8rem",
+              "w-40": "10rem",
+              "w-44": "11rem",
               "w-48": "12rem",
               "w-64": "16rem",
               "w-auto": "auto",
@@ -125,9 +130,7 @@ const Table = <T extends Record<string, unknown>>({
   }, [columns]);
 
   return (
-    <div
-      className={`bg-panel-bg border border-primary rounded-md overflow-hidden ${className}`}
-    >
+    <div className={`bg-panel-bg border border-primary rounded-md overflow-hidden ${className}`}>
       {/* Header */}
       <div className="bg-surface border-b border-primary/50">
         <div
@@ -139,12 +142,8 @@ const Table = <T extends Record<string, unknown>>({
           {columns.map((column) => (
             <div
               key={column.key}
-              className={`flex items-center gap-1 text-sm font-medium ${
-                column.className
-              } ${
-                column.sortable
-                  ? "cursor-pointer hover:text-button-bg-hover transition-colors"
-                  : ""
+              className={`flex items-center gap-1 text-sm font-medium ${column.className} ${
+                column.sortable ? "cursor-pointer hover:text-button-bg-hover transition-colors" : ""
               }`}
               onClick={() => handleSort(column.key)}
             >
@@ -157,8 +156,8 @@ const Table = <T extends Record<string, unknown>>({
                       sortKey === column.key && sortDirection === "asc"
                         ? "rotate-180 text-button-bg-hover"
                         : sortKey === column.key && sortDirection === "desc"
-                        ? "text-button-bg-hover"
-                        : "hidden"
+                          ? "text-button-bg-hover"
+                          : "hidden"
                     }`}
                   />
                 </div>
@@ -175,13 +174,9 @@ const Table = <T extends Record<string, unknown>>({
             <Loader text="Táblázat betöltése..." />
           </div>
         )}
-        {error && !loading && (
-          <div className="px-4 py-8 text-center text-red-500">{error}</div>
-        )}
+        {error && !loading && <div className="px-4 py-8 text-center text-red-500">{error}</div>}
         {!error && currentData.length === 0 ? (
-          <div className="px-4 py-8 text-center text-gray-400">
-            {!loading && emptyMessage}
-          </div>
+          <div className="px-4 py-8 text-center text-gray-400">{!loading && emptyMessage}</div>
         ) : (
           !error &&
           currentData.map((item, index) => (
@@ -236,9 +231,7 @@ const Table = <T extends Record<string, unknown>>({
                     key={pageNum}
                     onClick={() => goToPage(pageNum)}
                     className={`px-2 py-1 text-sm rounded transition-colors ${
-                      currentPage === pageNum
-                        ? "bg-primary text-white"
-                        : "hover:bg-primary/20"
+                      currentPage === pageNum ? "bg-primary text-white" : "hover:bg-primary/20"
                     }`}
                   >
                     {pageNum}

@@ -1,7 +1,6 @@
 import { useMemo, useState, type FC } from "react";
 import Button from "../Button";
 import Modal from "../Modal";
-import WheelPicker from "../WheelPicker";
 import { APP_CONFIG } from "@/config";
 import { MatchOutcome } from "@/utils/enums";
 import type { BetModalProps } from "./types";
@@ -47,7 +46,7 @@ const BetModalDesktop: FC<BetModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={editMode ? "Fogadás szerkesztése" : "Fogadás létrehozása"}
-      className="sm:w-[455px] bg-quaternary px-4 py-3 sm:mx-3"
+      className="sm:w-[455px] bg-primary px-4 py-3 sm:mx-3"
     >
       <div className="flex flex-col gap-2 mt-2 flex-1 sm:flex-none">
         <div className="flex justify-between items-center mb-4">
@@ -74,10 +73,10 @@ const BetModalDesktop: FC<BetModalProps> = ({
           </div>
         </div>
 
-        <div className="flex justify-center items-center gap-3 sm:gap-8">
+        <div className="flex justify-center items-center gap-3 sm:gap-5 px-1 sm:px-6">
           <div
             onClick={() => setSelectedOutcome(MatchOutcome.home)}
-            className={`px-3 py-1 rounded-md border text-center text-sm font-medium w-min-20 
+            className={`px-3 py-1 rounded-md border text-center text-sm font-medium flex-1 
               cursor-pointer transition-colors duration-300 ${
                 selectedOutcome === MatchOutcome.home
                   ? "bg-button-light text-white border-primary"
@@ -88,7 +87,7 @@ const BetModalDesktop: FC<BetModalProps> = ({
           </div>
           <div
             onClick={() => setSelectedOutcome(MatchOutcome.draw)}
-            className={`px-3 py-1 rounded-md border text-center text-sm font-medium w-min-20 
+            className={`px-3 py-1 rounded-md border text-center text-sm font-medium flex-1 
               cursor-pointer transition-colors duration-300 ${
                 selectedOutcome === MatchOutcome.draw
                   ? "bg-button-light text-white border-primary"
@@ -99,7 +98,7 @@ const BetModalDesktop: FC<BetModalProps> = ({
           </div>
           <div
             onClick={() => setSelectedOutcome(MatchOutcome.away)}
-            className={`px-3 py-1 rounded-md border text-center text-sm font-medium w-min-20 
+            className={`px-3 py-1 rounded-md border text-center text-sm font-medium flex-1 
               cursor-pointer transition-colors duration-300 ${
                 selectedOutcome === MatchOutcome.away
                   ? "bg-button-light text-white border-primary"
@@ -111,16 +110,29 @@ const BetModalDesktop: FC<BetModalProps> = ({
         </div>
 
         <div className="mt-6 flex-1 sm:flex-none">
-          <label className="block text-sm font-medium mb-3 text-center">
-            Feltett tét
-          </label>
-          <div className="flex justify-center">
-            <WheelPicker
-              values={Array.from({ length: 20 }, (_, i) => (i + 1) * 100)}
-              onValueChange={(value) => setBetValue(value)}
-              className="w-32"
-              defaultValue={betValue}
-            />
+          <label className="block text-sm font-medium mb-3 text-center">Feltett tét</label>
+          <div className="flex justify-center items-center gap-4">
+            <button
+              type="button"
+              aria-label="Csökkentés"
+              className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-white text-2xl flex items-center justify-center shadow transition disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => setBetValue((v) => Math.max(100, v - 100))}
+              disabled={betValue <= 100}
+            >
+              –
+            </button>
+            <span className="text-2xl font-bold min-w-[70px] text-center bg-gray-800 rounded-lg px-4 py-2 border border-gray-600 select-none">
+              {betValue} <span className="text-base font-normal text-gray-400">pont</span>
+            </span>
+            <button
+              type="button"
+              aria-label="Növelés"
+              className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-white text-2xl flex items-center justify-center shadow transition disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => setBetValue((v) => Math.min(userScore, v + 100))}
+              disabled={betValue + 100 > 2000}
+            >
+              +
+            </button>
           </div>
         </div>
 
@@ -129,13 +141,9 @@ const BetModalDesktop: FC<BetModalProps> = ({
           <Button
             text={editMode ? "Mentés" : "LÉTREHOZÁS"}
             subText={subText}
-            onClick={() =>
-              selectedOutcome && onSave(betValue, selectedOutcome, editMode)
-            }
+            onClick={() => selectedOutcome && onSave(betValue, selectedOutcome, editMode)}
             className={`${
-              editMode
-                ? "bg-blue-600 hover:bg-blue-700"
-                : "bg-green-600 hover:bg-green-700"
+              editMode ? "bg-blue-600 hover:bg-blue-700" : "bg-green-600 hover:bg-green-700"
             } w-full py-3 sm:py-2`}
             disabled={!isValidBet || loading || (userScore < 99 && !editMode)}
             loading={loading}

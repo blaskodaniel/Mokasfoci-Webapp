@@ -1,13 +1,11 @@
 import Table from "@/components/Table/Table";
 import type { Column } from "@/components/Table/types";
+import MatchDetailMobile from "@/components/Matches/MatchDetailMobile";
+import useResponsive from "@/hooks/useResponsive";
 
 import type { Bet } from "@/models/bet.type";
 
-import {
-  getMatchStatusInfo,
-  outcomeText,
-  potentialWinnings,
-} from "@/utils/common";
+import { getMatchStatusInfo, outcomeText, potentialWinnings } from "@/utils/common";
 
 import { useEffect } from "react";
 
@@ -30,6 +28,7 @@ const MatchDetailPage = () => {
   } = useMatchDetails(id || "");
 
   const match = matchDetails?.match;
+  const { isMobile } = useResponsive();
 
   useEffect(() => {
     refetchMatchDetails();
@@ -40,9 +39,7 @@ const MatchDetailPage = () => {
   const renderMatchStatusOrDate = () => {
     if (match?.status === MatchStatus.playing) {
       return (
-        <span
-          className={`${matchStyle.className} ${matchStyle.color} px-2 py-1 rounded text-xs`}
-        >
+        <span className={`${matchStyle.className} ${matchStyle.color} px-2 py-1 rounded text-xs`}>
           {matchStyle.text}
         </span>
       );
@@ -63,20 +60,14 @@ const MatchDetailPage = () => {
     {
       header: "Játékos",
       key: "user",
-      render: (bet) => (
-        <UserDisplay user={bet.userid!} showAvatar={true} avatarSize="sm" />
-      ),
+      render: (bet) => <UserDisplay user={bet.userid!} showAvatar={true} avatarSize="sm" />,
       sortable: true,
       // width: "w-48",
     },
     {
       header: "Tipp",
       key: "team",
-      render: (bet) => (
-        <span className="text-gray-400">
-          {match && outcomeText(bet, match)}
-        </span>
-      ),
+      render: (bet) => <span className="text-gray-400">{match && outcomeText(bet, match)}</span>,
       sortable: true,
     },
     {
@@ -117,11 +108,7 @@ const MatchDetailPage = () => {
         const isFinished = match?.status === MatchStatus.finished;
 
         if (!isFinished) {
-          return (
-            <span className="text-gray-400">
-              {potentialWinnings(bet.amount, bet.odds)}
-            </span>
-          );
+          return <span className="text-gray-400">{potentialWinnings(bet.amount, bet.odds)}</span>;
         }
 
         return (
@@ -148,9 +135,7 @@ const MatchDetailPage = () => {
   if (matchDetailsError && !matchDetailsLoading) {
     return (
       <div className="text-center text-white py-8">
-        <div className="text-red-400 mb-4">
-          Hiba történt a mérkőzés adatok betöltése során
-        </div>
+        <div className="text-red-400 mb-4">Hiba történt a mérkőzés adatok betöltése során</div>
         <button
           onClick={() => {
             // Reset error state és újrapróbálás
@@ -163,6 +148,8 @@ const MatchDetailPage = () => {
       </div>
     );
   }
+
+  if (!match) return <div>Nem található mérkőzés</div>;
 
   return (
     <div>
@@ -201,33 +188,31 @@ const MatchDetailPage = () => {
       <div className="flex gap-3 justify-center mb-6">
         <div className="text-sm flex flex-col items-center">
           <span className="text-xs text-gray-400 mb-1">1</span>
-          <span className="bg-gray-700/20 py-1 px-2 rounded-2xl font-bold">
-            {match?.oddsAwin}
-          </span>
+          <span className="bg-gray-700/20 py-1 px-2 rounded-2xl font-bold">{match?.oddsAwin}</span>
         </div>
         <div className="text-sm flex flex-col items-center">
           <span className="text-xs text-gray-400 mb-1">X</span>
-          <span className="bg-gray-700/20 py-1 px-2 rounded-2xl font-bold">
-            {match?.oddsDraw}
-          </span>
+          <span className="bg-gray-700/20 py-1 px-2 rounded-2xl font-bold">{match?.oddsDraw}</span>
         </div>
         <div className="text-sm flex flex-col items-center">
           <span className="text-xs text-gray-400 mb-1">2</span>
-          <span className="bg-gray-700/20 py-1 px-2 rounded-2xl font-bold">
-            {match?.oddsBwin}
-          </span>
+          <span className="bg-gray-700/20 py-1 px-2 rounded-2xl font-bold">{match?.oddsBwin}</span>
         </div>
       </div>
 
       <section>
-        <Table
-          data={matchDetails?.coupons || []}
-          columns={columns}
-          pageSize={10}
-          emptyMessage="Még nincsenek fogadások"
-          className="mt-4"
-          loading={matchDetailsLoading}
-        />
+        {isMobile ? (
+          <MatchDetailMobile bets={matchDetails?.coupons || []} match={match} />
+        ) : (
+          <Table
+            data={matchDetails?.coupons || []}
+            columns={columns}
+            pageSize={10}
+            emptyMessage="Még nincsenek fogadások"
+            className="mt-4"
+            loading={matchDetailsLoading}
+          />
+        )}
       </section>
     </div>
   );

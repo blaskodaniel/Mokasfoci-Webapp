@@ -19,8 +19,11 @@ import useResponsive from "@/hooks/useResponsive";
 import BalanceHistoryChart from "@/components/Charts/BalanceHistoryChart";
 import WinLostChart from "@/components/Charts/WinLostChart";
 import ScoreByMatchChart from "@/components/Charts/ScoreByMatchChart";
+import { useConfig } from "@/hooks/useConfig";
+import { format, isAfter } from "date-fns";
 
 const MyProfilePage = () => {
+  const { config } = useConfig();
   const navigate = useNavigate();
   const { showSuccess, showError } = useNotification();
   const { isMobile } = useResponsive();
@@ -41,6 +44,11 @@ const MyProfilePage = () => {
   } = useAllTeams();
 
   const mutationUpdateProfile = useUpdateProfile();
+
+  const isBettingLocked = useMemo(() => {
+    if (!config?.championStartDate) return false;
+    return isAfter(new Date(), new Date(config.championStartDate));
+  }, [config]);
 
   // Form inicializálása
   const {
@@ -111,8 +119,6 @@ const MyProfilePage = () => {
   }, [teams]);
 
   const onSubmitForm = (data: ProfileFormData) => {
-    console.log("Form data:", data);
-
     const body = Object.keys(data).reduce((acc, key) => {
       const value = data[key as keyof ProfileFormData];
       if (value && value.trim() !== "") {
@@ -124,7 +130,7 @@ const MyProfilePage = () => {
     mutationUpdateProfile.mutate(body, {
       onSuccess: (updatedUser) => {
         console.log("Profile updated successfully:", updatedUser);
-        showSuccess("A fogadás sikeresen frissítve lett.");
+        showSuccess("Mentettük a profilodat");
       },
       onError: (error) => {
         console.error("Error updating profile:", error);
@@ -270,40 +276,76 @@ const MyProfilePage = () => {
       {/* Form Section */}
       <form onSubmit={handleSubmit(onSubmitForm)} className="mx-auto px-6 space-y-8">
         {/* Basic Info Section */}
-        <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
-          <h3 className="text-xl font-semibold text-white mb-6">Alapadatok</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-gray-700/50">
+          <h3 className="text-xl font-semibold text-white">Alapadatok, kedvenc és bajnok csapat</h3>
+          <p className="mb-6 text-gray-400 text-sm leading-relaxed tracking-wide mt-1">
+            Tippeld meg ki lesz a világbajnok és válasszd ki a kedvenc csapatodat ami plusz pontokat
+            hozhat neked a játék során! <br />
+            <span className="text-red-500">
+              Fontos, hogy ezeket csak a bajnokság legelső mérkőzésének a kezdési időpontjáig tudod
+              beállítani. (
+              {format(
+                new Date(config?.championStartDate ? config?.championStartDate : new Date()),
+                "MMM dd HH:mm"
+              )}
+              )
+            </span>
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-6">
             <Input
               name="name"
               control={control}
               type="text"
-              label="Teljes nevem"
+              label="Nevem"
               placeholder="Add meg a neved"
+              description="Ha megadod akkor ez fog megjelenni mindenhol a userneved helyett"
               error={errors.name?.message}
             />
             <Select
               name="teamid"
               control={control}
               options={teamOptions}
-              label="Kedvenc csapatom"
+              label={`Kedvenc csapatom ( +${config?.favoritTeamFactor}x )`}
+              description={`Minden egyes mérkőzésen, amikor a kedvenc csapatod 
+                játszik és eltalálod a mérkőzés kimenetelét, plusz ${config?.favoritTeamFactor}x-es 
+                szorzót kapsz a nyereményre.`}
               placeholder="Válaszd ki a kedvenc csapatodat"
               error={errors.teamid?.message}
+              disabled={isBettingLocked}
             />
             <Select
               name="winteamid"
               control={control}
               options={teamOptions}
-              label="Világbajnok csapat"
+              label={`Világbajnok csapat (+${config?.championWinPoint} pont)`}
+              description={`Ha eltalálod a bajnok csapatot akkor plusz ${config?.championWinPoint} pont jóváírást kapsz`}
               placeholder="Melyik csapat nyeri a vb-t?"
               error={errors.winteamid?.message}
+              disabled={isBettingLocked}
             />
           </div>
         </div>
 
         {/* Group Winners Section */}
-        <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
-          <h3 className="text-xl font-semibold text-white mb-6">Csoportgyőztesek</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
+        <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-gray-700/50">
+          <h3 className="text-xl font-semibold text-white">
+            Csoportgyőztesek{" "}
+            <span className="text-sm">(+{config?.groupWinPoint} pont / találat)</span>
+          </h3>
+          <p className="mb-6 text-gray-400 text-sm leading-relaxed tracking-wide mt-1">
+            Tippeld meg az egyes csoportok csoportgyőzteseit. Ha eltalálod akkor plusz{" "}
+            {config?.groupWinPoint} pontot kapsz csoportonként. <br />{" "}
+            <span className="text-red-500">
+              Fontos, hogy a csoportgyőztesek megtippelése, a bajokság legelső mérkőzésének a
+              kezdési időpontjáig lehetséges (
+              {format(
+                new Date(config?.championStartDate ? config?.championStartDate : new Date()),
+                "MMM dd HH:mm"
+              )}
+              )
+            </span>
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-2 md:gap-4">
             {GROUPS.map((group) => (
               <Select
                 key={group}
@@ -315,20 +357,26 @@ const MyProfilePage = () => {
                 label={`${group} csoport`}
                 placeholder={`${group}`}
                 error={errors[group as keyof ProfileFormData]?.message}
+                disabled={isBettingLocked}
               />
             ))}
           </div>
         </div>
 
-        {/* Submit Button */}
-        <div className="flex justify-end pb-8">
-          <Button
-            text="Profil mentése"
-            type="submit"
-            disabled={!isValid || !hasAnyFieldFilled}
-            className="bg-green-600 hover:bg-green-700 px-8 py-3 text-lg font-semibold disabled:bg-gray-500 disabled:cursor-not-allowed"
-            loading={false}
-          />
+        {/* Submit Button - sticky on mobile */}
+        <div className="flex justify-end pb-8 md:static md:pb-8">
+          <div
+            className="w-full md:w-fit fixed bottom-0 left-0 right-0 z-50 p-4 bg-gray-900 md:static 
+          md:bg-transparent md:p-0"
+          >
+            <Button
+              text="Profil mentése"
+              type="submit"
+              disabled={!isValid || !hasAnyFieldFilled}
+              className="bg-green-600 hover:bg-green-700 px-8 py-3 text-lg font-semibold disabled:bg-gray-500 disabled:cursor-not-allowed w-full md:w-fit"
+              loading={false}
+            />
+          </div>
         </div>
       </form>
 

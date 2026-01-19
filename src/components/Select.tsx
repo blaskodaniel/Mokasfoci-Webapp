@@ -16,6 +16,8 @@ interface SelectProps {
   error?: string;
   label?: string;
   required?: boolean;
+  disabled?: boolean;
+  description?: string;
 }
 
 const Select: React.FC<SelectProps> = ({
@@ -27,9 +29,11 @@ const Select: React.FC<SelectProps> = ({
   error,
   label,
   required,
+  disabled,
+  description,
 }) => {
   return (
-    <div className="mb-4">
+    <div className="mb-2 md:mb-4">
       {label && (
         <label className="block text-sm font-medium text-gray-300 mb-2">
           {label} {required && <span className="text-red-400">*</span>}
@@ -37,13 +41,14 @@ const Select: React.FC<SelectProps> = ({
       )}
       <Controller
         name={name}
+        disabled={disabled}
         control={control}
         render={({ field }) => (
           <select
             {...field}
             className={`
-              w-full px-3 py-2 
-              bg-gray-700 border border-gray-600 
+              w-full px-3 py-2 pr-10
+              ${disabled ? "bg-gray-800 border-gray-800 appearance-none" : "bg-gray-700 border border-gray-600"} 
               text-white placeholder-gray-400
               rounded-md focus:outline-none 
               focus:ring-2 focus:ring-blue-500 
@@ -63,6 +68,7 @@ const Select: React.FC<SelectProps> = ({
           </select>
         )}
       />
+      {description && <p className="text-xs text-gray-400 mt-2 px-1">{description}</p>}
       {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
     </div>
   );

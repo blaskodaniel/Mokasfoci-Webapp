@@ -1,5 +1,6 @@
 import { APP_CONFIG } from "@/config";
 import type { Match } from "@/models/match.type";
+import { getDateDisplay } from "@/utils/dateTimefn";
 import { format } from "date-fns";
 
 interface MatchCardProps {
@@ -33,7 +34,7 @@ const MatchCard = ({ match, onClick, className, flagSize = "large" }: MatchCardP
         </div>
         <div className="flex-1 justify-center items-center flex flex-col gap-2">
           <div className="flex justify-center items-center text-sm text-gray-400">
-            {match.date ? format(new Date(match.date), "LLL dd") : "nincs dátum"}
+            {match.date ? getDateDisplay(new Date(match.date)) : "nincs dátum"}
           </div>
           <div className="text-xl text-white font-bold">
             {match.date ? format(new Date(match.date), "HH:mm") : "nincs dátum"}

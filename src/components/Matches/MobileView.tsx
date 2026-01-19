@@ -2,6 +2,8 @@ import type { FC } from "react";
 import MatchListItem from "../MatchListItem";
 import type { MatchesMobileViewProps } from "./types";
 import Loader from "../Loader";
+import { useNavigate } from "react-router-dom";
+import { MatchStatus } from "@/utils/enums";
 
 const MatchesMobileView: FC<MatchesMobileViewProps> = ({
   matchesWithBets,
@@ -9,6 +11,7 @@ const MatchesMobileView: FC<MatchesMobileViewProps> = ({
   error,
   onSelectMatch,
 }) => {
+  const navigate = useNavigate();
   if (loading) {
     return (
       <div className="flex justify-center py-10">
@@ -34,6 +37,10 @@ const MatchesMobileView: FC<MatchesMobileViewProps> = ({
           <div
             key={match._id}
             className="mb-1 border-b border-gray-700/30 last:border-b-0 first:pt-0"
+            onClick={() => {
+              const canViewDetails = match?.status !== MatchStatus.enabled;
+              if (canViewDetails) navigate(`/merkozesek/${match._id}`);
+            }}
           >
             <MatchListItem
               match={match}

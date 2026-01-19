@@ -28,6 +28,7 @@ const MatchListItem = ({
   const isUserBetTeamAWin = bet?.outcome === MatchOutcome.home;
   const isUserBetTeamBWin = bet?.outcome === MatchOutcome.away;
   const isUserBetDraw = bet?.outcome === MatchOutcome.draw;
+  const canBet = "userbet" in match;
 
   const statusInfoBadge = useMemo(() => {
     return getMatchStatusInfo(match.status);
@@ -79,7 +80,7 @@ const MatchListItem = ({
           </div>
         </div>
         <div className="flex items-center gap-5 flex-1 justify-end">
-          {match.status === MatchStatus.enabled && !bet && (
+          {canBet && match.status === MatchStatus.enabled && !bet && (
             <div
               onClick={() => onSelectMatch && onSelectMatch(match)}
               className="px-2 py-2 rounded-md text-center bg-button-light hover:bg-button-light-hover cursor-pointer text-xs"

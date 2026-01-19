@@ -44,11 +44,7 @@ const typeStyles = {
   },
 };
 
-export const NotificationItem = ({
-  notification,
-  onClose,
-  index,
-}: NotificationItemProps) => {
+export const NotificationItem = ({ notification, onClose, index }: NotificationItemProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
 
@@ -67,7 +63,7 @@ export const NotificationItem = ({
   };
 
   const baseClasses = `
-    relative w-96 max-w-sm backdrop-blur-sm rounded-lg border shadow-lg
+    relative w-70 md:w-96 max-w-sm backdrop-blur-sm rounded-lg border shadow-lg
     transform transition-all duration-500 ease-out pointer-events-auto
     ${styles.bg} ${styles.text}
   `;
@@ -75,8 +71,8 @@ export const NotificationItem = ({
   const animationClasses = isRemoving
     ? "translate-x-full opacity-0 scale-95"
     : isVisible
-    ? "translate-x-0 opacity-100 scale-100"
-    : "translate-x-full opacity-0 scale-95";
+      ? "translate-x-0 opacity-100 scale-100"
+      : "translate-x-full opacity-0 scale-95";
 
   return (
     <div
@@ -104,20 +100,14 @@ export const NotificationItem = ({
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="font-semibold text-sm leading-5">
-              {notification.title}
-            </div>
+            <div className="font-semibold text-sm leading-5">{notification.title}</div>
 
             {notification.subtitle && (
-              <div className="text-xs text-gray-300 mt-1">
-                {notification.subtitle}
-              </div>
+              <div className="text-xs text-gray-300 mt-1">{notification.subtitle}</div>
             )}
 
             {notification.description && (
-              <div className="text-xs text-gray-400 mt-2 leading-4">
-                {notification.description}
-              </div>
+              <div className="text-xs text-gray-400 mt-2 leading-4">{notification.description}</div>
             )}
 
             {/* Actions */}

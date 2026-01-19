@@ -10,6 +10,6 @@ export const getDateDisplay = (date: string | Date) => {
   } else if (isTomorrow(matchDate)) {
     return "Holnap";
   } else {
-    return format(matchDate, "dd.MM", { locale: hu });
+    return format(matchDate, "LLL dd", { locale: hu });
   }
 };

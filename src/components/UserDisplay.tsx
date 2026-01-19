@@ -4,6 +4,7 @@ import { APP_CONFIG, DEFAULT_AVATAR_URL } from "@/config";
 interface UserDisplayProps {
   user: User;
   showAvatar?: boolean;
+  showUsername?: boolean;
   className?: string;
   avatarSize?: "xs" | "sm" | "md" | "lg";
   nameClassName?: string;
@@ -13,6 +14,7 @@ interface UserDisplayProps {
 const UserDisplay = ({
   user,
   showAvatar = true,
+  showUsername = true,
   className = "",
   avatarSize = "md",
   nameClassName = "",
@@ -67,12 +69,14 @@ const UserDisplay = ({
           </div>
         </div>
       )}
-      <div
-        className={`font-semibold truncate ${nameClassName} ${onClick ? "cursor-pointer" : ""}`}
-        onClick={() => onClick && onClick()}
-      >
-        {user?.username || ""}
-      </div>
+      {showUsername && (
+        <div
+          className={`font-semibold truncate ${nameClassName} ${onClick ? "cursor-pointer" : ""}`}
+          onClick={() => onClick && onClick()}
+        >
+          {user?.username || ""}
+        </div>
+      )}
     </div>
   );
 };

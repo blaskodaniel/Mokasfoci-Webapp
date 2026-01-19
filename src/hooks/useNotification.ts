@@ -53,40 +53,28 @@ export const useNotification = () => {
 
   // Convenience methods for different types
   const showSuccess = useCallback(
-    (
-      title: string,
-      options?: Omit<ShowNotificationOptions, "title" | "type">
-    ) => {
+    (title: string, options?: Omit<ShowNotificationOptions, "title" | "type">) => {
       showNotification({ title, type: "success", ...options });
     },
     [showNotification]
   );
 
   const showError = useCallback(
-    (
-      title: string,
-      options?: Omit<ShowNotificationOptions, "title" | "type">
-    ) => {
+    (title: string, options?: Omit<ShowNotificationOptions, "title" | "type">) => {
       showNotification({ title, type: "error", duration: 5000, ...options });
     },
     [showNotification]
   );
 
   const showWarning = useCallback(
-    (
-      title: string,
-      options?: Omit<ShowNotificationOptions, "title" | "type">
-    ) => {
+    (title: string, options?: Omit<ShowNotificationOptions, "title" | "type">) => {
       showNotification({ title, type: "warning", duration: 4000, ...options });
     },
     [showNotification]
   );
 
   const showInfo = useCallback(
-    (
-      title: string,
-      options?: Omit<ShowNotificationOptions, "title" | "type">
-    ) => {
+    (title: string, options?: Omit<ShowNotificationOptions, "title" | "type">) => {
       showNotification({ title, type: "info", ...options });
     },
     [showNotification]

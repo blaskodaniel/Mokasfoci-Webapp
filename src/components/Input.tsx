@@ -12,6 +12,7 @@ interface InputProps {
   label?: string;
   required?: boolean;
   accept?: string; // file input esetén
+  description?: string;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -24,9 +25,10 @@ const Input: React.FC<InputProps> = ({
   label,
   required,
   accept,
+  description,
 }) => {
   return (
-    <div className="mb-4">
+    <div className="mb-2 md:mb-4">
       {label && (
         <label className="block text-sm font-medium text-gray-300 mb-2">
           {label} {required && <span className="text-red-400">*</span>}
@@ -40,9 +42,7 @@ const Input: React.FC<InputProps> = ({
             {...field}
             type={type}
             value={type === "file" ? undefined : value}
-            onChange={
-              type === "file" ? (e) => onChange(e.target.files?.[0]) : onChange
-            }
+            onChange={type === "file" ? (e) => onChange(e.target.files?.[0]) : onChange}
             placeholder={placeholder}
             accept={accept}
             className={`
@@ -63,6 +63,7 @@ const Input: React.FC<InputProps> = ({
           />
         )}
       />
+      {description && <p className="text-xs text-gray-400 mt-2 px-1">{description}</p>}
       {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
     </div>
   );

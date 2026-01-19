@@ -14,6 +14,7 @@ import type { MatchOutcome } from "@/utils/enums";
 import type { Bet } from "@/models/bet.type";
 import type { Transaction } from "@/models/transaction.type";
 import type { Team } from "@/models/team.type";
+import type { Config } from "@/models/config.type";
 
 const Api = {
   async login(username: string, password: string): Promise<SignInResponse> {
@@ -75,6 +76,11 @@ const Api = {
     const response = await axiosInstance.get(`/match/recent`, {
       params: validParams,
     });
+    return response.data;
+  },
+
+  async getLiveMatches(): Promise<Match[]> {
+    const response = await axiosInstance.get("/match/live");
     return response.data;
   },
 
@@ -229,7 +235,7 @@ const Api = {
     return response.data;
   },
 
-  async getConfigs(): Promise<Record<string, string>> {
+  async getConfigs(): Promise<Config> {
     const response = await axiosInstance.get(`/config/all`);
     return response.data;
   },
