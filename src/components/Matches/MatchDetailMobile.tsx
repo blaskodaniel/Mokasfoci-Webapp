@@ -15,29 +15,29 @@ const MatchDetailMobile: FC<MatchDetailMobileProps> = ({ bets, match }) => {
   return (
     <div className="flex flex-col gap-2">
       {bets.length === 0 && (
-        <div className="text-center text-gray-400 py-6 text-sm">Még nincsenek fogadások</div>
+        <div className="text-center text-gray-400 py-6 text-sm">
+          {match.status === MatchStatus.finished
+            ? "Erre a mérkőzésre nem fogadtak"
+            : "Még nincsenek fogadások"}
+        </div>
       )}
       {bets.map((bet) => {
         const isFinished = matchStatus === MatchStatus.finished;
         return (
           <div
             key={bet._id}
-            className="rounded-xl shadow bg-linear-to-br from-gray-800 to-gray-900 
-            p-2 border border-gray-700 flex flex-col gap-1 mx-3"
+            className="rounded-lg shadow bg-linear-to-br from-[#0e111b] to-[#01111f] 
+            px-3 py-2 border flex flex-col gap-1 mx-3 border-[#00000070]"
           >
             <div className="flex items-center justify-between mb-0.5">
               <UserDisplay user={bet.userid!} showAvatar={true} avatarSize="sm" />
-              {isFinished ? (
+              {isFinished && (
                 <span
                   className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
                     bet.success ? "bg-green-600 text-white" : "bg-red-600 text-white"
                   }`}
                 >
                   {bet.success ? "Nyert" : "Vesztett"}
-                </span>
-              ) : (
-                <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-600 text-white">
-                  Folyamatban
                 </span>
               )}
             </div>

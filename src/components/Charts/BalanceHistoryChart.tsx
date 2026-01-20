@@ -38,10 +38,10 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
         <p className="text-text-secondary text-sm mb-2 font-medium">{date}</p>
         <div className="space-y-1">
           <p className="text-success text-sm">
-            <span className="font-semibold">Bevétel:</span> +{positiveBalance} Ft
+            <span className={`font-semibold`}>Nyeremény:</span> +{positiveBalance} Ft
           </p>
           <p className="text-error text-sm">
-            <span className="font-semibold">Kiadás:</span> {negativeBalance} Ft
+            <span className={`font-semibold`}>Veszteség:</span> {negativeBalance} Ft
           </p>
           <div className="border-t border-accent/20 mt-2 pt-2">
             <p className={`font-semibold ${balance >= 0 ? "text-success" : "text-error"}`}>
@@ -60,9 +60,21 @@ interface BalanceHistoryChartProps {
   from?: string;
   to?: string;
   userId?: string;
+  height?: number;
+  showXAxis?: boolean;
+  showYAxis?: boolean;
+  legendFontSize?: number;
 }
 
-export const BalanceHistoryChart = ({ from, to, userId }: BalanceHistoryChartProps) => {
+export const BalanceHistoryChart = ({
+  from,
+  to,
+  userId,
+  height = 300,
+  showXAxis = true,
+  showYAxis = true,
+  legendFontSize = 14,
+}: BalanceHistoryChartProps) => {
   const queryClient = useQueryClient();
   const { data, isLoading, isError } = useBalanceHistory(from, to, userId);
 
@@ -86,9 +98,13 @@ export const BalanceHistoryChart = ({ from, to, userId }: BalanceHistoryChartPro
     );
   }
 
+  const balances = data.map((d) => d.balance);
+  const maxBalance = Math.max(...balances);
+  const minBalance = Math.min(...balances);
+
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <ComposedChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+    <ResponsiveContainer width="100%" height={height}>
+      <ComposedChart data={data} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="positiveGradient" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#4ade80" stopOpacity={0.9} />
@@ -102,11 +118,13 @@ export const BalanceHistoryChart = ({ from, to, userId }: BalanceHistoryChartPro
         <CartesianGrid strokeDasharray="3 3" stroke="#2a2543" vertical={false} />
         <XAxis
           dataKey="_id"
+          hide={!showXAxis}
           stroke="#b6b1d4"
           tick={{ fill: "#b6b1d4", fontSize: 12 }}
           tickLine={{ stroke: "#2a2543" }}
         />
         <YAxis
+          hide={!showYAxis}
           stroke="#b6b1d4"
           tick={{ fill: "#b6b1d4", fontSize: 12 }}
           tickLine={{ stroke: "#2a2543" }}
@@ -114,18 +132,46 @@ export const BalanceHistoryChart = ({ from, to, userId }: BalanceHistoryChartPro
         />
         <Tooltip content={<CustomTooltip />} cursor={{ fill: "#2a2543", opacity: 0.3 }} />
         <Legend
-          wrapperStyle={{ paddingTop: "10px" }}
+          wrapperStyle={{ paddingTop: "20px" }}
           iconType="rect"
           formatter={(value) => {
             const labels: Record<string, string> = {
-              positiveBalance: "Bevétel",
-              negativeBalance: "Kiadás",
+              positiveBalance: "Nyeremény",
+              negativeBalance: "Veszteség",
               balance: "Napi egyenleg",
             };
-            return <span style={{ color: "#b6b1d4" }}>{labels[value] || value}</span>;
+            return (
+              <span style={{ color: "#b6b1d4", fontSize: legendFontSize }}>
+                {labels[value] || value}
+              </span>
+            );
           }}
         />
         <ReferenceLine y={0} stroke="#b6b1d4" strokeWidth={2} strokeDasharray="3 3" />
+        <ReferenceLine
+          y={maxBalance}
+          label={{
+            position: "top",
+            value: `Max: ${maxBalance.toFixed(2)}`,
+            fill: "#ffffff",
+            fontSize: 12,
+          }}
+          stroke="#8b5cf6"
+          strokeDasharray="3 3"
+          opacity={0.5}
+        />
+        <ReferenceLine
+          y={minBalance}
+          label={{
+            position: "bottom",
+            value: `Min: ${minBalance.toFixed(2)}`,
+            fill: "#ffffff",
+            fontSize: 12,
+          }}
+          stroke="#8b5cf6"
+          strokeDasharray="3 3"
+          opacity={0.5}
+        />
         <Bar
           dataKey="positiveBalance"
           fill="url(#positiveGradient)"

@@ -13,11 +13,8 @@
 
   --color-start: #0d101a;
   --color-end: #19202c;
-  --color-bg-gradient: linear-gradient(
-    180deg,
-    var(--color-start) 0%,
-    var(--color-end) 100%
-  );
+  --color-bg-gradient: linear-gradient(180deg, var(--color-start) 0%, var(--color-end) 100%);
+  --color-bg-card-gradient: linear-gradient(180deg, #0e111b 0%, #01111f 100%);
 
   /* ⚽️ Kártyák, panelek */
   --color-surface: #1f1a35;

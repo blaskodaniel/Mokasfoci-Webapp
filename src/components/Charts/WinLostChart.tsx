@@ -20,7 +20,10 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     const data = payload[0];
     return (
-      <div className="bg-surface/95 backdrop-blur-sm border border-accent/20 rounded-lg px-4 py-2 shadow-lg">
+      <div
+        className="bg-surface/95 backdrop-blur-sm border border-accent/20 rounded-lg 
+      px-4 py-2 shadow-lg"
+      >
         <p className="text-text-primary font-semibold mb-1">{data.name}</p>
         <p className="text-accent text-lg">{data.value} tipp</p>
         <p className="text-text-secondary text-sm">{data.payload.percentage}</p>
@@ -30,7 +33,19 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   return null;
 };
 
-export const WinLostChart = ({ userId }: { userId?: string }) => {
+interface WinLostChartProps {
+  userId?: string;
+  height?: number;
+  showLabel?: boolean;
+  legendFontSize?: number;
+}
+
+export const WinLostChart = ({
+  userId,
+  height = 300,
+  showLabel = true,
+  legendFontSize = 14,
+}: WinLostChartProps) => {
   const { data, isLoading, isError } = useWinLostStats(userId);
 
   if (isLoading) {
@@ -79,7 +94,7 @@ export const WinLostChart = ({ userId }: { userId?: string }) => {
   return (
     <div className="flex flex-col items-center">
       <div className="relative w-full">
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={height}>
           <PieChart>
             <defs>
               <linearGradient id="wonGradient" x1="0" y1="0" x2="1" y2="1">
@@ -96,8 +111,8 @@ export const WinLostChart = ({ userId }: { userId?: string }) => {
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={renderCustomLabel}
-              outerRadius={100}
+              label={showLabel ? renderCustomLabel : false}
+              outerRadius={80}
               innerRadius={60}
               paddingAngle={5}
               dataKey="value"
@@ -115,21 +130,24 @@ export const WinLostChart = ({ userId }: { userId?: string }) => {
             <Legend
               iconType="circle"
               wrapperStyle={{
-                paddingTop: "0px",
+                paddingTop: "10px",
               }}
               formatter={(value, entry: any) => (
-                <span className="text-text-primary">{`${value}: ${entry.payload.value}`}</span>
+                <span
+                  className="text-text-primary"
+                  style={{ fontSize: legendFontSize }}
+                >{`${value}: ${entry.payload.value}`}</span>
               )}
             />
           </PieChart>
         </ResponsiveContainer>
         <div
           className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-        text-center pointer-events-none"
+        text-center pointer-events-none -mt-3"
         >
-          <p className="text-text-secondary text-xs mb-1">Nyerési arány</p>
-          <p className="text-accent text-3xl font-bold">{data.winRatePercentage.toFixed(1)}%</p>
-          <p className="text-text-secondary text-xs mt-1">
+          <p className="text-text-secondary text-xs">Nyerési arány</p>
+          <p className="text-accent text-xl font-bold">{data.winRatePercentage.toFixed(1)}%</p>
+          <p className="text-text-secondary text-xs">
             {data.won} / {total}
           </p>
         </div>

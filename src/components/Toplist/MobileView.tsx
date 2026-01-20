@@ -39,7 +39,7 @@ const ToplistMobileView: FC<ToplistProps> = ({ users, loading, error, onSelect }
                   <div className="text-lg font-semibold text-green-400">
                     {formatNumber(user.data.availableScore)}
                   </div>
-                  <div className="text-xs text-gray-400 italic">felhasználható</div>
+                  <div className="text-xs text-gray-400 italic">összpontszám</div>
                 </div>
                 <div>
                   <div className="text-lg font-semibold text-green-400">

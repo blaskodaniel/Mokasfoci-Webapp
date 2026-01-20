@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
   Legend,
+  ReferenceLine,
 } from "recharts";
 import Loader from "../Loader";
 import { format } from "date-fns";
@@ -72,6 +73,10 @@ const ScoreByMatchChart = () => {
     displayName: `${format(new Date(match.matchDate), "MMM dd")}`,
   }));
 
+  const scores = chartData.map((d) => d.availableScore);
+  const maxScore = Math.max(...scores);
+  const minScore = Math.min(...scores);
+
   return (
     <ResponsiveContainer width="100%" height={300}>
       <LineChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
@@ -100,6 +105,20 @@ const ScoreByMatchChart = () => {
           label={{ value: "Pontok", angle: -90, position: "insideLeft", fill: "#b6b1d4" }}
         />
         <Tooltip content={<CustomTooltip />} />
+        <ReferenceLine
+          y={maxScore}
+          label={{ position: "top", value: `Max: ${maxScore}`, fill: "#60fafaff", fontSize: 12 }}
+          stroke="#60fafaff"
+          strokeDasharray="3 3"
+          opacity={0.5}
+        />
+        <ReferenceLine
+          y={minScore}
+          label={{ position: "bottom", value: `Min: ${minScore}`, fill: "#60fafaff", fontSize: 12 }}
+          stroke="#60fafaff"
+          strokeDasharray="3 3"
+          opacity={0.5}
+        />
         <Legend
           wrapperStyle={{ paddingTop: "10px" }}
           iconType="line"

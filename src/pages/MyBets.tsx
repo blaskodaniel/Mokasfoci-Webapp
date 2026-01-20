@@ -4,10 +4,10 @@ import type { Column } from "@/components/Table/types";
 import { useMyBets, useDeleteBet, useUpdateBet } from "@/hooks/api/usePlayers";
 import type { Bet } from "@/models/bet.type";
 import type { Match } from "@/models/match.type";
-import { getCouponStatusInfo, potentialWinnings } from "@/utils/common";
+import { getCouponStatusInfo } from "@/utils/common";
 import { CouponStatus, MatchOutcome, MatchStatus } from "@/utils/enums";
 import { useEffect, useState } from "react";
-import { MdEdit, MdOutlinePriceCheck } from "react-icons/md";
+import { MdEdit, MdFavorite, MdOutlinePriceCheck } from "react-icons/md";
 import { IoTrashOutline } from "react-icons/io5";
 import ConfirmModal from "@/components/ConfirmModal";
 import { useNotification } from "@/hooks/useNotification";
@@ -15,8 +15,12 @@ import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import useResponsive from "@/hooks/useResponsive";
 import MyBetsMobileView from "@/components/MyBets/MobileView";
+import { useConfig } from "@/hooks/useConfig";
+import useGame from "@/hooks/useGame";
 
 const MyBetsPage = () => {
+  const { config } = useConfig();
+  const { userFavoriteTeam } = useGame();
   const { isDesktop, isMobile } = useResponsive();
   const { showSuccess, showError } = useNotification();
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
@@ -95,11 +99,21 @@ const MyBetsPage = () => {
               to={`/merkozesek/${bet.matchid?._id}`}
               className="font-semibold text-amber-400 hover:underline"
             >
-              {matchName}
+              <div className="flex gap-1">
+                {matchName}
+                {userFavoriteTeam(bet.matchid) && <MdFavorite color="red" />}
+              </div>
             </Link>
           );
 
-        return <span className="font-semibold">{matchName}</span>;
+        return (
+          <span className="font-semibold">
+            <div className="flex gap-1">
+              {matchName}
+              {userFavoriteTeam(bet.matchid) && <MdFavorite color="red" />}
+            </div>
+          </span>
+        );
       },
       sortable: true,
       width: "w-48",
@@ -121,7 +135,16 @@ const MyBetsPage = () => {
     {
       header: "Odds",
       key: "odds",
-      render: (bet) => <span className="text-gray-400">{bet.odds}</span>,
+      render: (bet) => {
+        if (userFavoriteTeam(bet.matchid)) {
+          return (
+            <div className="text-gray-400">
+              {bet.odds} <span className="text-green-600">* {config?.favoritTeamFactor}x</span>
+            </div>
+          );
+        }
+        return <span className="text-gray-400">{bet.odds}</span>;
+      },
       sortable: true,
     },
     {
@@ -166,16 +189,14 @@ const MyBetsPage = () => {
     },
     {
       header: "Nyeremény",
-      key: "custom_key",
-      valueBySort: (bet) => potentialWinnings(bet.amount, bet.odds),
+      key: "totalWin",
+      valueBySort: (bet) => bet.totalWin,
       render: (bet) => {
         const shouldShowPotentialWinnings =
           bet.status === CouponStatus.active || (bet.status === CouponStatus.closed && bet.success);
 
         return (
-          <span className="text-gray-400">
-            {shouldShowPotentialWinnings ? potentialWinnings(bet.amount, bet.odds) : 0}
-          </span>
+          <span className="text-gray-400">{shouldShowPotentialWinnings ? bet.totalWin : 0}</span>
         );
       },
       sortable: true,
@@ -186,11 +207,7 @@ const MyBetsPage = () => {
       key: "profit",
       render: (bet) => {
         if (bet.status === CouponStatus.closed && bet.success) {
-          return (
-            <span className="text-green-600">
-              {potentialWinnings(bet.amount, bet.odds) - bet.amount}
-            </span>
-          );
+          return <span className="text-green-600">{bet.totalWin - bet.amount}</span>;
         } else {
           return <span className="text-gray-400">0</span>;
         }

@@ -11,6 +11,7 @@ interface MatchListItemProps {
   displayTime?: boolean;
   displayStatusBadge?: boolean;
   onSelectMatch?: (match: Match) => void;
+  onRowClick?: (match: Match) => void;
 }
 
 const MatchListItem = ({
@@ -18,6 +19,7 @@ const MatchListItem = ({
   displayTime,
   displayStatusBadge,
   onSelectMatch,
+  onRowClick,
 }: MatchListItemProps) => {
   const isTeamAWin = match.outcome === MatchOutcome.home;
   const isTeamBWin = match.outcome === MatchOutcome.away;
@@ -48,6 +50,7 @@ const MatchListItem = ({
 
   return (
     <div
+      onClick={() => onRowClick?.(match)}
       className="
      hover:bg-gray-700/10 transition-colors cursor-pointer"
     >
@@ -103,13 +106,13 @@ const MatchListItem = ({
           )}
           <div className="flex flex-col items-center text-xs text-gray-400 gap-0.5">
             <div className={`${isUserBetTeamAWin ? "text-white font-semibold" : "text-gray-400"}`}>
-              {match.oddsAwin}
+              {match.oddsAwin?.toFixed(2)}
             </div>
             <div className={`${isUserBetDraw ? "text-white font-semibold" : "text-gray-400"}`}>
-              {match.oddsDraw}
+              {match.oddsDraw?.toFixed(2)}
             </div>
             <div className={`${isUserBetTeamBWin ? "text-white font-semibold" : "text-gray-400"}`}>
-              {match.oddsBwin}
+              {match.oddsBwin?.toFixed(2)}
             </div>
           </div>
         </div>

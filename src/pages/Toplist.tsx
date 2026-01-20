@@ -41,7 +41,7 @@ const ToplistPage = () => {
       sortable: true,
     },
     {
-      header: "Felhaszn.",
+      header: "Összpontszám",
       key: "data.availableScore",
       render: (user) => <div>{formatNumber(user?.data.availableScore)}</div>,
       sortable: true,

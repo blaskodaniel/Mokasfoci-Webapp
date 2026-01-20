@@ -16,7 +16,7 @@ import { useAppDispatch } from "@/state/hooks";
 import type { MatchOutcome } from "@/utils/enums";
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ToplistWidget from "@/components/Widgets/ToplistWidget";
 import Slider from "@/components/Slider";
 import useResponsive from "@/hooks/useResponsive";
@@ -24,6 +24,7 @@ import { ApiError } from "@/utils/apiError";
 import { useNotification } from "@/hooks/useNotification";
 
 const HomePage = () => {
+  const navigate = useNavigate();
   const { showError } = useNotification();
   const { isMobile } = useResponsive();
   const dispatch = useAppDispatch();
@@ -99,12 +100,17 @@ const HomePage = () => {
                   match={match}
                   onSelectMatch={setSelectedMatch}
                   displayStatusBadge
+                  onRowClick={(match: Match) => {
+                    navigate(`/merkozesek/${match._id}`);
+                  }}
                 />
               ))}
             </div>
           )}
           {liveMatches && liveMatches.length === 0 && (
-            <div className="p-4 text-gray-500">Nincsenek futó mérkőzések</div>
+            <div className="p-4 text-gray-500 text-xs text-center">
+              Most éppen nincs futó mérkőzés{" "}
+            </div>
           )}
         </Panel>
 

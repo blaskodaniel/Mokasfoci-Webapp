@@ -1,11 +1,13 @@
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
-import { MdEdit, MdOutlinePriceCheck } from "react-icons/md";
+import { MdEdit, MdFavorite, MdOutlinePriceCheck } from "react-icons/md";
 import { IoTrashOutline } from "react-icons/io5";
 import type { Bet } from "@/models/bet.type";
-import { getCouponStatusInfo, potentialWinnings } from "@/utils/common";
+import { formatNumber, getCouponStatusInfo } from "@/utils/common";
 import { CouponStatus, MatchOutcome, MatchStatus } from "@/utils/enums";
 import { APP_CONFIG } from "@/config";
+import { useConfig } from "@/hooks/useConfig";
+import useGame from "@/hooks/useGame";
 
 interface MyBetsMobileViewProps {
   bets: Bet[];
@@ -14,6 +16,8 @@ interface MyBetsMobileViewProps {
 }
 
 const MyBetsMobileView = ({ bets, onEdit, onDelete }: MyBetsMobileViewProps) => {
+  const { userFavoriteTeam } = useGame();
+  const { config } = useConfig();
   if (!bets || bets.length === 0) {
     return <div className="text-center text-gray-400 py-8">Még nincsenek fogadásaid</div>;
   }
@@ -26,7 +30,7 @@ const MyBetsMobileView = ({ bets, onEdit, onDelete }: MyBetsMobileViewProps) => 
         const statusInfo = getCouponStatusInfo(bet.status);
         const shouldShowPotentialWinnings =
           bet.status === CouponStatus.active || (bet.status === CouponStatus.closed && bet.success);
-        const winnings = potentialWinnings(bet.amount, bet.odds);
+        const winnings = bet.totalWin;
         const profit =
           bet.status === CouponStatus.closed && bet.success ? winnings - bet.amount : 0;
         const bgColor =
@@ -68,7 +72,17 @@ const MyBetsMobileView = ({ bets, onEdit, onDelete }: MyBetsMobileViewProps) => 
                 )}
                 <span className="text-white font-semibold text-md">{outcomeText}</span>
               </div>
-              <span className="text-amber-500 text-md font-bold">x{bet.odds}</span>
+              {userFavoriteTeam(bet.matchid) ? (
+                <div>
+                  <span className="text-amber-500 text-md font-bold">x{bet.odds}</span>
+                  <span className="text-green-500 text-md font-bold">
+                    {" "}
+                    x{config?.favoritTeamFactor}
+                  </span>
+                </div>
+              ) : (
+                <span className="text-amber-500 text-md font-bold">x{bet.odds}</span>
+              )}
             </div>
 
             {/* Match Result label and status */}
@@ -89,10 +103,18 @@ const MyBetsMobileView = ({ bets, onEdit, onDelete }: MyBetsMobileViewProps) => 
                     to={`/merkozesek/${bet.matchid?._id}`}
                     className="text-white hover:text-amber-400 text-sm font-medium"
                   >
-                    {matchName}
+                    <div className="flex gap-1">
+                      {matchName}
+                      {userFavoriteTeam(bet.matchid) && <MdFavorite color="red" />}
+                    </div>
                   </Link>
                 ) : (
-                  <span className="text-white text-sm font-medium">{matchName}</span>
+                  <span className="text-white text-sm font-medium">
+                    <div className="flex gap-1">
+                      {matchName}
+                      {userFavoriteTeam(bet.matchid) && <MdFavorite color="red" />}
+                    </div>
+                  </span>
                 )}
               </div>
 
@@ -108,7 +130,7 @@ const MyBetsMobileView = ({ bets, onEdit, onDelete }: MyBetsMobileViewProps) => 
                     <div
                       className={`font-bold text-xl ${shouldShowPotentialWinnings ? "text-green-400" : "text-gray-400"}`}
                     >
-                      {shouldShowPotentialWinnings ? winnings : 0}
+                      {shouldShowPotentialWinnings ? formatNumber(winnings) : 0}
                     </div>
                     <div className="text-gray-400 text-xs">Nyeremény</div>
                   </div>
@@ -132,7 +154,9 @@ const MyBetsMobileView = ({ bets, onEdit, onDelete }: MyBetsMobileViewProps) => 
                   </div>
                 )}
                 {profit > 0 && (
-                  <span className="text-green-600 font-semibold">+{profit} Ft profit</span>
+                  <span className="text-green-600 font-semibold">
+                    +{formatNumber(profit)} profit
+                  </span>
                 )}
               </div>
             </div>

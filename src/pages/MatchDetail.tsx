@@ -2,13 +2,9 @@ import Table from "@/components/Table/Table";
 import type { Column } from "@/components/Table/types";
 import MatchDetailMobile from "@/components/Matches/MatchDetailMobile";
 import useResponsive from "@/hooks/useResponsive";
-
 import type { Bet } from "@/models/bet.type";
-
 import { getMatchStatusInfo, outcomeText, potentialWinnings } from "@/utils/common";
-
 import { useEffect } from "react";
-
 import { useParams } from "react-router-dom";
 import { useMatchDetails } from "@/hooks/api/useMatches";
 import Loader from "@/components/Loader";
@@ -16,6 +12,7 @@ import { APP_CONFIG } from "@/config";
 import { format } from "date-fns";
 import { MatchStatus } from "@/utils/enums";
 import UserDisplay from "@/components/UserDisplay";
+import MobileBackBar from "@/components/MobileBackBar";
 
 const MatchDetailPage = () => {
   const { id } = useParams();
@@ -153,6 +150,7 @@ const MatchDetailPage = () => {
 
   return (
     <div>
+      <MobileBackBar title="Mérkőzés részletei" />
       <div className="flex mx-auto items-center gap-8 justify-center mb-6">
         <div className="flex flex-col justify-center items-center gap-4">
           {match?.teamA?.flag && (

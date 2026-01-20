@@ -102,5 +102,9 @@ export interface UserDetails {
   };
   stats: {
     averageBetAmount: number;
+    biggestWin: number;
+    riskLevel: number;
+    roi: number;
+    winningStreak: number;
   };
 }

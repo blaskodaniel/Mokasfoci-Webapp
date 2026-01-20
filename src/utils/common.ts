@@ -95,8 +95,8 @@ export const getTransactionTypeText = (type: TransactionType) => {
   }
 };
 
-export const potentialWinnings = (bet: number, odds: number): number => {
-  return parseFloat((bet * odds).toFixed(2));
+export const potentialWinnings = (bet: number, odds: number, additional = 1): number => {
+  return parseFloat((bet * odds * additional).toFixed(2));
 };
 
 export const outcomeText = (bet: Bet, match: Match) =>

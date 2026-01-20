@@ -20,11 +20,12 @@ export const useAxiosInterceptor = () => {
 
         // 1. Ellenőrizzük, hogy 401-es hiba-e
         // 2. Ellenőrizzük, hogy ez NEM egy újrapróbálkozás-e (kerüljük a végtelen ciklust)
-        console.log(
-          "Axios interceptor elkapta a hibát:",
-          error.response?.status
-        );
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        console.log("Axios interceptor elkapta a hibát:", error.response?.status);
+        if (
+          error.response?.status === 401 &&
+          !originalRequest._retry &&
+          !originalRequest.url?.includes("refresh")
+        ) {
           originalRequest._retry = true; // Megjelöljük, hogy ez már újrapróbálkozás lesz
 
           try {
@@ -37,18 +38,13 @@ export const useAxiosInterceptor = () => {
 
             // 5. Frissítjük az EREDETI kérés fejlécét az új tokennel
             originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
-            console.log(
-              "Token frissítve, újrapróbálkozás az eredeti kéréssel."
-            );
+            console.log("Token frissítve, újrapróbálkozás az eredeti kéréssel.");
             // 6. Újrapróbáljuk az eredeti kérést
             return axiosInstance(originalRequest);
           } catch (refreshError) {
             // Ha a /refresh is 401-et ad, lejárt a refresh token is
             // Kijelentkeztetjük a usert
-            if (
-              axios.isAxiosError(refreshError) &&
-              refreshError.response?.status === 401
-            ) {
+            if (axios.isAxiosError(refreshError) && refreshError.response?.status === 401) {
               logout(); // Ez törli az állapotot és a cookie-t (a szerverrel)
             }
             return Promise.reject(refreshError);
