@@ -186,15 +186,21 @@ const MatchDetailPage = () => {
       <div className="flex gap-3 justify-center mb-6">
         <div className="text-sm flex flex-col items-center">
           <span className="text-xs text-gray-400 mb-1">1</span>
-          <span className="bg-gray-700/20 py-1 px-2 rounded-2xl font-bold">{match?.oddsAwin}</span>
+          <span className="bg-gray-700/20 py-1 px-2 rounded-2xl font-bold">
+            {match?.oddsAwin?.toFixed(2)}
+          </span>
         </div>
         <div className="text-sm flex flex-col items-center">
           <span className="text-xs text-gray-400 mb-1">X</span>
-          <span className="bg-gray-700/20 py-1 px-2 rounded-2xl font-bold">{match?.oddsDraw}</span>
+          <span className="bg-gray-700/20 py-1 px-2 rounded-2xl font-bold">
+            {match?.oddsDraw?.toFixed(2)}
+          </span>
         </div>
         <div className="text-sm flex flex-col items-center">
           <span className="text-xs text-gray-400 mb-1">2</span>
-          <span className="bg-gray-700/20 py-1 px-2 rounded-2xl font-bold">{match?.oddsBwin}</span>
+          <span className="bg-gray-700/20 py-1 px-2 rounded-2xl font-bold">
+            {match?.oddsBwin?.toFixed(2)}
+          </span>
         </div>
       </div>
 

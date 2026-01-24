@@ -1,21 +1,32 @@
 import { APP_CONFIG } from "@/config";
-import type { Match } from "@/models/match.type";
 import { getDateDisplay } from "@/utils/dateTimefn";
 import { format } from "date-fns";
+import { MatchOutcome } from "@/utils/enums";
+import type { MatchWithUserBet } from "./Matches/types";
 
 interface MatchCardProps {
-  match: Match;
-  onClick?: (match: Match) => void;
+  match: MatchWithUserBet;
+  onClick?: (match: MatchWithUserBet) => void;
   className?: string;
   flagSize?: "small" | "large";
 }
 
 const MatchCard = ({ match, onClick, className, flagSize = "large" }: MatchCardProps) => {
   const defaultWrapperClass = "px-4 py-6";
+  const userBet = match.userbet;
+
+  const getOddsClass = (outcome: MatchOutcome) => {
+    const baseClass = "text-sm flex-1 py-1 rounded transition-colors duration-200 border";
+    if (userBet?.outcome === outcome) {
+      return `${baseClass} bg-green-600/20 text-green-400 font-bold border-green-500/50`;
+    }
+    return `${baseClass} border-transparent text-gray-400`;
+  };
+
   return (
     <div
       className={`w-full sm:w-100 bg-black/20 rounded-lg flex flex-col gap-4 
-      cursor-pointer hover:bg-black/30 transition-colors ${className || defaultWrapperClass}`}
+      cursor-pointer hover:bg-black/30 transition-colors relative ${className || defaultWrapperClass}`}
       onClick={() => onClick?.(match)}
     >
       <div className="flex">
@@ -50,10 +61,10 @@ const MatchCard = ({ match, onClick, className, flagSize = "large" }: MatchCardP
           )}
         </div>
       </div>
-      <div className="flex gap-3 border-t border-gray-700/30 pt-3 text-gray-400 text-center">
-        <div className="text-sm flex-1 border-r border-gray-700/30">{match.oddsAwin}</div>
-        <div className="text-sm flex-1 border-r border-gray-700/30">{match.oddsDraw}</div>
-        <div className="text-sm flex-1">{match.oddsBwin}</div>
+      <div className="flex gap-1 border-t border-gray-700/30 pt-3 text-center">
+        <div className={getOddsClass(MatchOutcome.home)}>{match.oddsAwin?.toFixed(2)}</div>
+        <div className={getOddsClass(MatchOutcome.draw)}>{match.oddsDraw?.toFixed(2)}</div>
+        <div className={getOddsClass(MatchOutcome.away)}>{match.oddsBwin?.toFixed(2)}</div>
       </div>
     </div>
   );

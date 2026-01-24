@@ -83,12 +83,14 @@ const MatchListItem = ({
           </div>
         </div>
         <div className="flex items-center gap-5 flex-1 justify-end">
-          {canBet && match.status === MatchStatus.enabled && !bet && (
+          {canBet && match.status === MatchStatus.enabled && (
             <div
               onClick={() => onSelectMatch && onSelectMatch(match)}
-              className="px-2 py-2 rounded-md text-center bg-button-light hover:bg-button-light-hover cursor-pointer text-xs"
+              className={`px-2 py-2 rounded-md text-center 
+                ${bet ? "bg-button-secondary-bg" : "bg-button-light"}  
+              cursor-pointer text-xs`}
             >
-              Fogadás
+              {bet ? "Módosít" : "Fogadás"}
             </div>
           )}
           {displayStatusBadge && match.status !== MatchStatus.enabled && (
@@ -104,7 +106,7 @@ const MatchListItem = ({
               <div className="text-sm">{match.goalB}</div>
             </div>
           )}
-          <div className="flex flex-col items-center text-xs text-gray-400 gap-0.5">
+          <div className="flex flex-col items-end text-xs text-gray-400 gap-0.5 w-7">
             <div className={`${isUserBetTeamAWin ? "text-white font-semibold" : "text-gray-400"}`}>
               {match.oddsAwin?.toFixed(2)}
             </div>

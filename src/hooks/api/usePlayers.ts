@@ -62,14 +62,12 @@ export const useDeleteBet = () => {
 };
 
 export const useUpdateBet = () => {
-  const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
 
   return useMutation({
     mutationFn: ({ betId, data }: { betId: string; data: Partial<Bet> }) =>
       Api.updateBet(betId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
       dispatch(getMeAction());
     },
   });

@@ -1,12 +1,12 @@
-import { useNavigate } from "react-router-dom";
-import BG from "../assets/img/login_bg.jpg";
+import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import { AxiosError } from "axios";
 import type { ApiError } from "@/utils/apiError";
+import Api from "@/services/service";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
-  // const { token } = useParams();
+  const { token } = useParams();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +27,7 @@ const ResetPassword = () => {
       }
 
       setIsLoading(true);
-      // await Api.resetPassword(password, token || "");
+      await Api.resetPassword(password, token || "");
       setSuccess(true);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -47,11 +47,8 @@ const ResetPassword = () => {
   };
 
   return (
-    <div
-      className="min-h-screen flex justify-center bg-cover bg-center px-5"
-      style={{ backgroundImage: `url(${BG})` }}
-    >
-      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md flex flex-col gap-6 h-fit mt-20">
+    <div className="min-h-screen flex justify-center bg-cover bg-center px-3 sm:px-5">
+      <div className="p-8 w-full max-w-md flex flex-col gap-6 h-fit mt-20">
         {/* <img
           src={AppLogo}
           alt="WatchTogether Logo"
@@ -62,10 +59,7 @@ const ResetPassword = () => {
         {!success ? (
           <>
             <div className="flex flex-col gap-2">
-              <label
-                htmlFor="username"
-                className="text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="username" className="text-sm font-medium text-white-700">
                 Új jelszó*
               </label>
               <input
@@ -79,10 +73,7 @@ const ResetPassword = () => {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label
-                htmlFor="confirmPassword"
-                className="text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="confirmPassword" className="text-sm font-medium text-white-700">
                 Új jelszó megint*
               </label>
               <input
@@ -95,28 +86,25 @@ const ResetPassword = () => {
                 placeholder="Új jelszó megint"
               />
             </div>
-            {error && (
-              <div className="text-red-600 text-sm text-center">{error}</div>
-            )}
+            {error && <div className="text-red-600 text-sm text-center">{error}</div>}
             <button
               type="button"
               onClick={handleSubmit}
-              className="bg-purple-600 text-white font-semibold py-2 rounded hover:bg-purple-700 transition"
+              className="bg-button-light text-white font-semibold py-2 rounded hover:bg-button-light-hover transition"
             >
               Mentés
             </button>
           </>
         ) : (
-          <div className="text-center text-green-900">
-            <div className="font-semibold">
-              Sikeresen megváltoztattad a jelszavad!
-            </div>
-            <div className="text-sm text-gray-600 pt-3">
+          <div className="text-center text-green-500 text-xl">
+            <div className="font-semibold">Sikeresen megváltoztattad a jelszavad!</div>
+            <div className="text-sm text-gray-500 pt-3">
               Mostmár bejelentkezhetsz az új jelszavaddal.
             </div>
             <div
               onClick={navigateHandler}
-              className="text-purple-700 text-center cursor-pointer mt-5"
+              className="text-white text-center cursor-pointer mt-5 rounded-3xl
+               bg-button-light px-4 py-2 hover:bg-button-light-hover transition inline-block"
             >
               Bejelentkezés
             </div>

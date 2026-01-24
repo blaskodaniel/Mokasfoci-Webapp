@@ -8,13 +8,10 @@ import {
   matchesKeys,
   useLiveMatches,
 } from "@/hooks/api/useMatches";
-import { playersKeys } from "@/hooks/api/usePlayers";
+import { playersKeys, useCreateBet, useMyBets, useUpdateBet } from "@/hooks/api/usePlayers";
 import type { Match } from "@/models/match.type";
-import Api from "@/services/service";
-import { getMeAction } from "@/state/authSlice";
-import { useAppDispatch } from "@/state/hooks";
 import type { MatchOutcome } from "@/utils/enums";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import ToplistWidget from "@/components/Widgets/ToplistWidget";
@@ -22,22 +19,30 @@ import Slider from "@/components/Slider";
 import useResponsive from "@/hooks/useResponsive";
 import { ApiError } from "@/utils/apiError";
 import { useNotification } from "@/hooks/useNotification";
+import type { MatchWithUserBet } from "@/components/Matches/types";
+import WelcomePanel from "@/components/WelcomePanel";
+import { useConfig } from "@/hooks/useConfig";
+import { isBefore } from "date-fns";
 
 const HomePage = () => {
+  const { config } = useConfig();
   const navigate = useNavigate();
-  const { showError } = useNotification();
+  const { showError, showSuccess } = useNotification();
   const { isMobile } = useResponsive();
-  const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
-  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(null);
+  const [isBetModalOpen, setIsBetModalOpen] = useState(false);
   const upcomingMatchesLength = 5;
+
+  const updateBetMutation = useUpdateBet();
+  const createBetMutation = useCreateBet();
 
   // Frissítjük az összes query-t amikor a komponens mount-olódik
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: matchesKeys.upcoming() });
     queryClient.invalidateQueries({ queryKey: matchesKeys.recent() });
     queryClient.invalidateQueries({ queryKey: playersKeys.toplist() });
+    queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
   }, [queryClient]);
 
   const { data: upcomingMatches } = useUpcomingMatches(upcomingMatchesLength);
@@ -49,37 +54,92 @@ const HomePage = () => {
   } = useLiveMatches();
 
   const { data: recentMatches, isLoading: recentLoading, error: recentError } = useRecentMatches(5);
+  const { data: myBets } = useMyBets();
 
-  const onCreateCoupon = async (betAmount: number, outcome: MatchOutcome) => {
+  const upcomingMatchesWithBets = useMemo(() => {
+    if (!upcomingMatches) return [];
+    if (!myBets) return upcomingMatches;
+    return upcomingMatches.map((match) => ({
+      ...match,
+      userbet: myBets.find((b) => b.matchid._id === match._id),
+    }));
+  }, [upcomingMatches, myBets]);
+
+  const onSubmitCouponHandling = async (
+    betAmount: number,
+    outcome: MatchOutcome,
+    editMode: boolean
+  ) => {
     if (!selectedMatch) return;
-    try {
-      setIsLoading(true);
-      await Api.createBet(selectedMatch._id, betAmount, outcome);
-      dispatch(getMeAction());
-      setSelectedMatch(null);
-    } catch (error: unknown) {
-      const msg = ApiError.getErrorMessage(error);
-      showError(msg);
-    } finally {
-      setIsLoading(false);
+
+    if (editMode && selectedMatch.userbet) {
+      // Update bet
+      updateBetMutation.mutate(
+        {
+          betId: selectedMatch.userbet._id,
+          data: {
+            amount: betAmount,
+            outcome: outcome,
+          },
+        },
+        {
+          onSuccess: () => {
+            setIsBetModalOpen(false);
+            showSuccess("Frissítettük a fogadásodat!");
+            queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
+          },
+          onError: (error) => {
+            console.error("Error updating bet:", error);
+            showError("A fogadás frissítése sikertelen volt.");
+          },
+        }
+      );
+    } else {
+      // Create bet
+      createBetMutation.mutate(
+        {
+          matchId: selectedMatch._id,
+          betAmount,
+          outcome,
+        },
+        {
+          onSuccess: () => {
+            setIsBetModalOpen(false);
+            queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
+            showSuccess("A fogadásod sikeresen létrehoztuk.");
+          },
+          onError: (error) => {
+            const msg = ApiError.getErrorMessage(error);
+            showError(msg);
+          },
+        }
+      );
     }
   };
 
   return (
     <div>
+      {isBefore(new Date(), new Date(config?.championStartDate || "")) && (
+        <section className="w-full px-3">
+          <WelcomePanel />
+        </section>
+      )}
       <section className="mt-6 mb-5">
-        <h1 className="text-2xl font-bold text-white px-4 hidden sm:block">Kiemelt</h1>
+        <h1 className="text-2xl font-bold text-white px-4 hidden sm:block">Hamarosan játszák</h1>
         <section className="mt-6 px-4">
           <Slider itemsPerView={isMobile ? 1 : 3} gap={16}>
-            {upcomingMatches?.slice(0, upcomingMatchesLength).map((match: Match) => (
-              <MatchCard
-                key={match._id}
-                match={match}
-                onClick={() => {
-                  setSelectedMatch(match);
-                }}
-              />
-            ))}
+            {upcomingMatchesWithBets
+              ?.slice(0, upcomingMatchesLength)
+              .map((match: MatchWithUserBet) => (
+                <MatchCard
+                  key={match._id}
+                  match={match}
+                  onClick={() => {
+                    setSelectedMatch(match);
+                    setIsBetModalOpen(true);
+                  }}
+                />
+              ))}
           </Slider>
         </section>
       </section>
@@ -98,7 +158,10 @@ const HomePage = () => {
                 <MatchListItem
                   key={match._id}
                   match={match}
-                  onSelectMatch={setSelectedMatch}
+                  onSelectMatch={(m) => {
+                    setSelectedMatch(m as MatchWithUserBet);
+                    setIsBetModalOpen(true);
+                  }}
                   displayStatusBadge
                   onRowClick={(match: Match) => {
                     navigate(`/merkozesek/${match._id}`);
@@ -135,6 +198,11 @@ const HomePage = () => {
               ))}
             </div>
           )}
+          {liveMatches && liveMatches.length === 0 && (
+            <div className="p-4 text-gray-500 text-xs text-center">
+              Még nem játszottak le mérkőzést{" "}
+            </div>
+          )}
         </Panel>
       </div>
 
@@ -142,10 +210,14 @@ const HomePage = () => {
         <BetModalDesktop
           key={selectedMatch._id}
           match={selectedMatch}
-          isOpen={!!selectedMatch}
-          onClose={() => setSelectedMatch(null)}
-          onSave={onCreateCoupon}
-          loading={isLoading}
+          isOpen={isBetModalOpen}
+          onClose={() => setIsBetModalOpen(false)}
+          onAfterClose={() => setSelectedMatch(null)}
+          onSave={onSubmitCouponHandling}
+          loading={updateBetMutation.isPending || createBetMutation.isPending}
+          editMode={!!selectedMatch.userbet}
+          initBetValue={selectedMatch?.userbet?.amount}
+          initSelectedOutcome={selectedMatch?.userbet?.outcome}
         />
       )}
     </div>

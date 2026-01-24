@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Api from "@/services/service";
 import { getMeAction } from "@/state/authSlice";
+import { ApiError } from "@/utils/apiError";
 
 const Login: React.FC = () => {
   const { login } = useAuth();
@@ -11,12 +12,19 @@ const Login: React.FC = () => {
   const { isLoading } = useAppSelector((state) => state.auth);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const response = await Api.login(username, password);
-    login(response.token, response.user);
-    dispatch(getMeAction());
+    try {
+      e.preventDefault();
+      const response = await Api.login(username.trim(), password);
+      login(response.token, response.user);
+      dispatch(getMeAction());
+    } catch (err: unknown) {
+      const error = ApiError.getErrorMessage(err);
+      setErrorMessage(error);
+      console.error("Login error:", err);
+    }
   };
 
   return (
@@ -58,6 +66,7 @@ const Login: React.FC = () => {
             placeholder="Jelszó"
           />
         </div>
+        {errorMessage && <p className="text-red-500 text-sm text-center">{errorMessage}</p>}
         <button
           type="submit"
           className="bg-button-light text-white font-semibold py-2 rounded hover:bg-button-light-hover 

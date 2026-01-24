@@ -1,4 +1,5 @@
 import type { User } from "../models/user.type";
+import type { Team } from "@/models/team.type";
 
 export interface SignInResponse {
   token: string;
@@ -107,4 +108,8 @@ export interface UserDetails {
     roi: number;
     winningStreak: number;
   };
+}
+
+export interface GetTeamRankingsResponse {
+  [groupName: string]: Team[];
 }

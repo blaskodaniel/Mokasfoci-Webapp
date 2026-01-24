@@ -1,8 +1,6 @@
 import BetModalDesktop from "@/components/BetModal/Desktop";
 import type { Column } from "@/components/Table/types";
-import { useMyBets, useUpdateBet, useCreateBet } from "@/hooks/api/usePlayers";
-import type { Bet } from "@/models/bet.type";
-import type { Match } from "@/models/match.type";
+import { useMyBets, useUpdateBet, useCreateBet, playersKeys } from "@/hooks/api/usePlayers";
 import {
   getMatchStatusInfo,
   getMatchTypeText,
@@ -21,17 +19,16 @@ import Calendar from "@/components/Calendar";
 import useResponsive from "@/hooks/useResponsive";
 import MatchesDesktopView from "@/components/Matches/DesktopView.tsx";
 import MatchesMobileView from "@/components/Matches/MobileView";
-
-// Extended Match type a user bet-tel
-type MatchWithUserBet = Match & {
-  userbet?: Bet;
-};
+import type { MatchWithUserBet } from "@/components/Matches/types";
+import { useQueryClient } from "@tanstack/react-query";
 
 const MatchesPage = () => {
+  const queryClient = useQueryClient();
   const { isDesktop } = useResponsive();
   const { showSuccess, showError } = useNotification();
   const { currentUser } = useAppSelector((state) => state.auth);
   const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(null);
+  const [isBetModalOpen, setIsBetModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
   const {
@@ -102,8 +99,9 @@ const MatchesPage = () => {
         },
         {
           onSuccess: () => {
-            setSelectedMatch(null);
+            setIsBetModalOpen(false);
             showSuccess("A fogadás sikeresen frissítve lett.");
+            queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
           },
           onError: (error) => {
             console.error("Error updating bet:", error);
@@ -120,7 +118,8 @@ const MatchesPage = () => {
         },
         {
           onSuccess: () => {
-            setSelectedMatch(null);
+            setIsBetModalOpen(false);
+            queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
             showSuccess("A fogadás sikeresen létrehozva lett.");
           },
           onError: (error) => {
@@ -205,21 +204,21 @@ const MatchesPage = () => {
     {
       header: "Hazai",
       key: "oddsAwin",
-      render: (match) => <span className="text-gray-400">{match.oddsAwin}</span>,
+      render: (match) => <span className="text-gray-400">{match.oddsAwin?.toFixed(2)}</span>,
       sortable: true,
       width: "w-24",
     },
     {
       header: "Döntetlen",
       key: "oddsDraw",
-      render: (match) => <span className="text-gray-400">{match.oddsDraw}</span>,
+      render: (match) => <span className="text-gray-400">{match.oddsDraw?.toFixed(2)}</span>,
       sortable: true,
       width: "w-24",
     },
     {
       header: "Vendég",
       key: "oddsBwin",
-      render: (match) => <span className="text-gray-400">{match.oddsBwin}</span>,
+      render: (match) => <span className="text-gray-400">{match.oddsBwin?.toFixed(2)}</span>,
       sortable: true,
       width: "w-24",
     },
@@ -274,7 +273,10 @@ const MatchesPage = () => {
         if (hasUserBet && isMatchEnabled) {
           return (
             <div
-              onClick={() => setSelectedMatch(match)}
+              onClick={() => {
+                setSelectedMatch(match);
+                setIsBetModalOpen(true);
+              }}
               className="px-2 py-1 rounded-md text-center text-xs bg-button-secondary-bg hover:bg-button-secondary-bg-hover cursor-pointer"
             >
               Fogadás módosítása
@@ -286,7 +288,10 @@ const MatchesPage = () => {
         if (!hasUserBet && hasEnoughScore && isMatchEnabled) {
           return (
             <div
-              onClick={() => setSelectedMatch(match)}
+              onClick={() => {
+                setSelectedMatch(match);
+                setIsBetModalOpen(true);
+              }}
               className="px-2 py-1 rounded-md text-center bg-button-light hover:bg-button-light-hover cursor-pointer text-xs"
             >
               Fogadok a mérkőzésre
@@ -337,7 +342,10 @@ const MatchesPage = () => {
               updateBetMutation.isPending ||
               createBetMutation.isPending
             }
-            onSelectMatch={(match) => setSelectedMatch(match)}
+            onSelectMatch={(match) => {
+              setSelectedMatch(match);
+              setIsBetModalOpen(true);
+            }}
           />
         </section>
       )}
@@ -346,8 +354,9 @@ const MatchesPage = () => {
         <BetModalDesktop
           key={selectedMatch._id}
           match={selectedMatch}
-          isOpen={!!selectedMatch}
-          onClose={() => setSelectedMatch(null)}
+          isOpen={isBetModalOpen}
+          onClose={() => setIsBetModalOpen(false)}
+          onAfterClose={() => setSelectedMatch(null)}
           onSave={onSubmitCoupon}
           loading={updateBetMutation.isPending || createBetMutation.isPending}
           editMode={!!selectedMatch.userbet}

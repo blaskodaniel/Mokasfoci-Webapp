@@ -1,16 +1,19 @@
 import { useMemo, useState, type FC } from "react";
 import Button from "../Button";
 import Modal from "../Modal";
-import { APP_CONFIG } from "@/config";
-import { MatchOutcome } from "@/utils/enums";
+import { MatchOutcome, MatchType } from "@/utils/enums";
 import type { BetModalProps } from "./types";
 import { useAppSelector } from "@/state/hooks";
-import { MdFavorite } from "react-icons/md";
 import useGame from "@/hooks/useGame";
 import { useConfig } from "@/hooks/useConfig";
 import { formatNumber, potentialWinnings } from "@/utils/common";
+import MatchTeamsPanel from "./MatchTeamsPanel";
+import MatchOutcomeSelector from "./MatchOutcomeSelector";
+import BetValueSelector from "./BetValueSelector";
+import GroupStandings from "../Widgets/GroupStandings";
+import { useGetGroupStandingsById } from "@/hooks/api/useTeams";
 
-const BetModalDesktop: FC<BetModalProps> = ({
+const BetModalDesktop: FC<BetModalProps & { onAfterClose?: () => void }> = ({
   isOpen,
   onClose,
   onSave,
@@ -19,6 +22,7 @@ const BetModalDesktop: FC<BetModalProps> = ({
   initBetValue = 1000,
   initSelectedOutcome,
   editMode = false,
+  onAfterClose,
 }) => {
   const { config } = useConfig();
   const { currentUser } = useAppSelector((state) => state.auth);
@@ -27,6 +31,14 @@ const BetModalDesktop: FC<BetModalProps> = ({
   const [selectedOutcome, setSelectedOutcome] = useState<MatchOutcome | null>(
     initSelectedOutcome || null
   );
+
+  const teamStandingsQuery = useGetGroupStandingsById(String(match.teamA?.groupid ?? ""));
+
+  const groupName = useMemo(() => {
+    return teamStandingsQuery.data && teamStandingsQuery.data?.length > 0
+      ? teamStandingsQuery.data[0].groupid.name
+      : "";
+  }, [teamStandingsQuery]);
 
   const userScore = useMemo(() => {
     return currentUser ? currentUser.data.availableScore : 0;
@@ -57,43 +69,12 @@ const BetModalDesktop: FC<BetModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={editMode ? "Fogadás szerkesztése" : "Fogadás létrehozása"}
+      title={editMode ? "Fogadás módosítása" : "Fogadás létrehozása"}
       className="sm:w-[455px] bg-primary px-4 py-3 sm:mx-3"
+      onAfterClose={onAfterClose}
     >
       <div className="flex flex-col gap-2 mt-2 flex-1 sm:flex-none">
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex-1 flex flex-col justify-center items-center gap-4">
-            <div className="relative">
-              {match.teamA?.flag && (
-                <img
-                  src={`${APP_CONFIG.FLAG_PATH}${match.teamA.flag}`}
-                  alt={`${match.teamA.name} flag`}
-                  className="w-12 h-12 object-cover rounded-full"
-                />
-              )}
-              {userFavoriteTeam(match)?._id === match.teamA?._id && (
-                <MdFavorite className="absolute -top-1 -right-1 text-red-500 w-5 h-5 drop-shadow-md" />
-              )}
-            </div>
-            <span className="text-lg">{match.teamA?.name}</span>
-          </div>
-          <div>vs.</div>
-          <div className="flex-1 flex flex-col justify-center items-center gap-4">
-            <div className="relative">
-              {match.teamB?.flag && (
-                <img
-                  src={`${APP_CONFIG.FLAG_PATH}${match.teamB.flag}`}
-                  alt={`${match.teamB.name} flag`}
-                  className="w-12 h-12 object-cover rounded-full"
-                />
-              )}
-              {userFavoriteTeam(match)?._id === match.teamB?._id && (
-                <MdFavorite className="absolute -top-1 -right-1 text-red-500 w-5 h-5 drop-shadow-md" />
-              )}
-            </div>
-            <span className="text-lg">{match.teamB?.name}</span>
-          </div>
-        </div>
+        <MatchTeamsPanel match={match} />
 
         {userFavoriteTeam(match) && (
           <div className="text-center text-xs text-green-600">
@@ -101,98 +82,17 @@ const BetModalDesktop: FC<BetModalProps> = ({
           </div>
         )}
 
-        <div className="flex justify-center items-center gap-3 sm:gap-5 px-1 sm:px-6">
-          <div
-            onClick={() => setSelectedOutcome(MatchOutcome.home)}
-            className={`px-3 py-1 rounded-md border text-center text-sm font-medium flex-1 
-              cursor-pointer transition-colors duration-300 ${
-                selectedOutcome === MatchOutcome.home
-                  ? "bg-button-light text-white border-primary"
-                  : "border-gray-300/20 hover:bg-primary/20"
-              }`}
-          >
-            <p>{match.teamA?.name}</p>{" "}
-            <p>
-              {userFavoriteTeam(match) ? (
-                <span>
-                  {match.oddsAwin}{" "}
-                  <span className="text-green-500">x{config?.favoritTeamFactor}</span>
-                </span>
-              ) : (
-                match.oddsAwin
-              )}
-            </p>
-          </div>
-          <div
-            onClick={() => setSelectedOutcome(MatchOutcome.draw)}
-            className={`px-3 py-1 rounded-md border text-center text-sm font-medium flex-1 
-              cursor-pointer transition-colors duration-300 ${
-                selectedOutcome === MatchOutcome.draw
-                  ? "bg-button-light text-white border-primary"
-                  : "border-gray-300/20 hover:bg-primary/20"
-              }`}
-          >
-            <p>döntetlen</p>{" "}
-            <p>
-              {userFavoriteTeam(match) ? (
-                <span>
-                  {match.oddsDraw}{" "}
-                  <span className="text-green-500">x{config?.favoritTeamFactor}</span>
-                </span>
-              ) : (
-                match.oddsDraw
-              )}
-            </p>
-          </div>
-          <div
-            onClick={() => setSelectedOutcome(MatchOutcome.away)}
-            className={`px-3 py-1 rounded-md border text-center text-sm font-medium flex-1 
-              cursor-pointer transition-colors duration-300 ${
-                selectedOutcome === MatchOutcome.away
-                  ? "bg-button-light text-white border-primary"
-                  : "border-gray-300/20 hover:bg-primary/20"
-              }`}
-          >
-            <p>{match.teamB?.name}</p>{" "}
-            <p>
-              {userFavoriteTeam(match) ? (
-                <span>
-                  {match.oddsBwin}{" "}
-                  <span className="text-green-500">x{config?.favoritTeamFactor}</span>
-                </span>
-              ) : (
-                match.oddsBwin
-              )}
-            </p>
-          </div>
-        </div>
+        <MatchOutcomeSelector
+          selectedOutcome={selectedOutcome}
+          onSelectOutcome={setSelectedOutcome}
+          match={match}
+        />
 
-        <div className="mt-6 flex-1 sm:flex-none">
-          <label className="block text-sm font-medium mb-3 text-center">Feltett tét</label>
-          <div className="flex justify-center items-center gap-4">
-            <button
-              type="button"
-              aria-label="Csökkentés"
-              className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-white text-2xl flex items-center justify-center shadow transition disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={() => setBetValue((v) => Math.max(100, v - 100))}
-              disabled={betValue <= 100}
-            >
-              –
-            </button>
-            <span className="text-2xl font-bold min-w-[70px] text-center bg-gray-800 rounded-lg px-4 py-2 border border-gray-600 select-none">
-              {betValue} <span className="text-base font-normal text-gray-400">pont</span>
-            </span>
-            <button
-              type="button"
-              aria-label="Növelés"
-              className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-white text-2xl flex items-center justify-center shadow transition disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={() => setBetValue((v) => Math.min(userScore, v + 100))}
-              disabled={betValue + 100 > 2000}
-            >
-              +
-            </button>
-          </div>
-        </div>
+        <BetValueSelector
+          betValue={betValue}
+          onChangeBetValue={setBetValue}
+          userScore={userScore}
+        />
 
         {isValidBet && (
           <div className="text-center mt-5">
@@ -208,6 +108,14 @@ const BetModalDesktop: FC<BetModalProps> = ({
               <span className="pl-1 text-base font-normal text-gray-400">pont</span>
             </div>
           </div>
+        )}
+
+        {(match.type === MatchType.GroupStageRound1 ||
+          match.type === MatchType.GroupStageRound2 ||
+          match.type === MatchType.GroupStageRound3) && (
+          <section className="flex justify-center pt-4">
+            <GroupStandings teams={teamStandingsQuery.data ?? []} groupName={groupName} size="sm" />
+          </section>
         )}
 
         {/* Mobile: Sticky button at bottom, Desktop: Regular button */}

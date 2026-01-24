@@ -4,6 +4,7 @@ import { axiosInstance } from "./axiosConfig";
 import type {
   BalanceHistoryEntry,
   DefaultAvatar,
+  GetTeamRankingsResponse,
   ScoreByMatch,
   SignInResponse,
   UpdateUserProfileBody,
@@ -237,6 +238,29 @@ const Api = {
 
   async getConfigs(): Promise<Config> {
     const response = await axiosInstance.get(`/config/all`);
+    return response.data;
+  },
+
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const response = await axiosInstance.post(`/auth/forgot-password`, { email });
+    return response.data;
+  },
+
+  async resetPassword(password: string, token: string): Promise<{ message: string }> {
+    const response = await axiosInstance.post(`/auth/reset-password`, {
+      password,
+      token,
+    });
+    return response.data;
+  },
+
+  async getGroupsStandings(): Promise<GetTeamRankingsResponse> {
+    const response = await axiosInstance.get(`/group/standings`);
+    return response.data;
+  },
+
+  async getGroupStandingsById(groupId: string): Promise<Team[]> {
+    const response = await axiosInstance.get(`/group/${groupId}/standings`);
     return response.data;
   },
 };

@@ -74,7 +74,7 @@ const UserDisplay = ({
           className={`font-semibold truncate ${nameClassName} ${onClick ? "cursor-pointer" : ""}`}
           onClick={() => onClick && onClick()}
         >
-          {user?.username || ""}
+          {user?.name || user.username || ""}
         </div>
       )}
     </div>

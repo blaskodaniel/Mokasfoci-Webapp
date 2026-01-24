@@ -31,6 +31,11 @@ const useMenu = () => {
         link: "/profilom",
         isActive: location.pathname === "/profilom",
       },
+      {
+        name: "Csoportok",
+        link: "/csoportok",
+        isActive: location.pathname === "/csoportok",
+      },
     ],
     [location.pathname]
   );

@@ -15,6 +15,7 @@ import MatchesPage from "./pages/Matches";
 import ToplistPage from "./pages/Toplist";
 import MatchDetailPage from "./pages/MatchDetail";
 import MyTransactions from "./pages/MyTransactions";
+import GroupTables from "./pages/GroupTables";
 
 function App() {
   useAxiosInterceptor();
@@ -38,6 +39,7 @@ function App() {
           <Route path="merkozesek" element={<MatchesPage />} />
           <Route path="merkozesek/:id" element={<MatchDetailPage />} />
           <Route path="toplista" element={<ToplistPage />} />
+          <Route path="csoportok" element={<GroupTables />} />
           <Route path="transactions" element={<MyTransactions />} />
 
           <Route path="*" element={<NotFound />} />

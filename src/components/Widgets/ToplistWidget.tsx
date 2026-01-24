@@ -22,7 +22,6 @@ const ToplistWidget = () => {
               <div>Játékos</div>
             </div>
             <div className="flex gap-4">
-              <div>Elérhető</div>
               <div>Nyeremény</div>
             </div>
           </div>
@@ -40,10 +39,7 @@ const ToplistWidget = () => {
                   />
                 </div>
                 <div className="flex gap-4 items-center">
-                  <div className="w-16 text-right text-xs">
-                    {formatPoints(player.data.availableScore, false)}
-                  </div>
-                  <div className="w-16 text-right text-xs">
+                  <div className="w-16 text-center text-xs">
                     {formatPoints(player.data.profitScore, false)}
                   </div>
                 </div>

@@ -7,6 +7,7 @@ const Button = ({
   className,
   disabled,
   loading,
+  loadingText,
   type = "button",
   icon,
 }: {
@@ -16,6 +17,7 @@ const Button = ({
   className?: string;
   disabled?: boolean;
   loading?: boolean;
+  loadingText?: string;
   type?: "button" | "submit" | "reset";
   icon?: React.ReactNode;
 }) => {
@@ -30,7 +32,7 @@ const Button = ({
       {loading ? (
         <div className="flex justify-center items-center gap-3 text-white">
           <ImSpinner9 className="animate-spin" />
-          Mentés...
+          {loadingText || "Mentés..."}
         </div>
       ) : (
         <div className="flex flex-col items-center text-white">

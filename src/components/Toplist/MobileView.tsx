@@ -33,7 +33,7 @@ const ToplistMobileView: FC<ToplistProps> = ({ users, loading, error, onSelect }
             </div>
 
             <div className="flex-1">
-              <div className="font-medium mb-0">{user.username}</div>
+              <div className="font-medium mb-0">{user?.name || user.username}</div>
               <div className="flex gap-4">
                 <div>
                   <div className="text-lg font-semibold text-green-400">

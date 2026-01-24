@@ -47,12 +47,18 @@ export const useAxiosInterceptor = () => {
             if (axios.isAxiosError(refreshError) && refreshError.response?.status === 401) {
               logout(); // Ez törli az állapotot és a cookie-t (a szerverrel)
             }
-            return Promise.reject(refreshError);
+            // Az eredeti hibát továbbítjuk
+            return Promise.reject(error);
           }
         }
 
-        // Bármilyen más hiba esetén csak továbbítjuk azt
-        return Promise.reject(error);
+        // Bármilyen más hiba esetén csak továbbítjuk azt, de a data.message-t mindig átadjuk
+        const customError = {
+          ...error,
+          message: error?.response?.data?.message || error.message,
+          response: error?.response,
+        };
+        return Promise.reject(customError);
       }
     );
 

@@ -4,14 +4,24 @@ import type { Match } from "@/models/match.type";
 
 export const getCouponStatusInfo = (
   status: CouponStatus
-): { color: string; text: string; className?: string } => {
+): { color: string; text: string; className?: string; selectedColor?: string } => {
   switch (status) {
     case CouponStatus.active:
-      return { color: "bg-green-600", text: "Játékban", className: "" };
+      return {
+        color: "bg-neutral-600",
+        text: "Játékban",
+        className: "",
+        selectedColor: "bg-neutral-700",
+      };
     case CouponStatus.inactive:
-      return { color: "bg-gray-600", text: "Inaktív", className: "" };
+      return { color: "bg-gray-600", text: "Inaktív", className: "", selectedColor: "bg-gray-500" };
     case CouponStatus.closed:
-      return { color: "bg-gray-600", text: "Lezárva", className: "" };
+      return {
+        color: "bg-yellow-700",
+        text: "Lezárt",
+        className: "",
+        selectedColor: "bg-yellow-600",
+      };
     case CouponStatus.inprogress:
       return {
         color: "bg-red-600",
