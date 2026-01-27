@@ -1,10 +1,7 @@
-import type { Team } from "./team.type";
-
 export interface Config {
   invitationCode: string;
   championStartDate: string | null;
   championEndDate: string;
-  championTeamId: Team | null;
   championWinPoint: number;
   defaultScore: number;
   favoritTeamFactor: number;

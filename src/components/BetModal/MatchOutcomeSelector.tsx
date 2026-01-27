@@ -28,11 +28,12 @@ const MatchOutcomeSelector: FC<MatchOutcomeSelectorProps> = ({
                       : "border-gray-300/20 hover:bg-primary/20"
                   }`}
       >
-        <p>{match.teamA?.name}</p>{" "}
-        <p>
+        <p className="font-thin">{match.teamA?.tla}</p>{" "}
+        <p className="font-bold">
           {userFavoriteTeam(match) ? (
             <span>
-              {match.oddsAwin} <span className="text-green-500">x{config?.favoritTeamFactor}</span>
+              {match.oddsAwin?.toFixed(2)}{" "}
+              <span className="text-green-500">x{config?.favoritTeamFactor}</span>
             </span>
           ) : (
             match.oddsAwin?.toFixed(2)
@@ -48,11 +49,12 @@ const MatchOutcomeSelector: FC<MatchOutcomeSelectorProps> = ({
                       : "border-gray-300/20 hover:bg-primary/20"
                   }`}
       >
-        <p>döntetlen</p>{" "}
-        <p>
+        <p className="font-thin">döntetlen</p>{" "}
+        <p className="font-bold">
           {userFavoriteTeam(match) ? (
             <span>
-              {match.oddsDraw} <span className="text-green-500">x{config?.favoritTeamFactor}</span>
+              {match.oddsDraw?.toFixed(2)}{" "}
+              <span className="text-green-500">x{config?.favoritTeamFactor}</span>
             </span>
           ) : (
             match.oddsDraw?.toFixed(2)
@@ -68,11 +70,12 @@ const MatchOutcomeSelector: FC<MatchOutcomeSelectorProps> = ({
                       : "border-gray-300/20 hover:bg-primary/20"
                   }`}
       >
-        <p>{match.teamB?.name}</p>{" "}
-        <p>
+        <p className="font-thin">{match.teamB?.tla}</p>{" "}
+        <p className="font-bold">
           {userFavoriteTeam(match) ? (
             <span>
-              {match.oddsBwin} <span className="text-green-500">x{config?.favoritTeamFactor}</span>
+              {match.oddsBwin?.toFixed(2)}{" "}
+              <span className="text-green-500">x{config?.favoritTeamFactor}</span>
             </span>
           ) : (
             match.oddsBwin?.toFixed(2)

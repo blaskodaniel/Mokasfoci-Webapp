@@ -5,9 +5,11 @@ import { useAuth } from "@/hooks/useAuth";
 import Api from "@/services/service";
 import { getMeAction } from "@/state/authSlice";
 import { ApiError } from "@/utils/apiError";
+import { useConfig } from "@/hooks/useConfig";
 
 const Login: React.FC = () => {
   const { login } = useAuth();
+  const { config } = useConfig();
   const dispatch = useAppDispatch();
   const { isLoading } = useAppSelector((state) => state.auth);
   const [username, setUsername] = useState("");
@@ -74,9 +76,11 @@ const Login: React.FC = () => {
         >
           Bejelentkezés
         </button>
-        <Link to="/register" className="text-text-primary text-center">
-          Regisztráció
-        </Link>
+        {config?.enabledRegistration && (
+          <Link to="/regisztracio" className="text-text-primary text-center">
+            Regisztráció
+          </Link>
+        )}
         <Link to="/forgot-password" className="text-text-muted text-center text-xs">
           Elfelejtettem a jelszavam
         </Link>

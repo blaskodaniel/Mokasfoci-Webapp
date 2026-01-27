@@ -6,6 +6,7 @@ interface PanelProps {
   wrapperClassName?: string;
   loading?: boolean;
   error?: string;
+  noBackground?: boolean;
 }
 
 const Panel = ({
@@ -16,10 +17,11 @@ const Panel = ({
   wrapperClassName,
   loading,
   error,
+  noBackground,
 }: PanelProps) => {
   return (
     <div
-      className={`relative bg-panel-bg border border-primary/20 rounded-md overflow-hidden 
+      className={`relative ${noBackground ? "" : "bg-panel-bg border border-primary/20"} rounded-md overflow-hidden 
         w-full ${wrapperClassName}`}
     >
       <div className="pl-2 py-2 rounded-t-md font-light text-sm text-gray-300">{title}</div>

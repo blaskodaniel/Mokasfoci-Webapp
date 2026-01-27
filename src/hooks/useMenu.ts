@@ -22,9 +22,9 @@ const useMenu = () => {
         isActive: location.pathname === "/merkozesek",
       },
       {
-        name: "Toplista",
-        link: "/toplista",
-        isActive: location.pathname === "/toplista",
+        name: "Ranglista",
+        link: "/ranglista",
+        isActive: location.pathname === "/ranglista",
       },
       {
         name: "Profilom",

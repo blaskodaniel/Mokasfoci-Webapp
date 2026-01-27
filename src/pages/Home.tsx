@@ -177,7 +177,7 @@ const HomePage = () => {
           )}
         </Panel>
 
-        <ToplistWidget />
+        <ToplistWidget showHeader={false} />
 
         <Panel
           title="Legutóbbi eredmények"

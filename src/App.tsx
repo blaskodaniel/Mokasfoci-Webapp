@@ -16,15 +16,19 @@ import ToplistPage from "./pages/Toplist";
 import MatchDetailPage from "./pages/MatchDetail";
 import MyTransactions from "./pages/MyTransactions";
 import GroupTables from "./pages/GroupTables";
+import { useConfig } from "@/hooks/useConfig";
+import TeamDetail from "./pages/TeamDetail";
 
 function App() {
   useAxiosInterceptor();
+  const { config } = useConfig();
+
   return (
     <Routes>
       {/* PUBLIC ROUTES (ha be van lépve → redirect) */}
       <Route element={<PublicRoute />}>
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        {config?.enabledRegistration && <Route path="/regisztracio" element={<Register />} />}
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Route>
@@ -38,7 +42,8 @@ function App() {
           <Route path="profilom" element={<MyProfilePage />} />
           <Route path="merkozesek" element={<MatchesPage />} />
           <Route path="merkozesek/:id" element={<MatchDetailPage />} />
-          <Route path="toplista" element={<ToplistPage />} />
+          <Route path="csapatok/:id" element={<TeamDetail />} />
+          <Route path="ranglista" element={<ToplistPage />} />
           <Route path="csoportok" element={<GroupTables />} />
           <Route path="transactions" element={<MyTransactions />} />
 

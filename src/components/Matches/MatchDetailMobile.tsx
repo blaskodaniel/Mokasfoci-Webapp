@@ -12,6 +12,11 @@ interface MatchDetailMobileProps {
 
 const MatchDetailMobile: FC<MatchDetailMobileProps> = ({ bets, match }) => {
   const matchStatus = match.status;
+  const sortByPrdeictionWinnings = (a: Bet, b: Bet) => {
+    const aWinnings = potentialWinnings(a.amount, a.odds);
+    const bWinnings = potentialWinnings(b.amount, b.odds);
+    return bWinnings - aWinnings;
+  };
   return (
     <div className="flex flex-col gap-2">
       {bets.length === 0 && (
@@ -21,7 +26,7 @@ const MatchDetailMobile: FC<MatchDetailMobileProps> = ({ bets, match }) => {
             : "Még nincsenek fogadások"}
         </div>
       )}
-      {bets.map((bet) => {
+      {bets.sort(sortByPrdeictionWinnings).map((bet) => {
         const isFinished = matchStatus === MatchStatus.finished;
         return (
           <div

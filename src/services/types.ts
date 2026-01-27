@@ -1,3 +1,4 @@
+import type { Match } from "@/models/match.type";
 import type { User } from "../models/user.type";
 import type { Team } from "@/models/team.type";
 
@@ -112,4 +113,12 @@ export interface UserDetails {
 
 export interface GetTeamRankingsResponse {
   [groupName: string]: Team[];
+}
+
+export interface TeamDetails {
+  championUsers: User[];
+  favoriteUsers: User[];
+  groupWinners: User[];
+  matches: Match[];
+  teamData: Team;
 }

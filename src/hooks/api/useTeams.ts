@@ -1,6 +1,6 @@
 import type { Team } from "@/models/team.type";
 import Api from "@/services/service";
-import type { GetTeamRankingsResponse } from "@/services/types";
+import type { GetTeamRankingsResponse, TeamDetails } from "@/services/types";
 import { useQuery } from "@tanstack/react-query";
 
 export const teamsKeys = {
@@ -31,6 +31,17 @@ export const useGetGroupStandingsById = (groupId: string) => {
     queryFn: () => Api.getGroupStandingsById(groupId),
     staleTime: 30 * 60 * 1000, // 30 perc
     enabled: !!groupId,
+    retry: 2,
+  });
+};
+
+// Team details hook
+export const useTeamDetails = (teamId: string) => {
+  return useQuery<TeamDetails>({
+    queryKey: [...teamsKeys.all, "details", teamId],
+    queryFn: () => Api.getTeamDetails(teamId),
+    staleTime: 2 * 60 * 1000, // 2 perc (gyakrabban frissül)
+    enabled: !!teamId,
     retry: 2,
   });
 };

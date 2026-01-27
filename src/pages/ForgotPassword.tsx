@@ -36,6 +36,9 @@ const ForgotPassword = () => {
   return (
     <div className="min-h-screen flex justify-center bg-cover bg-center px-3 sm:px-5">
       <div className="p-8 w-full max-w-md flex flex-col gap-6 h-fit mt-20">
+        <h2 className="text-2xl font-bold text-center text-text-primary mb-4">
+          Elfelejtett jelszó
+        </h2>
         {/* <img src={AppLogo} alt="WatchTogether Logo" className="h-25 mx-auto " /> */}
         {!success ? (
           <>

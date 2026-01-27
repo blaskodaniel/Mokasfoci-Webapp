@@ -1,11 +1,10 @@
 import useMenu from "@/hooks/useMenu";
 import { Link } from "react-router-dom";
 import { IoCloseOutline } from "react-icons/io5";
-import { useAppDispatch, useAppSelector } from "@/state/hooks";
+import { useAppDispatch } from "@/state/hooks";
 import { logoutAction } from "@/state/authSlice";
 import { HiOutlineLogout } from "react-icons/hi";
 import { useAuth } from "@/hooks/useAuth";
-import { APP_CONFIG, DEFAULT_AVATAR_URL } from "@/config";
 
 const MobileMenu = ({
   isOpen,
@@ -15,7 +14,6 @@ const MobileMenu = ({
   setIsMenuOpen: (isOpen: boolean) => void;
 }) => {
   const { logout } = useAuth();
-  const { currentUser } = useAppSelector((state) => state.auth);
   const { menuList } = useMenu();
   const dispatch = useAppDispatch();
 
@@ -44,15 +42,11 @@ const MobileMenu = ({
             className="text-white/70 cursor-pointer transition-transform duration-200 hover:scale-110"
           />
         </div>
-        <div className="flex flex-col justify-between h-full w-full items-center mt-5 gap-8">
+        <div className="flex flex-col justify-between h-full w-full items-center mt-2 gap-8">
           <div className="mt-8 flex flex-col items-center gap-4 w-full">
-            <div className="w-18 h-18 rounded-full shadow-lg mb-5">
+            <div className="w-22 h-22 rounded-full shadow-lg mb-5">
               <img
-                src={
-                  currentUser?.avatar
-                    ? `${APP_CONFIG.SERVER_URL}${currentUser.avatar}`
-                    : DEFAULT_AVATAR_URL
-                }
+                src={"/wm26.png"}
                 alt="Avatar"
                 className="w-full h-full rounded-full object-cover"
               />

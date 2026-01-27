@@ -1,6 +1,7 @@
 import { useClickOutside } from "@/hooks/useClickOutside";
 import type { Team } from "@/models/team.type";
 import { useRef, useState, type FC } from "react";
+import { useNavigate } from "react-router-dom";
 
 const columnFieldMap = {
   LM: "playedGames",
@@ -35,6 +36,7 @@ const GroupStandings: FC<GroupStandingsProps> = ({
   columns = Object.keys(columnFieldMap) as ColumnKey[],
   size = "md",
 }) => {
+  const navigate = useNavigate();
   const [activeCol, setActiveCol] = useState<ColumnKey | null>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   useClickOutside(headerRef, () => setActiveCol(null));
@@ -46,10 +48,10 @@ const GroupStandings: FC<GroupStandingsProps> = ({
     rounded-xl shadow-lg text-white backdrop-filter bg-opacity-0 ${className}`}
     >
       <div
-        className="rounded-xl px-2 py-1 flex justify-between items-center
-       bg-[#06923edb] backdrop-blur-md font-bold"
+        className="rounded-xl px-2 py-1 mb-2 flex justify-between items-center
+       bg-[#085225db] backdrop-blur-md font-bold"
       >
-        <div className="truncate ">{groupName} csoport</div>
+        <div className="truncate uppercase text-sm">{groupName} csoport</div>
         <div className="flex items-center gap-4 text-sm" ref={headerRef}>
           {columns
             ? columns.map((col) => (
@@ -59,11 +61,17 @@ const GroupStandings: FC<GroupStandingsProps> = ({
                   onClick={() => setActiveCol(activeCol === col ? null : col)}
                 >
                   {col}
-                  <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-max px-2 py-1 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap ${
-                    activeCol === col ? "block" : "hidden group-hover:block"
-                  }`}>
+                  <div
+                    className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-max px-2 
+                      py-1 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap ${
+                        activeCol === col ? "block" : "hidden group-hover:block"
+                      }`}
+                  >
                     {columnTooltipMap[col]}
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                    <div
+                      className="absolute top-full left-1/2 -translate-x-1/2 border-4 
+                    border-transparent border-t-gray-800"
+                    ></div>
                   </div>
                 </div>
               ))
@@ -74,11 +82,18 @@ const GroupStandings: FC<GroupStandingsProps> = ({
                   onClick={() => setActiveCol(activeCol === col ? null : col)}
                 >
                   {col}
-                  <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-max px-2 py-1 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap ${
-                    activeCol === col ? "block" : "hidden group-hover:block"
-                  }`}>
+                  <div
+                    className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 
+                      w-max px-2 py-1 bg-gray-800 text-white text-xs rounded shadow-lg 
+                      whitespace-nowrap ${
+                        activeCol === col ? "block" : "hidden group-hover:block"
+                      }`}
+                  >
                     {columnTooltipMap[col]}
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                    <div
+                      className="absolute top-full left-1/2 -translate-x-1/2 border-4 
+                    border-transparent border-t-gray-800"
+                    ></div>
                   </div>
                 </div>
               ))}
@@ -89,14 +104,23 @@ const GroupStandings: FC<GroupStandingsProps> = ({
           teams.length > 0 &&
           teams.map((team, i) => {
             const qualifierColor =
-              i <= 1 ? "bg-blue-600 text-white" : i === 2 ? "bg-green-600 text-white" : "";
+              i <= 1 ? "bg-blue-800/40 text-white" : i === 2 ? "bg-green-800/40 text-white" : "";
             return (
               <div className={`flex justify-between items-center px-2 py-1`} key={team.name}>
                 <div className="truncate flex items-center gap-2">
                   <span className={`rounded-sm text-center text-xs ${qualifierColor} p-1`}>
                     {i + 1}.
-                  </span>{" "}
-                  <span className="pt-0.5">{team.name}</span>
+                  </span>
+                  <button
+                    className="transition-all duration-150 underline underline-offset-4
+                     decoration-blue-400 hover:text-blue-400 hover:bg-blue-900/10 
+                     focus:outline-none focus:ring-2 focus:ring-blue-400 rounded px-1"
+                    onClick={() => navigate(`/csapatok/${team._id}`)}
+                    tabIndex={0}
+                    type="button"
+                  >
+                    {team.name}
+                  </button>
                 </div>
                 <div className="flex items-center gap-4 text-sm">
                   {(columns ? columns : (Object.keys(columnFieldMap) as ColumnKey[])).map((col) => (

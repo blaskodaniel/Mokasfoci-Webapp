@@ -55,7 +55,7 @@ const ToplistPage = () => {
   ];
   return (
     <div className="px-1.5">
-      <div className="text-white text-2xl">Toplista</div>
+      <div className="text-white text-2xl">Ranglista</div>
       <section>
         {!isMobile && (
           <Table

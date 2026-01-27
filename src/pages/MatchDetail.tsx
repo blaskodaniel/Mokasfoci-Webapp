@@ -5,7 +5,7 @@ import useResponsive from "@/hooks/useResponsive";
 import type { Bet } from "@/models/bet.type";
 import { getMatchStatusInfo, outcomeText, potentialWinnings } from "@/utils/common";
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useMatchDetails } from "@/hooks/api/useMatches";
 import Loader from "@/components/Loader";
 import { APP_CONFIG } from "@/config";
@@ -152,7 +152,10 @@ const MatchDetailPage = () => {
     <div>
       <MobileBackBar title="Mérkőzés részletei" />
       <div className="flex mx-auto items-center gap-8 justify-center mb-6">
-        <div className="flex flex-col justify-center items-center gap-4">
+        <Link
+          to={`/csapatok/${match?.teamA?._id}`}
+          className="flex flex-col justify-center items-center gap-4"
+        >
           {match?.teamA?.flag && (
             <img
               src={`${APP_CONFIG.FLAG_PATH}${match.teamA.flag}`}
@@ -160,7 +163,7 @@ const MatchDetailPage = () => {
               className="w-16 h-16 object-cover rounded-full"
             />
           )}
-        </div>
+        </Link>
         {match?.status === MatchStatus.finished && (
           <div className="font-extrabold text-2xl">{match.goalA}</div>
         )}
@@ -168,12 +171,15 @@ const MatchDetailPage = () => {
           <div className="flex justify-center items-center text-xs text-gray-400">
             {renderMatchStatusOrDate()}
           </div>
-          <div className="text-xl text-white">vs</div>
+          <div className="text-xl text-white font-thin">vs</div>
         </div>
         {match?.status === MatchStatus.finished && (
           <div className="font-extrabold text-2xl">{match.goalB}</div>
         )}
-        <div className="flex flex-col justify-center items-center gap-4">
+        <Link
+          to={`/csapatok/${match?.teamB?._id}`}
+          className="flex flex-col justify-center items-center gap-4"
+        >
           {match?.teamB?.flag && (
             <img
               src={`${APP_CONFIG.FLAG_PATH}${match?.teamB.flag}`}
@@ -181,7 +187,7 @@ const MatchDetailPage = () => {
               className="w-16 h-16 object-cover rounded-full"
             />
           )}
-        </div>
+        </Link>
       </div>
       <div className="flex gap-3 justify-center mb-6">
         <div className="text-sm flex flex-col items-center">

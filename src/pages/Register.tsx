@@ -5,8 +5,10 @@ import { AxiosError } from "axios";
 import Modal from "@/components/Modal";
 import Button from "@/components/Button";
 import { IoIosCheckmarkCircle } from "react-icons/io";
+import { useConfig } from "@/hooks/useConfig";
 
 const Register: React.FC = () => {
+  const { config } = useConfig();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -27,12 +29,17 @@ const Register: React.FC = () => {
     setLoading(true);
 
     try {
-      await Api.register(username, email, password, invitationCode);
+      if (config?.enabledInvitation) {
+        await Api.register(username, email, password, invitationCode);
+        setInvitationCode("");
+      } else {
+        await Api.register(username, email, password);
+      }
+
       setUsername("");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
-      setInvitationCode("");
       setIsModalOpen(true);
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
@@ -111,20 +118,22 @@ const Register: React.FC = () => {
             placeholder="Jelszó megerősítése"
           />
         </div>
-        <div className="flex flex-col gap-2">
-          <label htmlFor="invitationCode" className="text-sm font-medium text-white-700">
-            Meghívó kód
-          </label>
-          <input
-            type="text"
-            id="invitationCode"
-            value={invitationCode}
-            onChange={(e) => setInvitationCode(e.target.value)}
-            required
-            className="text-white border border-gray-300/20  rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            placeholder="Meghívó kód"
-          />
-        </div>
+        {config?.enabledInvitation && (
+          <div className="flex flex-col gap-2">
+            <label htmlFor="invitationCode" className="text-sm font-medium text-white-700">
+              Meghívó kód
+            </label>
+            <input
+              type="text"
+              id="invitationCode"
+              value={invitationCode}
+              onChange={(e) => setInvitationCode(e.target.value)}
+              required
+              className="text-white border border-gray-300/20  rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Meghívó kód"
+            />
+          </div>
+        )}
         {error && <div className="text-red-600 text-sm text-center">{error}</div>}
         <button
           type="submit"

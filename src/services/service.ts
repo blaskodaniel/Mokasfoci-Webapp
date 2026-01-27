@@ -7,6 +7,7 @@ import type {
   GetTeamRankingsResponse,
   ScoreByMatch,
   SignInResponse,
+  TeamDetails,
   UpdateUserProfileBody,
   UserDetails,
   WinLostStats,
@@ -36,7 +37,7 @@ const Api = {
     password: string,
     invitationCode?: string
   ): Promise<{ user: User }> {
-    const response = await axiosInstance.post(`/auth/register`, {
+    const response = await axiosInstance.post(`/auth/regisztracio`, {
       username,
       email,
       password,
@@ -173,6 +174,11 @@ const Api = {
 
   async getTeams(): Promise<Team[]> {
     const response = await axiosInstance.get(`/team/all`);
+    return response.data;
+  },
+
+  async getTeamDetails(teamId: string): Promise<TeamDetails> {
+    const response = await axiosInstance.get(`/team/details/${teamId}`);
     return response.data;
   },
 

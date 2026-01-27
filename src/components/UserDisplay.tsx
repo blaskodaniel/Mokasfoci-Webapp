@@ -9,6 +9,7 @@ interface UserDisplayProps {
   avatarSize?: "xs" | "sm" | "md" | "lg";
   nameClassName?: string;
   onClick?: () => void;
+  withBackground?: boolean;
 }
 
 const UserDisplay = ({
@@ -19,6 +20,7 @@ const UserDisplay = ({
   avatarSize = "md",
   nameClassName = "",
   onClick,
+  withBackground = false,
 }: UserDisplayProps) => {
   const getAvatarUrl = () => {
     if (user?.avatar && user.avatar.trim() !== "") {
@@ -46,7 +48,8 @@ const UserDisplay = ({
     <div className={`flex items-center gap-3 ${className}`}>
       {showAvatar && (
         <div
-          className={`rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold ${getSizeClasses()}`}
+          className={`rounded-full bg-linear-to-br ${withBackground ? "from-blue-500 to-purple-600" : ""} 
+            flex items-center justify-center text-white font-bold ${getSizeClasses()}`}
         >
           <img
             src={getAvatarUrl()}
@@ -58,6 +61,7 @@ const UserDisplay = ({
               const fallbackDiv = e.currentTarget.nextElementSibling as HTMLElement;
               if (fallbackDiv) {
                 fallbackDiv.style.display = "flex";
+                fallbackDiv.classList.add("bg-linear-to-br", "from-blue-500", "to-purple-600");
               }
             }}
           />

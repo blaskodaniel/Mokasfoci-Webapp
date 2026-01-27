@@ -207,7 +207,7 @@ const MyProfilePage = () => {
             <div className="relative group">
               <div
                 onClick={() => console.log("Avatar clicked")}
-                className="w-32 h-32 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex 
+                className="w-32 h-32 rounded-full bg-linear-to-br flex 
                 items-center justify-center text-white text-4xl font-bold cursor-pointer 
                 hover:scale-105 transition-transform duration-200 shadow-lg"
               >
@@ -233,10 +233,10 @@ const MyProfilePage = () => {
               </div>
               <div
                 onClick={() => setIsOpenAvatarModal(true)}
-                className="absolute inset-0 bg-black/20 rounded-full opacity-0 cursor-pointer
-              group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center"
+                className="absolute top-0 right-0 bg-blue-600 p-2 rounded-full cursor-pointer 
+                shadow-lg hover:bg-blue-700 transition-colors z-10"
               >
-                <FiEdit3 className="w-8 h-8 text-white" />
+                <FiEdit3 className="w-5 h-5 text-white" />
               </div>
             </div>
           </div>

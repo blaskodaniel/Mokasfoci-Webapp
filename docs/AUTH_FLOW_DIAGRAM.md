@@ -7,7 +7,7 @@
        │
        ▼
 ┌─────────────┐
-│Public Routes│ ── /login, /register, /forgot-password
+│Public Routes│ ── /login, /regisztracio, /forgot-password
 └─────────────┘
        │
        ▼
