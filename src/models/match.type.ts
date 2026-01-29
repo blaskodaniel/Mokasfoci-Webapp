@@ -6,7 +6,9 @@ import type { User } from "./user.type";
 export interface Match {
   _id: string;
   teamA?: Team;
+  teamAPlaceholder?: string;
   teamB?: Team;
+  teamBPlaceholder?: string;
   goalA?: number | null;
   goalB?: number | null;
   oddsAwin?: number | null;

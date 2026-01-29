@@ -36,7 +36,7 @@ const MatchesMobileView: FC<MatchesMobileViewProps> = ({
         return (
           <div
             key={match._id}
-            className="mb-1 border-b border-gray-700/30 last:border-b-0 first:pt-0"
+            className="px-1 mb-1 border-b border-gray-700/30 last:border-b-0 first:pt-0"
             onClick={() => {
               const canViewDetails = match?.status !== MatchStatus.enabled;
               if (canViewDetails) navigate(`/merkozesek/${match._id}`);

@@ -28,7 +28,7 @@ const MatchOutcomeSelector: FC<MatchOutcomeSelectorProps> = ({
                       : "border-gray-300/20 hover:bg-primary/20"
                   }`}
       >
-        <p className="font-thin">{match.teamA?.tla}</p>{" "}
+        <p className="font-thin">{match.teamA?.tla || "??"}</p>{" "}
         <p className="font-bold">
           {userFavoriteTeam(match) ? (
             <span>
@@ -36,7 +36,7 @@ const MatchOutcomeSelector: FC<MatchOutcomeSelectorProps> = ({
               <span className="text-green-500">x{config?.favoritTeamFactor}</span>
             </span>
           ) : (
-            match.oddsAwin?.toFixed(2)
+            match.oddsAwin?.toFixed(2) || "-"
           )}
         </p>
       </div>
@@ -57,7 +57,7 @@ const MatchOutcomeSelector: FC<MatchOutcomeSelectorProps> = ({
               <span className="text-green-500">x{config?.favoritTeamFactor}</span>
             </span>
           ) : (
-            match.oddsDraw?.toFixed(2)
+            match.oddsDraw?.toFixed(2) || "-"
           )}
         </p>
       </div>
@@ -70,7 +70,7 @@ const MatchOutcomeSelector: FC<MatchOutcomeSelectorProps> = ({
                       : "border-gray-300/20 hover:bg-primary/20"
                   }`}
       >
-        <p className="font-thin">{match.teamB?.tla}</p>{" "}
+        <p className="font-thin">{match.teamB?.tla || "??"}</p>{" "}
         <p className="font-bold">
           {userFavoriteTeam(match) ? (
             <span>
@@ -78,7 +78,7 @@ const MatchOutcomeSelector: FC<MatchOutcomeSelectorProps> = ({
               <span className="text-green-500">x{config?.favoritTeamFactor}</span>
             </span>
           ) : (
-            match.oddsBwin?.toFixed(2)
+            match.oddsBwin?.toFixed(2) || "-"
           )}
         </p>
       </div>

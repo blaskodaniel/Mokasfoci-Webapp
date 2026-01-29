@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import Api from "@/services/service";
 import type { Match, MatchDetail } from "@/models/match.type";
+import { MatchStatus } from "@/utils/enums";
 
 // Query keys - központi helyen definiáljuk
 export const matchesKeys = {
@@ -73,4 +74,11 @@ export const useMatchDetails = (matchId: string) => {
     staleTime: 2 * 60 * 1000, // 2 perc (gyakrabban frissül)
     retry: 2,
   });
+};
+
+export const isBettableMatch = (match: Match): boolean => {
+  const isEnabledMatch = match.status === MatchStatus.enabled;
+  const isExistTeams = match.teamA !== undefined && match.teamB !== undefined;
+  const isOddsAvailable = match.odds !== undefined;
+  return isEnabledMatch && isExistTeams && isOddsAvailable;
 };

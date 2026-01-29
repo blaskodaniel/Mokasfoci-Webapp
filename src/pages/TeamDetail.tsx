@@ -6,6 +6,7 @@ import GroupStandings from "@/components/Widgets/GroupStandings";
 import { APP_CONFIG } from "@/config";
 import { useGetGroupStandingsById, useTeamDetails } from "@/hooks/api/useTeams";
 import type { Match } from "@/models/match.type";
+import { MatchStatus } from "@/utils/enums";
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 
@@ -96,11 +97,20 @@ const TeamDetail = () => {
             <Panel title="Mérkőzések" className="flex-1">
               {matches && matches.length > 0 && (
                 <div className="p-1">
-                  {matches.map((match: Match) => (
-                    <Link to={`/merkozesek/${match._id}`} key={match._id}>
-                      <MatchListItem match={match} />
-                    </Link>
-                  ))}
+                  {matches.map((match: Match) => {
+                    if (
+                      match.status === MatchStatus.finished ||
+                      match.status === MatchStatus.playing
+                    ) {
+                      return (
+                        <Link to={`/merkozesek/${match._id}`} key={match._id}>
+                          <MatchListItem match={match} />
+                        </Link>
+                      );
+                    }
+
+                    return <MatchListItem match={match} key={match._id} displayTime displayDate />;
+                  })}
                 </div>
               )}
               {matches && matches.length === 0 && (

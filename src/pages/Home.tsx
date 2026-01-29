@@ -198,7 +198,7 @@ const HomePage = () => {
               ))}
             </div>
           )}
-          {liveMatches && liveMatches.length === 0 && (
+          {recentMatches && recentMatches.length === 0 && (
             <div className="p-4 text-gray-500 text-xs text-center">
               Még nem játszottak le mérkőzést{" "}
             </div>

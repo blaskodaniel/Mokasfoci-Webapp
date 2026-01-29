@@ -70,7 +70,7 @@ const MyTransactions = () => {
     <div>
       <div className="flex gap-3 items-center pl-2">
         <IoArrowBack size={23} className="cursor-pointer" onClick={() => window.history.back()} />
-        <div className="text-white text-2xl">Tranzakcióim</div>
+        <div className="text-white text-2xl">Pontjaim alakulása</div>
       </div>
 
       {/* Horizontális scrollozható filter tag-ek */}

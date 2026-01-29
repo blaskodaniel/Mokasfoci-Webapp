@@ -1,14 +1,16 @@
 import { APP_CONFIG } from "@/config";
 import type { Match } from "@/models/match.type";
-import { getMatchStatusInfo } from "@/utils/common";
+import { getMatchStatusInfo, getMatchTypeText } from "@/utils/common";
 import { MatchOutcome, MatchStatus } from "@/utils/enums";
 import { format } from "date-fns";
 import { useCallback, useMemo } from "react";
 import type { MatchWithUserBet } from "./Matches/types";
+import UnknownFlag from "./UnknownFlag";
 
 interface MatchListItemProps {
   match: MatchWithUserBet | Match;
   displayTime?: boolean;
+  displayDate?: boolean;
   displayStatusBadge?: boolean;
   onSelectMatch?: (match: Match) => void;
   onRowClick?: (match: Match) => void;
@@ -17,6 +19,7 @@ interface MatchListItemProps {
 const MatchListItem = ({
   match,
   displayTime,
+  displayDate,
   displayStatusBadge,
   onSelectMatch,
   onRowClick,
@@ -54,32 +57,50 @@ const MatchListItem = ({
       className="
      hover:bg-gray-700/10 transition-colors cursor-pointer"
     >
-      <div className="flex justify-between items-center px-1 pb-2 pt-2">
-        {displayTime && match.date && (
-          <div className="pr-3 text-xs text-gray-400 text-center">
-            {format(new Date(match.date), "HH:mm")}
+      <div className="flex justify-between items-center">
+        <div className="text-white/50 text-xs px-1 text-right italic bg-button-bg/20 rounded-md">
+          {getMatchTypeText(match.type)}
+        </div>
+        {(displayTime || displayDate) && match.date && (
+          <div
+            className="text-xs text-white px-2 py-0.5 flex flex-row
+          ml-auto  gap-2"
+          >
+            {displayTime && <div>{format(new Date(match.date), "HH:mm")}</div>}
+            {displayDate && <div>{format(new Date(match.date), "LLL dd")}</div>}
           </div>
         )}
+      </div>
+
+      <div className="flex justify-between items-center px-1 pb-2 pt-2">
         <div className="flex-1 flex gap-2 flex-col">
           <div className="flex items-center gap-2">
-            {match.teamA?.flag && (
+            {match.teamA?.flag ? (
               <img
                 src={`${APP_CONFIG.FLAG_PATH}${match.teamA.flag}`}
                 alt={`${match.teamA.name} flag`}
                 className="w-4 h-4 object-cover rounded-full"
               />
+            ) : (
+              <UnknownFlag size={4} />
             )}
-            <span className={`text-sm ${getTeamColor("A")}`}>{match.teamA?.name}</span>
+            <span className={`text-sm ${getTeamColor("A")}`}>
+              {match.teamA?.name ?? match.teamAPlaceholder ?? "-"}
+            </span>
           </div>
           <div className="flex items-center gap-2">
-            {match.teamB?.flag && (
+            {match.teamB?.flag ? (
               <img
                 src={`${APP_CONFIG.FLAG_PATH}${match.teamB.flag}`}
                 alt={`${match.teamB.name} flag`}
                 className="w-4 h-4 object-cover rounded-full"
               />
+            ) : (
+              <UnknownFlag size={4} />
             )}
-            <span className={`text-sm ${getTeamColor("B")}`}>{match.teamB?.name}</span>
+            <span className={`text-sm ${getTeamColor("B")}`}>
+              {match.teamB?.name ?? match.teamBPlaceholder ?? "-"}
+            </span>
           </div>
         </div>
         <div className="flex items-center gap-5 flex-1 justify-end">
@@ -108,20 +129,20 @@ const MatchListItem = ({
           )}
           <div className="flex flex-col items-end text-xs text-gray-400 gap-0.5 w-7">
             <div className={`${isUserBetTeamAWin ? "text-white font-semibold" : "text-gray-400"}`}>
-              {match.oddsAwin?.toFixed(2)}
+              {match.oddsAwin?.toFixed(2) ?? "-"}
             </div>
             <div className={`${isUserBetDraw ? "text-white font-semibold" : "text-gray-400"}`}>
-              {match.oddsDraw?.toFixed(2)}
+              {match.oddsDraw?.toFixed(2) ?? "-"}
             </div>
             <div className={`${isUserBetTeamBWin ? "text-white font-semibold" : "text-gray-400"}`}>
-              {match.oddsBwin?.toFixed(2)}
+              {match.oddsBwin?.toFixed(2) ?? "-"}
             </div>
           </div>
         </div>
       </div>
 
       {comment && (
-        <div className="px-1 text-xs text-gray-400/60 mb-1 italic text-right">{comment}</div>
+        <div className="px-2 text-xs text-gray-400/60 mb-1 italic text-left">{comment}</div>
       )}
     </div>
   );

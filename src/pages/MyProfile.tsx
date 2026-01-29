@@ -10,12 +10,11 @@ import { useAllTeams } from "@/hooks/api/useTeams";
 import { useEffect, useMemo, useState } from "react";
 import { APP_CONFIG, DEFAULT_AVATAR_URL, GROUPS } from "@/config";
 import { formatPoints } from "@/utils/common";
-import { FiEdit3, FiDollarSign } from "react-icons/fi";
+import { FiEdit3 } from "react-icons/fi";
 import { useUpdateProfile } from "@/hooks/api/usePlayers";
 import { useNotification } from "@/hooks/useNotification";
 import type { UpdateUserProfileBody } from "@/services/types";
 import AvatarModal from "@/components/MyProfile/AvatarModal";
-import useResponsive from "@/hooks/useResponsive";
 import BalanceHistoryChart from "@/components/Charts/BalanceHistoryChart";
 import WinLostChart from "@/components/Charts/WinLostChart";
 import ScoreByMatchChart from "@/components/Charts/ScoreByMatchChart";
@@ -26,7 +25,6 @@ const MyProfilePage = () => {
   const { config } = useConfig();
   const navigate = useNavigate();
   const { showSuccess, showError } = useNotification();
-  const { isMobile } = useResponsive();
 
   const [isOpenAvatarModal, setIsOpenAvatarModal] = useState(false);
 
@@ -192,10 +190,9 @@ const MyProfilePage = () => {
       <div className="flex justify-between items-center p-3 sm:p-6">
         <h1 className="text-3xl font-bold text-white">Profilom</h1>
         <Button
-          text="Tranzakcióm"
+          text="Pontjaim története"
           onClick={() => navigate("/transactions")}
-          className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-full"
-          icon={isMobile ? null : <FiDollarSign className="w-4 h-4" />}
+          className="bg-blue-800/30 hover:bg-blue-700/40 px-3 py-1 rounded-md text-xs"
         />
       </div>
 

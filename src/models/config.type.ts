@@ -12,10 +12,6 @@ export interface Config {
   enabledNegativeScore: boolean;
   enabledRegistration: boolean;
   enabledInvitation: boolean;
-  showChampionsTable: boolean;
-  showGroupChampionsTable: boolean;
-  showSummaryChartOnHomePage: boolean;
   enabledNotBetPointSubtractByLaterRegister: boolean;
   enabledNotBetPointSubtract: boolean;
-  alwaysCalculateWithLatestOdds: boolean;
 }

@@ -9,7 +9,7 @@ import {
 } from "@/utils/common";
 import { MatchOutcome, MatchStatus } from "@/utils/enums";
 import { useEffect, useState, useMemo } from "react";
-import { useAllMatches } from "@/hooks/api/useMatches";
+import { isBettableMatch, useAllMatches } from "@/hooks/api/useMatches";
 import { format } from "date-fns";
 import { useAppSelector } from "@/state/hooks";
 import { useNotification } from "@/hooks/useNotification";
@@ -150,7 +150,7 @@ const MatchesPage = () => {
       header: "Mérkőzés",
       key: "match",
       render: (match) => {
-        const matchName = `${match.teamA?.name || ""} - ${match.teamB?.name || ""}`;
+        const matchName = `${match.teamA?.name || match.teamAPlaceholder || ""} - ${match.teamB?.name || match.teamBPlaceholder || ""}`;
         const canViewDetails = match.status !== MatchStatus.enabled;
 
         return (
@@ -204,21 +204,21 @@ const MatchesPage = () => {
     {
       header: "Hazai",
       key: "oddsAwin",
-      render: (match) => <span className="text-gray-400">{match.oddsAwin?.toFixed(2)}</span>,
+      render: (match) => <span className="text-gray-400">{match.oddsAwin?.toFixed(2) || "-"}</span>,
       sortable: true,
       width: "w-24",
     },
     {
       header: "Döntetlen",
       key: "oddsDraw",
-      render: (match) => <span className="text-gray-400">{match.oddsDraw?.toFixed(2)}</span>,
+      render: (match) => <span className="text-gray-400">{match.oddsDraw?.toFixed(2) || "-"}</span>,
       sortable: true,
       width: "w-24",
     },
     {
       header: "Vendég",
       key: "oddsBwin",
-      render: (match) => <span className="text-gray-400">{match.oddsBwin?.toFixed(2)}</span>,
+      render: (match) => <span className="text-gray-400">{match.oddsBwin?.toFixed(2) || "-"}</span>,
       sortable: true,
       width: "w-24",
     },
@@ -285,14 +285,15 @@ const MatchesPage = () => {
         }
 
         // Ha nincs fogadás, van elég pont és a mérkőzés aktív
-        if (!hasUserBet && hasEnoughScore && isMatchEnabled) {
+        if (!hasUserBet && hasEnoughScore && isBettableMatch(match)) {
           return (
             <div
               onClick={() => {
                 setSelectedMatch(match);
                 setIsBetModalOpen(true);
               }}
-              className="px-2 py-1 rounded-md text-center bg-button-light hover:bg-button-light-hover cursor-pointer text-xs"
+              className="px-2 py-1 rounded-md text-center bg-button-light
+               hover:bg-button-light-hover cursor-pointer text-xs"
             >
               Fogadok a mérkőzésre
             </div>
