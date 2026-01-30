@@ -15,8 +15,6 @@ import { useUpdateProfile } from "@/hooks/api/usePlayers";
 import { useNotification } from "@/hooks/useNotification";
 import type { UpdateUserProfileBody } from "@/services/types";
 import AvatarModal from "@/components/MyProfile/AvatarModal";
-import BalanceHistoryChart from "@/components/Charts/BalanceHistoryChart";
-import WinLostChart from "@/components/Charts/WinLostChart";
 import { useConfig } from "@/hooks/useConfig";
 import { format, isAfter } from "date-fns";
 
@@ -375,15 +373,6 @@ const MyProfilePage = () => {
           </div>
         </div>
       </form>
-
-      <div className="flex flex-col sm:flex-row gap-3 pt-8">
-        <div className="flex-1">
-          <BalanceHistoryChart />
-        </div>
-        <div className="flex-1">
-          <WinLostChart />
-        </div>
-      </div>
 
       {isOpenAvatarModal && (
         <AvatarModal isOpen={isOpenAvatarModal} onClose={() => setIsOpenAvatarModal(false)} />

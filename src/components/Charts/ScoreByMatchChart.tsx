@@ -9,11 +9,8 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
-  Legend,
-  ReferenceLine,
 } from "recharts";
 import Loader from "../Loader";
-import { format } from "date-fns";
 import { formatNumber } from "@/utils/common";
 
 interface CustomTooltipProps {
@@ -32,13 +29,13 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     return (
       <div className="bg-surface/95 backdrop-blur-sm border border-accent/20 rounded-lg px-4 py-3 shadow-lg">
         <p className="text-text-secondary text-sm mb-2 font-medium">
-          {data.isInitial ? "Kezdeti állapot" : `${data.teamA.name} - ${data.teamB.name}`}
+          {data.isInitial ? "Kezdeti állapot" : `${data.teamA} - ${data.teamB}`}
         </p>
         <div className="space-y-1">
+          {!data.isInitial && <p>{data.change}</p>}
           <p className="text-sm text-text-secondary">
-            <div>{data.change}</div>
-            <span className="text-text-secondary">Pontszám:</span>{" "}
-            <span className="font-semibold text-blue-400">{formatNumber(data.availableScore)}</span>
+            <span className="text-text-secondary">Pontod:</span>{" "}
+            <span className="font-semibold text-blue-400">{formatNumber(data.profitBalance)}</span>
           </p>
         </div>
       </div>
@@ -69,7 +66,7 @@ const ScoreByMatchChart = () => {
     return uniqueMatches.map((match) => ({
       ...match,
       // displayName: `${format(new Date(match.matchDate), "MMM dd")}`,
-      displayName: `${match.teamA?.name} - ${match.teamB?.name}`,
+      displayName: `${match.teamA} - ${match.teamB}`,
     }));
   }, [scoreByMatches]);
 
@@ -89,12 +86,12 @@ const ScoreByMatchChart = () => {
     );
   }
 
-  const scores = chartData.map((d: any) => d.availableScore);
+  /* const scores = chartData.map((d: any) => d.profitBalance);
   const maxScore = Math.max(...scores);
-  const minScore = Math.min(...scores);
+  const minScore = Math.min(...scores); */
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={250}>
       <LineChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
         <defs>
           <linearGradient id="availableScoreGradient" x1="0" y1="0" x2="0" y2="1">
@@ -115,10 +112,10 @@ const ScoreByMatchChart = () => {
           stroke="#b6b1d4"
           tick={{ fill: "#b6b1d4", fontSize: 12 }}
           tickLine={{ stroke: "#2a2543" }}
-          label={{ value: "Pontok", angle: -90, position: "insideLeft", fill: "#b6b1d4" }}
+          // label={{ value: "Pontok", angle: -90, position: "insideLeft", fill: "#b6b1d4" }}
         />
         <Tooltip content={<CustomTooltip />} />
-        {/* <ReferenceLine
+        {/*  <ReferenceLine
           y={maxScore}
           label={{ position: "top", value: `Max: ${maxScore}`, fill: "#60fafaff", fontSize: 12 }}
           stroke="#60fafaff"
@@ -144,7 +141,7 @@ const ScoreByMatchChart = () => {
         /> */}
         <Line
           type="monotone"
-          dataKey="availableScore"
+          dataKey="profitBalance"
           stroke="url(#availableScoreGradient)"
           strokeWidth={3}
           dot={{ fill: "#60fafaff", r: 3 }}
