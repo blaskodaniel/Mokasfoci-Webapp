@@ -55,6 +55,12 @@
     color: var(--color-text-primary);
   }
 
+  /* Recharts fókusz keret eltávolítása (kattintás/tap után ne legyen fehér outline) */
+  .recharts-wrapper:focus,
+  .recharts-wrapper *:focus {
+    outline: none;
+  }
+
   /* Scrollbar elrejtése */
   .scrollbar-hide {
     -ms-overflow-style: none; /* Internet Explorer 10+ */

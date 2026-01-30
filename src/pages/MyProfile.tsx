@@ -17,7 +17,6 @@ import type { UpdateUserProfileBody } from "@/services/types";
 import AvatarModal from "@/components/MyProfile/AvatarModal";
 import BalanceHistoryChart from "@/components/Charts/BalanceHistoryChart";
 import WinLostChart from "@/components/Charts/WinLostChart";
-import ScoreByMatchChart from "@/components/Charts/ScoreByMatchChart";
 import { useConfig } from "@/hooks/useConfig";
 import { format, isAfter } from "date-fns";
 
@@ -384,10 +383,6 @@ const MyProfilePage = () => {
         <div className="flex-1">
           <WinLostChart />
         </div>
-      </div>
-
-      <div>
-        <ScoreByMatchChart />
       </div>
 
       {isOpenAvatarModal && (

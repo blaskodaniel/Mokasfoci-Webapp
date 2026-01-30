@@ -59,11 +59,12 @@ export interface WinLostStats {
 export interface ScoreByMatch {
   matchId: string;
   matchDate: string;
-  teamA: string;
-  teamB: string;
+  teamA: Team;
+  teamB: Team;
   availableScore: number;
   profitScore: number;
   change: number;
+  isInitial?: boolean;
 }
 
 export interface SimpleTeam {

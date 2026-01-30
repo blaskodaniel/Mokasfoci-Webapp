@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useScoreByMatches } from "@/hooks/api/usePlayers";
+import { useMemo } from "react";
 import {
   LineChart,
   Line,
@@ -13,6 +14,7 @@ import {
 } from "recharts";
 import Loader from "../Loader";
 import { format } from "date-fns";
+import { formatNumber } from "@/utils/common";
 
 interface CustomTooltipProps {
   active?: boolean;
@@ -30,16 +32,13 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     return (
       <div className="bg-surface/95 backdrop-blur-sm border border-accent/20 rounded-lg px-4 py-3 shadow-lg">
         <p className="text-text-secondary text-sm mb-2 font-medium">
-          {data.teamA} vs {data.teamB}
+          {data.isInitial ? "Kezdeti állapot" : `${data.teamA.name} - ${data.teamB.name}`}
         </p>
         <div className="space-y-1">
-          <p className="text-sm">
-            <span className="text-text-secondary">Felhasználható:</span>{" "}
-            <span className="font-semibold text-blue-400">{data.availableScore}</span>
-          </p>
-          <p className="text-sm">
-            <span className="text-text-secondary">Nyeremény:</span>{" "}
-            <span className="font-semibold text-purple-400">{data.profitScore}</span>
+          <p className="text-sm text-text-secondary">
+            <div>{data.change}</div>
+            <span className="text-text-secondary">Pontszám:</span>{" "}
+            <span className="font-semibold text-blue-400">{formatNumber(data.availableScore)}</span>
           </p>
         </div>
       </div>
@@ -51,6 +50,29 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
 const ScoreByMatchChart = () => {
   const { data: scoreByMatches, isLoading, error } = useScoreByMatches();
 
+  // Adatok formázása a charthoz - rövidebb címkék a mérkőzésekhez
+  const chartData = useMemo(() => {
+    if (!scoreByMatches) return [];
+
+    // Duplikációk szűrése matchId vagy isInitial alapján
+    const uniqueMatches = [];
+    const seenIds = new Set();
+
+    for (const match of scoreByMatches) {
+      const id = match.matchId || (match.isInitial ? "INITIAL" : match.matchDate);
+      if (!seenIds.has(id)) {
+        seenIds.add(id);
+        uniqueMatches.push(match);
+      }
+    }
+
+    return uniqueMatches.map((match) => ({
+      ...match,
+      // displayName: `${format(new Date(match.matchDate), "MMM dd")}`,
+      displayName: `${match.teamA?.name} - ${match.teamB?.name}`,
+    }));
+  }, [scoreByMatches]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -59,7 +81,7 @@ const ScoreByMatchChart = () => {
     );
   }
 
-  if (error || !scoreByMatches || scoreByMatches.length === 0) {
+  if (error || !chartData || chartData.length === 0) {
     return (
       <div className="flex items-center justify-center h-64 text-text-secondary">
         Nincs megjeleníthető adat
@@ -67,32 +89,23 @@ const ScoreByMatchChart = () => {
     );
   }
 
-  // Adatok formázása a charthoz - rövidebb címkék a mérkőzésekhez
-  const chartData = scoreByMatches.map((match) => ({
-    ...match,
-    displayName: `${format(new Date(match.matchDate), "MMM dd")}`,
-  }));
-
-  const scores = chartData.map((d) => d.availableScore);
+  const scores = chartData.map((d: any) => d.availableScore);
   const maxScore = Math.max(...scores);
   const minScore = Math.min(...scores);
 
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+      <LineChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
         <defs>
           <linearGradient id="availableScoreGradient" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#60fafaff" stopOpacity={0.8} />
             <stop offset="100%" stopColor="#60fafaff" stopOpacity={0.4} />
           </linearGradient>
-          <linearGradient id="profitScoreGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.8} />
-            <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.4} />
-          </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="#60fafaff" vertical={false} />
         <XAxis
           dataKey="displayName"
+          hide
           stroke="#b6b1d4"
           tick={{ fill: "#b6b1d4", fontSize: 12 }}
           tickLine={{ stroke: "#60fafaff" }}
@@ -105,7 +118,7 @@ const ScoreByMatchChart = () => {
           label={{ value: "Pontok", angle: -90, position: "insideLeft", fill: "#b6b1d4" }}
         />
         <Tooltip content={<CustomTooltip />} />
-        <ReferenceLine
+        {/* <ReferenceLine
           y={maxScore}
           label={{ position: "top", value: `Max: ${maxScore}`, fill: "#60fafaff", fontSize: 12 }}
           stroke="#60fafaff"
@@ -118,33 +131,24 @@ const ScoreByMatchChart = () => {
           stroke="#60fafaff"
           strokeDasharray="3 3"
           opacity={0.5}
-        />
-        <Legend
+        /> */}
+        {/* <Legend
           wrapperStyle={{ paddingTop: "10px" }}
           iconType="line"
           formatter={(value) => {
             const labels: Record<string, string> = {
               availableScore: "Elérhető pont",
-              profitScore: "Megszerzett pont",
             };
             return <span style={{ color: "#b6b1d4" }}>{labels[value] || value}</span>;
           }}
-        />
+        /> */}
         <Line
           type="monotone"
           dataKey="availableScore"
-          stroke="#60fafaff"
-          strokeWidth={2}
+          stroke="url(#availableScoreGradient)"
+          strokeWidth={3}
           dot={{ fill: "#60fafaff", r: 3 }}
           activeDot={{ r: 5 }}
-        />
-        <Line
-          type="monotone"
-          dataKey="profitScore"
-          stroke="#a78bfa"
-          strokeWidth={3}
-          dot={{ fill: "#8b5cf6", r: 4 }}
-          activeDot={{ r: 6 }}
         />
       </LineChart>
     </ResponsiveContainer>

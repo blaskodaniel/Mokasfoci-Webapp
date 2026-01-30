@@ -36,6 +36,11 @@ const useMenu = () => {
         link: "/csoportok",
         isActive: location.pathname === "/csoportok",
       },
+      {
+        name: "Statisztikák",
+        link: "/statisztikak",
+        isActive: location.pathname === "/statisztikak",
+      },
     ],
     [location.pathname]
   );
