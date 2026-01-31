@@ -9,6 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  Legend,
 } from "recharts";
 import Loader from "../Loader";
 import { formatNumber } from "@/utils/common";
@@ -32,10 +33,20 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
           {data.isInitial ? "Kezdeti állapot" : `${data.teamA} - ${data.teamB}`}
         </p>
         <div className="space-y-1">
-          {!data.isInitial && <p>{data.change}</p>}
+          {data.change >= 0 ? (
+            <p className="text-green-400">+{data.change}</p>
+          ) : (
+            <p className="text-red-400">Vesztett</p>
+          )}
           <p className="text-sm text-text-secondary">
-            <span className="text-text-secondary">Pontod:</span>{" "}
+            <span className="text-text-secondary">Nyereség:</span>{" "}
             <span className="font-semibold text-blue-400">{formatNumber(data.profitBalance)}</span>
+          </p>
+          <p className="text-sm text-text-secondary">
+            <span className="text-text-secondary">Átlag:</span>{" "}
+            <span className="font-semibold text-blue-400">
+              {formatNumber(data.averageProfitBalance)}
+            </span>
           </p>
         </div>
       </div>
@@ -92,11 +103,15 @@ const ScoreByMatchChart = () => {
 
   return (
     <ResponsiveContainer width="100%" height={250}>
-      <LineChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+      <LineChart data={chartData} margin={{ top: 20, right: 30, left: -20, bottom: 10 }}>
         <defs>
-          <linearGradient id="availableScoreGradient" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id="profitScoreGradient" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#60fafaff" stopOpacity={0.8} />
             <stop offset="100%" stopColor="#60fafaff" stopOpacity={0.4} />
+          </linearGradient>
+          <linearGradient id="avarageProfitScoreGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#4ade80" stopOpacity={0.8} />
+            <stop offset="100%" stopColor="#4ade80" stopOpacity={0.4} />
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="#60fafaff" vertical={false} />
@@ -109,9 +124,14 @@ const ScoreByMatchChart = () => {
           label={{ value: "Mérkőzések", position: "insideBottom", offset: -5, fill: "#b6b1d4" }}
         />
         <YAxis
+          domain={["dataMin", "dataMax"]}
           stroke="#b6b1d4"
           tick={{ fill: "#b6b1d4", fontSize: 12 }}
           tickLine={{ stroke: "#2a2543" }}
+          tickFormatter={(value) => {
+            if (value >= 1000) return `${(value / 1000).toFixed(0)}k`;
+            return value;
+          }}
           // label={{ value: "Pontok", angle: -90, position: "insideLeft", fill: "#b6b1d4" }}
         />
         <Tooltip content={<CustomTooltip />} />
@@ -129,20 +149,32 @@ const ScoreByMatchChart = () => {
           strokeDasharray="3 3"
           opacity={0.5}
         /> */}
-        {/* <Legend
-          wrapperStyle={{ paddingTop: "10px" }}
-          iconType="line"
+        <Legend
+          align="center"
+          iconType="circle"
+          wrapperStyle={{ marginTop: "20px", paddingLeft: "30px", width: "100%" }}
           formatter={(value) => {
             const labels: Record<string, string> = {
-              availableScore: "Elérhető pont",
+              profitBalance: "Nyereményed",
+              averageProfitBalance: "Össz. játékos átl. nyeremény",
             };
-            return <span style={{ color: "#b6b1d4" }}>{labels[value] || value}</span>;
+            return (
+              <span className="text-text-secondary text-xs ml-1">{labels[value] || value}</span>
+            );
           }}
-        /> */}
+        />
         <Line
           type="monotone"
           dataKey="profitBalance"
-          stroke="url(#availableScoreGradient)"
+          stroke="url(#profitScoreGradient)"
+          strokeWidth={3}
+          dot={{ fill: "#60fafaff", r: 3 }}
+          activeDot={{ r: 5 }}
+        />
+        <Line
+          type="monotone"
+          dataKey="averageProfitBalance"
+          stroke="url(#avarageProfitScoreGradient)"
           strokeWidth={3}
           dot={{ fill: "#60fafaff", r: 3 }}
           activeDot={{ r: 5 }}

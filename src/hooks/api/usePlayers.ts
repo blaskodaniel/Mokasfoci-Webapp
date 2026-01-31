@@ -175,7 +175,6 @@ export const useScoreByMatches = () => {
   return useQuery<ScoreByMatch[]>({
     queryKey: playersKeys.getScoreByMatches(),
     queryFn: () => Api.getScoreByMatches(),
-    staleTime: 15 * 60 * 1000, // 15 perc
     retry: 2,
   });
 };
