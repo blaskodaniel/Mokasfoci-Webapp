@@ -65,6 +65,19 @@ export interface ScoreByMatch {
   profitScore: number;
   change: number;
   isInitial?: boolean;
+  isNotBetting: boolean;
+  balance: number;
+  averageProfitBalance: number;
+}
+
+export interface ScoreByMatchResponse {
+  timeline: ScoreByMatch[];
+  users: {
+    userid: string;
+    avatar: string;
+    username: string;
+    data: ScoreByMatch[];
+  }[];
 }
 
 export interface SimpleTeam {

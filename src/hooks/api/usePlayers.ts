@@ -9,7 +9,7 @@ import type { Transaction } from "@/models/transaction.type";
 import type {
   BalanceHistoryEntry,
   DefaultAvatar,
-  ScoreByMatch,
+  ScoreByMatchResponse,
   UpdateUserProfileBody,
   WinLostStats,
 } from "@/services/types";
@@ -23,7 +23,8 @@ export const playersKeys = {
   getDefaultAvatars: () => [...playersKeys.all, "default-avatars"] as const,
   getBalanceHistory: () => [...playersKeys.all, "balance-history"] as const,
   getWinLostStats: (userId?: string) => [...playersKeys.all, "win-loss-stats", userId] as const,
-  getScoreByMatches: () => [...playersKeys.all, "score-by-matches"] as const,
+  getScoreByMatches: (userids?: string[]) =>
+    [...playersKeys.all, "score-by-matches", userids] as const,
   getPlayerDetails: (userId: string) => [...playersKeys.all, "player-details", userId] as const,
 };
 
@@ -166,15 +167,14 @@ export const useWinLostStats = (userId?: string) => {
   return useQuery<WinLostStats>({
     queryKey: playersKeys.getWinLostStats(userId),
     queryFn: () => Api.getWinLostStats(userId),
-    staleTime: 15 * 60 * 1000, // 15 perc
     retry: 2,
   });
 };
 
-export const useScoreByMatches = () => {
-  return useQuery<ScoreByMatch[]>({
-    queryKey: playersKeys.getScoreByMatches(),
-    queryFn: () => Api.getScoreByMatches(),
+export const useScoreByMatches = (userids?: string[]) => {
+  return useQuery<ScoreByMatchResponse>({
+    queryKey: playersKeys.getScoreByMatches(userids),
+    queryFn: () => Api.getScoreByMatches(userids),
     retry: 2,
   });
 };

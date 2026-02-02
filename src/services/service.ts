@@ -5,7 +5,7 @@ import type {
   BalanceHistoryEntry,
   DefaultAvatar,
   GetTeamRankingsResponse,
-  ScoreByMatch,
+  ScoreByMatchResponse,
   SignInResponse,
   TeamDetails,
   UpdateUserProfileBody,
@@ -232,8 +232,8 @@ const Api = {
     return response.data;
   },
 
-  async getScoreByMatches(): Promise<ScoreByMatch[]> {
-    const response = await axiosInstance.get(`/user/stats/score-by-matches`);
+  async getScoreByMatches(userids?: string[]): Promise<ScoreByMatchResponse> {
+    const response = await axiosInstance.post(`/user/stats/score-by-matches`, { userids });
     return response.data;
   },
 

@@ -79,6 +79,7 @@ export const useMatchDetails = (matchId: string) => {
 export const isBettableMatch = (match: Match): boolean => {
   const isEnabledMatch = match.status === MatchStatus.enabled;
   const isExistTeams = match.teamA !== undefined && match.teamB !== undefined;
-  const isOddsAvailable = match.odds !== undefined;
+  const isOddsAvailable =
+    match.oddsAwin !== undefined && match.oddsBwin !== undefined && match.oddsDraw !== undefined;
   return isEnabledMatch && isExistTeams && isOddsAvailable;
 };

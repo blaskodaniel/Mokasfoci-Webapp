@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { useCallback, useMemo } from "react";
 import type { MatchWithUserBet } from "./Matches/types";
 import UnknownFlag from "./UnknownFlag";
+import { isBettableMatch } from "@/hooks/api/useMatches";
 
 interface MatchListItemProps {
   match: MatchWithUserBet | Match;
@@ -29,11 +30,10 @@ const MatchListItem = ({
   const isDraw = match.outcome === MatchOutcome.draw;
   const isFinished = match.status === MatchStatus.finished;
   const comment = match.comment;
-  const bet = (match as MatchWithUserBet).userbet;
+  const bet = (match as MatchWithUserBet)?.userbet;
   const isUserBetTeamAWin = bet?.outcome === MatchOutcome.home;
   const isUserBetTeamBWin = bet?.outcome === MatchOutcome.away;
   const isUserBetDraw = bet?.outcome === MatchOutcome.draw;
-  const canBet = "userbet" in match;
 
   const statusInfoBadge = useMemo(() => {
     return getMatchStatusInfo(match.status);
@@ -104,7 +104,7 @@ const MatchListItem = ({
           </div>
         </div>
         <div className="flex items-center gap-5 flex-1 justify-end">
-          {canBet && match.status === MatchStatus.enabled && (
+          {isBettableMatch(match) && (
             <div
               onClick={() => onSelectMatch && onSelectMatch(match)}
               className={`px-2 py-2 rounded-md text-center 

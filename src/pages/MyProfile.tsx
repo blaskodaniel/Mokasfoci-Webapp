@@ -187,7 +187,7 @@ const MyProfilePage = () => {
       <div className="flex justify-between items-center p-3 sm:p-6">
         <h1 className="text-3xl font-bold text-white">Profilom</h1>
         <Button
-          text="Pontjaim története"
+          text="Pontjaim alakulása"
           onClick={() => navigate("/transactions")}
           className="bg-blue-800/30 hover:bg-blue-700/40 px-3 py-1 rounded-md text-xs"
         />
