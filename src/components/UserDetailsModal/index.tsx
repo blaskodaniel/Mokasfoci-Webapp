@@ -2,7 +2,8 @@ import { useMemo, type FC } from "react";
 import type { UserDetailsModalProps } from "./types";
 import Modal from "../Modal";
 import { useGetPlayerDetails, useWinLostStats } from "@/hooks/api/usePlayers";
-import { APP_CONFIG, DEFAULT_AVATAR_URL } from "@/config";
+import { useBadgesByUser } from "@/hooks/api/useBadges";
+import { APP_CONFIG, DEFAULT_AVATAR_URL, BADGE_CONFIG } from "@/config";
 import { formatPoints } from "@/utils/common";
 import Loader from "../Loader";
 import BalanceHistoryChart from "../Charts/BalanceHistoryChart";
@@ -11,6 +12,7 @@ import InfoTooltip from "../InfoTooltip";
 const UserDetailsModal: FC<UserDetailsModalProps> = ({ isOpen, onClose, userId }) => {
   const { data: playerData, isLoading, error } = useGetPlayerDetails(userId);
   const { data: winLostData } = useWinLostStats(userId);
+  const { data: badgesData } = useBadgesByUser(userId);
   const playerDetails = playerData?.details;
   const playerStats = playerData?.stats;
 
@@ -56,12 +58,30 @@ const UserDetailsModal: FC<UserDetailsModalProps> = ({ isOpen, onClose, userId }
               <h2 className="text-xl sm:text-2xl font-semibold text-white">
                 {playerDetails?.name || playerDetails?.username}
               </h2>
-              <p className="text-gray-400 text-xs">{playerDetails?.email}</p>
               {playerDetails?.data.winteamid && (
-                <p className="text-xs mt-1">
+                <p className="text-xs mt-0">
                   Bajnok csapat tipp: {playerDetails?.data.winteamid?.name}
                 </p>
               )}
+
+              {badgesData?.badges && badgesData.badges.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {badgesData.badges.map((badge) => {
+                    const config = BADGE_CONFIG[badge.type];
+                    if (!config) return null;
+                    return (
+                      <InfoTooltip text={config.description} key={badge._id}>
+                        <img
+                          src={`/badges/${config.filename}`}
+                          alt={config.label}
+                          className="w-6 h-6 object-contain cursor-help hover:scale-110 transition-transform"
+                        />
+                      </InfoTooltip>
+                    );
+                  })}
+                </div>
+              )}
+              <div></div>
             </div>
           </div>
           {/* Stats */}
@@ -169,7 +189,10 @@ const UserDetailsModal: FC<UserDetailsModalProps> = ({ isOpen, onClose, userId }
               className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-3 border border-gray-700/50 
             flex flex-col justify-between relative z-1 hover:z-50 focus-within:z-50"
             >
-              <InfoTooltip text="Egymást követő nyertes napok" className="absolute top-2 right-2" />
+              <InfoTooltip
+                text="Egymást követő nyertes napok amit maximum elért a játékos egyhuzamban."
+                className="absolute top-2 right-2"
+              />
               <div>
                 <div className="text-gray-400 text-xs font-medium mb-1 uppercase">Nyerő széria</div>
                 <div className="text-blue-400 text-lg font-bold">
@@ -183,7 +206,10 @@ const UserDetailsModal: FC<UserDetailsModalProps> = ({ isOpen, onClose, userId }
               className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-3 border border-gray-700/50 
             flex flex-col justify-between relative z-1 hover:z-50 focus-within:z-50"
             >
-              <InfoTooltip text="Aktuálisan elérhető egyenleg" className="absolute top-2 right-2" />
+              <InfoTooltip
+                text="Aktuálisan elérhető felhasználható egyenlege"
+                className="absolute top-2 right-2"
+              />
               <div>
                 <div className="text-gray-400 text-xs font-medium mb-1 uppercase">Összpontszám</div>
                 <div className="text-white text-lg font-bold">

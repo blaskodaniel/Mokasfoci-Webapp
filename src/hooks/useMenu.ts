@@ -41,6 +41,11 @@ const useMenu = () => {
         link: "/statisztikak",
         isActive: location.pathname === "/statisztikak",
       },
+      {
+        name: "Jelvényeim",
+        link: "/badges",
+        isActive: location.pathname === "/badges",
+      },
     ],
     [location.pathname]
   );

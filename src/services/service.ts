@@ -2,6 +2,7 @@ import type { Match, MatchDetail } from "@/models/match.type";
 import type { User } from "../models/user.type";
 import { axiosInstance } from "./axiosConfig";
 import type {
+  BadgesResponse,
   BalanceHistoryEntry,
   DefaultAvatar,
   GetTeamRankingsResponse,
@@ -267,6 +268,16 @@ const Api = {
 
   async getGroupStandingsById(groupId: string): Promise<Team[]> {
     const response = await axiosInstance.get(`/group/${groupId}/standings`);
+    return response.data;
+  },
+
+  async getMyBadges(): Promise<BadgesResponse> {
+    const response = await axiosInstance.get(`/user/mybadges`);
+    return response.data;
+  },
+
+  async getBadgesByUser(userId: string): Promise<BadgesResponse> {
+    const response = await axiosInstance.get(`/user/${userId}/badges`);
     return response.data;
   },
 };

@@ -45,3 +45,13 @@ export enum TransactionType {
   betModification = "betModification",
   reward = "reward",
 }
+
+export enum BadgeType {
+  // Széria badge-ek
+  hotStreak = "hotStreak", // 3 egymást követő eltalált kimenetel
+  onFire = "onFire", // 5 egymást követő eltalált kimenetel
+
+  // Stratégiai badge-ek
+  groupOracle = "groupOracle", // Csoportgyőztes eltalálás
+  championVisionary = "championVisionary", // Bajnok csapat eltalálás
+}

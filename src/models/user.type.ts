@@ -18,7 +18,7 @@ interface UserData {
   profitScore: number;
   availableScore: number;
   notbetcount: number;
-  winteamcount: number;
+  groupWinCount: number;
   couponwin: number;
   couponlost: number;
   coupons: number;

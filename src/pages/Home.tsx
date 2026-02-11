@@ -65,6 +65,17 @@ const HomePage = () => {
     }));
   }, [upcomingMatches, myBets]);
 
+  // Szinkronizáljuk a selectedMatch-et a frissült adatokkal amikor változnak az odds-ok
+  useEffect(() => {
+    if (selectedMatch && isBetModalOpen) {
+      const updatedMatch = upcomingMatchesWithBets.find((m) => m._id === selectedMatch._id);
+      if (updatedMatch) {
+        setSelectedMatch(updatedMatch);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [upcomingMatchesWithBets, isBetModalOpen, selectedMatch?._id]);
+
   const onSubmitCouponHandling = async (
     betAmount: number,
     outcome: MatchOutcome,

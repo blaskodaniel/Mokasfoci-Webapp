@@ -3,6 +3,8 @@ import Api from "@/services/service";
 import type { Match, MatchDetail } from "@/models/match.type";
 import { MatchStatus } from "@/utils/enums";
 
+const matchRefreshInterval = 60 * 1000; // 1 perc
+
 // Query keys - központi helyen definiáljuk
 export const matchesKeys = {
   all: ["matches"] as const,
@@ -29,9 +31,10 @@ export const useAllMatches = ({
       { sortBy, sortOrder, startDate: startDate?.toISOString(), endDate: endDate?.toISOString() },
     ],
     queryFn: () => Api.getAllMatches({ sortBy, sortOrder, startDate, endDate }),
-    staleTime: 1 * 60 * 1000, // 10 perc
+    staleTime: matchRefreshInterval,
     retry: 2,
-    refetchOnWindowFocus: true,
+    refetchInterval: matchRefreshInterval,
+    refetchIntervalInBackground: false,
   });
 };
 
@@ -40,9 +43,10 @@ export const useUpcomingMatches = (limit?: number) => {
   return useQuery<Match[]>({
     queryKey: matchesKeys.upcoming(),
     queryFn: () => Api.getUpcomingMatches({ limit }),
-    staleTime: 5 * 60 * 1000, // 5 perc
+    staleTime: matchRefreshInterval,
     retry: 2,
-    refetchOnWindowFocus: false,
+    refetchInterval: matchRefreshInterval,
+    refetchIntervalInBackground: false,
   });
 };
 

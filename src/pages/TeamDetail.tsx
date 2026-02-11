@@ -68,7 +68,7 @@ const TeamDetail = () => {
           <Panel className="flex-1" noBackground>
             <div className="px-0 gap-4 md:gap-6 lg:gap-8 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3">
               <div className="bg-gray-900/50 backdrop-blur-sm p-3 border border-gray-700/50 px-4 py-3 rounded-2xl text-white">
-                <div>Kedvelések</div>
+                <div>Kedvenc csapat</div>
                 <div className="flex flex-col justify-start">
                   <span className="font-bold text-xl">{favoriteUsers.length}</span>
                   <span className="text-xs text-gray-500">felhasználó</span>

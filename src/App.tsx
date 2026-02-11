@@ -19,6 +19,7 @@ import GroupTables from "./pages/GroupTables";
 import { useConfig } from "@/hooks/useConfig";
 import TeamDetail from "./pages/TeamDetail";
 import Statistics from "./pages/Statistics";
+import MyBadges from "./pages/MyBadges";
 
 function App() {
   useAxiosInterceptor();
@@ -48,6 +49,7 @@ function App() {
           <Route path="csoportok" element={<GroupTables />} />
           <Route path="transactions" element={<MyTransactions />} />
           <Route path="statisztikak" element={<Statistics />} />
+          <Route path="badges" element={<MyBadges />} />
 
           <Route path="*" element={<NotFound />} />
         </Route>

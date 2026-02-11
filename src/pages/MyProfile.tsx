@@ -17,6 +17,7 @@ import type { UpdateUserProfileBody } from "@/services/types";
 import AvatarModal from "@/components/MyProfile/AvatarModal";
 import { useConfig } from "@/hooks/useConfig";
 import { format, isAfter } from "date-fns";
+import InfoTooltip from "@/components/InfoTooltip";
 
 const MyProfilePage = () => {
   const { config } = useConfig();
@@ -200,7 +201,6 @@ const MyProfilePage = () => {
           <div className="flex justify-center mb-6">
             <div className="relative group">
               <div
-                onClick={() => console.log("Avatar clicked")}
                 className="w-32 h-32 rounded-full bg-linear-to-br flex 
                 items-center justify-center text-white text-4xl font-bold cursor-pointer 
                 hover:scale-105 transition-transform duration-200 shadow-lg"
@@ -241,26 +241,144 @@ const MyProfilePage = () => {
             <p className="text-gray-400">{currentUser?.email}</p>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Stats - Ultra Clean Design */}
+          <div className="grid grid-cols-2 gap-6">
+            {/* Available Score Card */}
             <div
-              className="bg-linear-to-br from-green-500/20 to-green-600/20 
-            rounded-xl p-2 sm:p-4 border border-green-500/30"
+              className="relative pl-3 pr-3 py-3 bg-gray-800/60 backdrop-blur-md 
+            rounded-2xl border border-gray-700/50"
             >
-              <div className="text-green-400 text-sm font-medium mb-1">Felhasználható</div>
+              {/* Top row with label and info icon */}
+              <div className="flex items-start justify-between mb-1">
+                <div className="text-gray-400 text-xs font-medium">Felhasználható</div>
+                <InfoTooltip text="A felhasználható pontjaid. Ez a keret, amiből gazdálkodhatsz és fogadhatsz. Erre kell vigyáznod hogy el ne fogyjon! Igazából itt ez a pénzed." />
+              </div>
+
+              {/* Main number */}
               <div className="text-white text-xl font-bold">
-                {formatPoints(currentUser?.data?.availableScore || 0, false)}{" "}
-                <span className="text-xs">pont</span>
+                {formatPoints(currentUser?.data?.availableScore || 0, false)}
               </div>
             </div>
+
+            {/* Profit Score Card */}
             <div
-              className="bg-linear-to-br from-yellow-500/20 to-yellow-600/20 
-            rounded-xl p-2 sm:p-4 border border-yellow-500/30"
+              className="relative pl-3 pr-3 py-3 bg-gray-800/60 backdrop-blur-md rounded-2xl 
+            border border-gray-700/50"
             >
-              <div className="text-yellow-400 text-sm font-medium mb-1">Nyeremény</div>
+              {/* Top row with label and info icon */}
+              <div className="flex items-start justify-between mb-1">
+                <div className="text-gray-400 text-xs font-medium">Nyeremény</div>
+                <InfoTooltip text="Ez a tiszta hasznod. Az összess megnyert pontod összege (levonva a felrakott téteket). Ez mutatja meg, hogy mennyire vagy nyereséges és mennyire játszol ügyesen." />
+              </div>
+
+              {/* Main number */}
               <div className="text-white text-xl font-bold">
-                {formatPoints(currentUser?.data?.profitScore || 0, false)}{" "}
-                <span className="text-xs">pont</span>
+                {formatPoints(currentUser?.data?.profitScore || 0, false)}
+              </div>
+            </div>
+          </div>
+
+          {/* Rewards & Achievements Section */}
+          <div className="grid grid-cols-2 gap-4 pt-6">
+            {/* Group Winners Achievement Badge */}
+            <div
+              className="relative bg-linear-to-br from-purple-900/30 via-purple-800/20 to-transparent 
+              backdrop-blur-md rounded-2xl border border-purple-500/30 p-4
+              hover:border-purple-400/50 transition-all duration-300 hover:scale-[1.02] group"
+            >
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-linear-to-br from-purple-500/0 via-purple-400/10 to-purple-600/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+              {/* Content */}
+              <div className="relative z-10">
+                {/* Icon and label row */}
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div>
+                      <div className="text-purple-300 text-xs font-medium">Csoportgyőztes</div>
+                      <div className="text-gray-400 text-[10px]">találatok</div>
+                    </div>
+                  </div>
+                  <InfoTooltip
+                    text={`Eltalált csoportgyőztes tippek száma. Minden találatért ${config?.groupWinPoint || 1500} pont jár!`}
+                  />
+                </div>
+
+                {/* Achievement display */}
+                <div className="flex items-end justify-between">
+                  {/* Count badge */}
+                  <div className="flex items-baseline gap-2">
+                    <div className="text-3xl font-bold text-white">
+                      {currentUser?.data?.groupWinCount || 0}
+                    </div>
+                    <div className="text-sm text-purple-400">/ 12</div>
+                  </div>
+
+                  {/* Points earned */}
+                  <div className="text-right">
+                    <div className="text-xs text-gray-500">Nyert</div>
+                    <div className="text-sm font-bold text-purple-400">
+                      +
+                      {formatPoints(
+                        (currentUser?.data?.groupWinCount || 0) * (config?.groupWinPoint || 1500),
+                        false
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Champion Team Achievement Badge */}
+            <div
+              className="relative bg-linear-to-br from-amber-900/30 via-yellow-800/20 to-transparent 
+              backdrop-blur-md rounded-2xl border border-amber-500/30 p-4
+              hover:border-amber-400/50 transition-all duration-300 hover:scale-[1.02] group"
+            >
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-linear-to-br from-amber-500/0 via-yellow-400/10 to-amber-600/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+              {/* Content */}
+              <div className="relative">
+                {/* Icon and label row */}
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div>
+                      <div className="text-amber-300 text-xs font-medium">Bajnok csapat</div>
+                      <div className="text-gray-400 text-[10px]">találat</div>
+                    </div>
+                  </div>
+                  <InfoTooltip
+                    text={`A világbajnok tipped. ${config?.championWinPoint || 5000} pontot kapsz ha eltalálod a végén!`}
+                  />
+                </div>
+
+                {/* Achievement display */}
+                <div className="flex items-end justify-between">
+                  {/* Status badge */}
+                  <div>
+                    {currentUser?.data?.winteamid ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-amber-400">
+                          {teams.find((t) => t._id === currentUser?.data?.winteamid)?.name}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-gray-600" />
+                        <span className="text-sm font-semibold text-gray-500">Nincs tipp</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Points at stake */}
+                  <div className="text-right">
+                    <div className="text-xs text-gray-500">Várható</div>
+                    <div className="text-sm font-bold text-amber-400">
+                      +{formatPoints(config?.championWinPoint || 5000, false)}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -97,6 +97,17 @@ const MyBetsPage = () => {
     refetchMyBets();
   }, [refetchMyBets]);
 
+  // Szinkronizáljuk a selectedMatch-et a frissült adatokkal amikor változnak az odds-ok
+  useEffect(() => {
+    if (selectedMatch && isBetModalOpen) {
+      const updatedBet = myBets?.find((bet) => bet.matchid._id === selectedMatch._id);
+      if (updatedBet) {
+        setSelectedMatch(updatedBet.matchid);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [myBets, isBetModalOpen, selectedMatch?._id]);
+
   const columns: Column<Bet>[] = [
     {
       header: "Mérkőzés",

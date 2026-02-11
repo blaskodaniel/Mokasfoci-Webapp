@@ -1,6 +1,7 @@
 import type { Match } from "@/models/match.type";
 import type { User } from "../models/user.type";
 import type { Team } from "@/models/team.type";
+import type { Badge } from "@/models/badge.type";
 
 export interface SignInResponse {
   token: string;
@@ -135,4 +136,8 @@ export interface TeamDetails {
   groupWinners: User[];
   matches: Match[];
   teamData: Team;
+}
+
+export interface BadgesResponse {
+  badges: Badge[];
 }
