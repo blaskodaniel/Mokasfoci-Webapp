@@ -20,6 +20,7 @@ import { useConfig } from "@/hooks/useConfig";
 import TeamDetail from "./pages/TeamDetail";
 import Statistics from "./pages/Statistics";
 import MyBadges from "./pages/MyBadges";
+import GroupDetail from "./pages/GroupDetail";
 
 function App() {
   useAxiosInterceptor();
@@ -45,6 +46,7 @@ function App() {
           <Route path="merkozesek" element={<MatchesPage />} />
           <Route path="merkozesek/:id" element={<MatchDetailPage />} />
           <Route path="csapatok/:id" element={<TeamDetail />} />
+          <Route path="csoportok/:id" element={<GroupDetail />} />
           <Route path="ranglista" element={<ToplistPage />} />
           <Route path="csoportok" element={<GroupTables />} />
           <Route path="transactions" element={<MyTransactions />} />

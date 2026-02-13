@@ -40,6 +40,12 @@ const BetModalDesktop: FC<BetModalProps & { onAfterClose?: () => void }> = ({
       : "";
   }, [teamStandingsQuery]);
 
+  const groupId = useMemo(() => {
+    return teamStandingsQuery.data && teamStandingsQuery.data?.length > 0
+      ? teamStandingsQuery.data[0].groupid._id
+      : "";
+  }, [teamStandingsQuery]);
+
   const userScore = useMemo(() => {
     return currentUser ? currentUser.data.availableScore : 0;
   }, [currentUser]);
@@ -114,7 +120,12 @@ const BetModalDesktop: FC<BetModalProps & { onAfterClose?: () => void }> = ({
           match.type === MatchType.GroupStageRound2 ||
           match.type === MatchType.GroupStageRound3) && (
           <section className="flex justify-center pt-4">
-            <GroupStandings teams={teamStandingsQuery.data ?? []} groupName={groupName} size="sm" />
+            <GroupStandings
+              teams={teamStandingsQuery.data ?? []}
+              groupName={groupName}
+              size="sm"
+              groupId={groupId}
+            />
           </section>
         )}
 

@@ -1,7 +1,7 @@
 import { useClickOutside } from "@/hooks/useClickOutside";
 import type { Team } from "@/models/team.type";
 import { useRef, useState, type FC } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const columnFieldMap = {
   LM: "playedGames",
@@ -25,6 +25,7 @@ const columnTooltipMap: Record<ColumnKey, string> = {
 
 interface GroupStandingsProps {
   groupName: string;
+  groupId: string;
   teams?: Team[];
   columns?: ColumnKey[];
   size?: "sm" | "md" | "lg";
@@ -32,6 +33,7 @@ interface GroupStandingsProps {
 
 const GroupStandings: FC<GroupStandingsProps> = ({
   groupName,
+  groupId,
   teams,
   columns = Object.keys(columnFieldMap) as ColumnKey[],
   size = "md",
@@ -51,7 +53,12 @@ const GroupStandings: FC<GroupStandingsProps> = ({
         className="rounded-xl px-2 py-1 mb-2 flex justify-between items-center
        bg-[#085225db] backdrop-blur-md font-bold"
       >
-        <div className="truncate uppercase text-sm">{groupName} csoport</div>
+        <Link
+          to={`/csoportok/${groupId}`}
+          className="truncate uppercase text-sm hover:text-blue-400 underline"
+        >
+          {groupName} csoport
+        </Link>
         <div className="flex items-center gap-4 text-sm" ref={headerRef}>
           {columns
             ? columns.map((col) => (

@@ -2,6 +2,7 @@ import type { Match } from "@/models/match.type";
 import type { User } from "../models/user.type";
 import type { Team } from "@/models/team.type";
 import type { Badge } from "@/models/badge.type";
+import type { Group } from "@/models/group.type";
 
 export interface SignInResponse {
   token: string;
@@ -127,7 +128,7 @@ export interface UserDetails {
 }
 
 export interface GetTeamRankingsResponse {
-  [groupName: string]: Team[];
+  [groupName: string]: { teams: Team[]; groupId: string };
 }
 
 export interface TeamDetails {
@@ -140,4 +141,9 @@ export interface TeamDetails {
 
 export interface BadgesResponse {
   badges: Badge[];
+}
+
+export interface GroupDetailsResponse {
+  group: Group;
+  matches: Match[];
 }

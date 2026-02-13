@@ -161,6 +161,7 @@ const TeamDetail = () => {
             <GroupStandings
               teams={teamStandingsQuery.data ?? []}
               groupName={teamData?.groupid?.name || ""}
+              groupId={teamData?.groupid?._id || ""}
               size="sm"
             />
           </div>

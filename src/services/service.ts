@@ -6,6 +6,7 @@ import type {
   BalanceHistoryEntry,
   DefaultAvatar,
   GetTeamRankingsResponse,
+  GroupDetailsResponse,
   ScoreByMatchResponse,
   SignInResponse,
   TeamDetails,
@@ -278,6 +279,11 @@ const Api = {
 
   async getBadgesByUser(userId: string): Promise<BadgesResponse> {
     const response = await axiosInstance.get(`/user/${userId}/badges`);
+    return response.data;
+  },
+
+  async getGroupById(groupId: string): Promise<GroupDetailsResponse> {
+    const response = await axiosInstance.get(`/group/${groupId}/details`);
     return response.data;
   },
 };
