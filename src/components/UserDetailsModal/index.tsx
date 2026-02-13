@@ -74,7 +74,7 @@ const UserDetailsModal: FC<UserDetailsModalProps> = ({ isOpen, onClose, userId }
                         <img
                           src={`/badges/${config.filename}`}
                           alt={config.label}
-                          className="w-6 h-6 object-contain cursor-help hover:scale-110 transition-transform"
+                          className="w-10 h-10 object-contain cursor-help hover:scale-110 transition-transform"
                         />
                       </InfoTooltip>
                     );

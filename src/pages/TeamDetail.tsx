@@ -1,25 +1,54 @@
+import BetModalDesktop from "@/components/BetModal/Desktop";
+import type { MatchWithUserBet } from "@/components/Matches/types";
 import MatchListItem from "@/components/MatchListItem";
 import MobileBackBar from "@/components/MobileBackBar";
 import PageLoader from "@/components/PageLoader";
 import Panel from "@/components/Panel";
 import GroupStandings from "@/components/Widgets/GroupStandings";
 import { APP_CONFIG } from "@/config";
+import { useMyBets } from "@/hooks/api/usePlayers";
 import { useGetGroupStandingsById, useTeamDetails } from "@/hooks/api/useTeams";
-import type { Match } from "@/models/match.type";
-import { MatchStatus } from "@/utils/enums";
-import { useMemo } from "react";
+import { useBetting } from "@/hooks/useBetting";
+import { MatchOutcome, MatchStatus } from "@/utils/enums";
+import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 const TeamDetail = () => {
   const teamId = useParams()?.id;
   const { data: details, isLoading } = useTeamDetails(teamId!);
   const teamStandingsQuery = useGetGroupStandingsById(String(details?.teamData?.groupid._id ?? ""));
+  const { data: myBets } = useMyBets();
+  const { onSubmitCoupon: submitBet, isPending: isBettingPending } = useBetting();
 
   const teamData = useMemo(() => details?.teamData, [details?.teamData]);
   const favoriteUsers = useMemo(() => details?.favoriteUsers || [], [details?.favoriteUsers]);
   const championUsers = useMemo(() => details?.championUsers || [], [details?.championUsers]);
   const groupWinners = useMemo(() => details?.groupWinners || [], [details?.groupWinners]);
   const matches = useMemo(() => details?.matches || [], [details?.matches]);
+
+  const [isBetModalOpen, setIsBetModalOpen] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(null);
+
+  const matchesWithBets = useMemo((): MatchWithUserBet[] => {
+    if (!matches || !myBets) return matches || [];
+
+    const combined = matches.map((match) => {
+      const userBet = myBets.find((bet) => bet.matchid._id === match._id);
+
+      return {
+        ...match,
+        userbet: userBet,
+      };
+    });
+
+    return combined;
+  }, [matches, myBets]);
+
+  const onSubmitCoupon = (betAmount: number, outcome: MatchOutcome) => {
+    if (!selectedMatch) return;
+
+    submitBet(selectedMatch, betAmount, outcome, () => setIsBetModalOpen(false));
+  };
 
   if (isLoading) {
     return <PageLoader message="Adatok betöltése..." />;
@@ -94,10 +123,10 @@ const TeamDetail = () => {
             </div>
           </Panel>
           <div className="flex gap-3 flex-col sm:flex-row">
-            <Panel title="Mérkőzések" className="flex-1">
-              {matches && matches.length > 0 && (
+            <Panel title={`${teamData?.name} mérkőzései`} className="flex-1">
+              {matchesWithBets && matchesWithBets.length > 0 && (
                 <div className="p-1">
-                  {matches.map((match: Match) => {
+                  {matchesWithBets.map((match: MatchWithUserBet) => {
                     if (
                       match.status === MatchStatus.finished ||
                       match.status === MatchStatus.playing
@@ -109,7 +138,19 @@ const TeamDetail = () => {
                       );
                     }
 
-                    return <MatchListItem match={match} key={match._id} displayTime displayDate />;
+                    return (
+                      <MatchListItem
+                        match={match}
+                        key={match._id}
+                        displayTime
+                        displayDate
+                        onSelectMatch={(m: MatchWithUserBet) => {
+                          console.log(m);
+                          setSelectedMatch(m);
+                          setIsBetModalOpen(true);
+                        }}
+                      />
+                    );
                   })}
                 </div>
               )}
@@ -125,6 +166,21 @@ const TeamDetail = () => {
           </div>
         </div>
       </div>
+
+      {selectedMatch && (
+        <BetModalDesktop
+          key={selectedMatch._id}
+          match={selectedMatch}
+          isOpen={isBetModalOpen}
+          onClose={() => setIsBetModalOpen(false)}
+          onAfterClose={() => setSelectedMatch(null)}
+          onSave={onSubmitCoupon}
+          loading={isBettingPending}
+          editMode={!!selectedMatch.userbet}
+          initBetValue={selectedMatch.userbet?.amount}
+          initSelectedOutcome={selectedMatch.userbet?.outcome}
+        />
+      )}
     </div>
   );
 };

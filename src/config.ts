@@ -17,21 +17,21 @@ export const BADGE_CONFIG: Record<
   [BadgeType.hotStreak]: {
     filename: "hot_streak.svg",
     label: "Hot Streak",
-    description: "3 egymást követő sikeres tipp.",
+    description: "3 egymást követő sikeres fogadás széria jelvény.",
   },
   [BadgeType.onFire]: {
     filename: "on_fire.svg",
     label: "On Fire",
-    description: "5 egymást követő sikeres tipp.",
+    description: "5 egymást követő sikeres fogadás széria jelvény.",
   },
   [BadgeType.groupOracle]: {
     filename: "group_oracle.svg",
     label: "Group Oracle",
-    description: "Sikeresen megtippelted egy csoport győztesét.",
+    description: "Csoport győztes tipp jelvény.",
   },
   [BadgeType.championVisionary]: {
     filename: "champion_visionary.svg",
     label: "Champion Visionary",
-    description: "Sikeresen megtippelted a bajnokcsapatot.",
+    description: "Bajnokcsapat tipp jelvény.",
   },
 };

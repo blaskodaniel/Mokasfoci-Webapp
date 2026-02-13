@@ -49,7 +49,7 @@ function App() {
           <Route path="csoportok" element={<GroupTables />} />
           <Route path="transactions" element={<MyTransactions />} />
           <Route path="statisztikak" element={<Statistics />} />
-          <Route path="badges" element={<MyBadges />} />
+          <Route path="mybadges" element={<MyBadges />} />
 
           <Route path="*" element={<NotFound />} />
         </Route>

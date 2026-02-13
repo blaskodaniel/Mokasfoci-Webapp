@@ -1,6 +1,6 @@
 import BetModalDesktop from "@/components/BetModal/Desktop";
 import type { Column } from "@/components/Table/types";
-import { useMyBets, useUpdateBet, useCreateBet, playersKeys } from "@/hooks/api/usePlayers";
+import { useMyBets } from "@/hooks/api/usePlayers";
 import {
   getMatchStatusInfo,
   getMatchTypeText,
@@ -12,20 +12,16 @@ import { useEffect, useState, useMemo } from "react";
 import { isBettableMatch, useAllMatches } from "@/hooks/api/useMatches";
 import { format } from "date-fns";
 import { useAppSelector } from "@/state/hooks";
-import { useNotification } from "@/hooks/useNotification";
-import { AxiosError } from "axios";
+import { useBetting } from "@/hooks/useBetting";
 import { Link } from "react-router-dom";
 import Calendar from "@/components/Calendar";
 import useResponsive from "@/hooks/useResponsive";
 import MatchesDesktopView from "@/components/Matches/DesktopView.tsx";
 import MatchesMobileView from "@/components/Matches/MobileView";
 import type { MatchWithUserBet } from "@/components/Matches/types";
-import { useQueryClient } from "@tanstack/react-query";
 
 const MatchesPage = () => {
-  const queryClient = useQueryClient();
   const { isDesktop } = useResponsive();
-  const { showSuccess, showError } = useNotification();
   const { currentUser } = useAppSelector((state) => state.auth);
   const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(null);
   const [isBetModalOpen, setIsBetModalOpen] = useState(false);
@@ -50,8 +46,7 @@ const MatchesPage = () => {
     refetch: refetchMyBets,
   } = useMyBets();
 
-  const updateBetMutation = useUpdateBet();
-  const createBetMutation = useCreateBet();
+  const { onSubmitCoupon: submitBet, isPending: isBettingPending } = useBetting();
 
   // Matches és myBets összevonása
   const matchesWithBets = useMemo((): MatchWithUserBet[] => {
@@ -96,59 +91,10 @@ const MatchesPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchesWithBets, isBetModalOpen, selectedMatch?._id]);
 
-  const onSubmitCoupon = (betAmount: number, outcome: MatchOutcome, editMode: boolean) => {
+  const onSubmitCoupon = (betAmount: number, outcome: MatchOutcome) => {
     if (!selectedMatch) return;
 
-    if (editMode && selectedMatch.userbet) {
-      updateBetMutation.mutate(
-        {
-          betId: selectedMatch.userbet._id,
-          data: {
-            amount: betAmount,
-            outcome: outcome,
-          },
-        },
-        {
-          onSuccess: () => {
-            setIsBetModalOpen(false);
-            showSuccess("A fogadás sikeresen frissítve lett.");
-            queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
-          },
-          onError: (error) => {
-            console.error("Error updating bet:", error);
-            showError("A fogadás frissítése sikertelen volt.");
-          },
-        }
-      );
-    } else {
-      createBetMutation.mutate(
-        {
-          matchId: selectedMatch._id,
-          betAmount,
-          outcome,
-        },
-        {
-          onSuccess: () => {
-            setIsBetModalOpen(false);
-            queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
-            showSuccess("A fogadás sikeresen létrehozva lett.");
-          },
-          onError: (error) => {
-            if (error instanceof AxiosError && error.status === 400) {
-              if (error.response?.data.msg === "Don't have enough score to bet") {
-                showError("Nincs elég pontod a fogadás létrehozásához.");
-                return;
-              } else if (error.response?.data.msg === "The match has already started") {
-                showError("A mérkőzés már elkezdődött, nem lehet fogadni rá.");
-                return;
-              }
-            }
-            console.error("Error creating bet:", error);
-            showError("A fogadás létrehozása sikertelen volt.");
-          },
-        }
-      );
-    }
+    submitBet(selectedMatch, betAmount, outcome, () => setIsBetModalOpen(false));
   };
 
   useEffect(() => {
@@ -330,12 +276,7 @@ const MatchesPage = () => {
               (matchesError?.message || myBetsError?.message) &&
               "Valami hiba történt, kérlek próbáld újra később."
             }
-            loading={
-              matchesLoading ||
-              myBetsLoading ||
-              updateBetMutation.isPending ||
-              createBetMutation.isPending
-            }
+            loading={matchesLoading || myBetsLoading || isBettingPending}
           />
         </section>
       )}
@@ -348,12 +289,7 @@ const MatchesPage = () => {
               (matchesError?.message || myBetsError?.message) &&
               "Valami hiba történt, kérlek próbáld újra később."
             }
-            loading={
-              matchesLoading ||
-              myBetsLoading ||
-              updateBetMutation.isPending ||
-              createBetMutation.isPending
-            }
+            loading={matchesLoading || myBetsLoading || isBettingPending}
             onSelectMatch={(match) => {
               setSelectedMatch(match);
               setIsBetModalOpen(true);
@@ -370,7 +306,7 @@ const MatchesPage = () => {
           onClose={() => setIsBetModalOpen(false)}
           onAfterClose={() => setSelectedMatch(null)}
           onSave={onSubmitCoupon}
-          loading={updateBetMutation.isPending || createBetMutation.isPending}
+          loading={isBettingPending}
           editMode={!!selectedMatch.userbet}
           initBetValue={selectedMatch.userbet?.amount}
           initSelectedOutcome={selectedMatch.userbet?.outcome}
