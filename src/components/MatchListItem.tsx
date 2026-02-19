@@ -7,6 +7,7 @@ import { useCallback, useMemo } from "react";
 import type { MatchWithUserBet } from "./Matches/types";
 import UnknownFlag from "./UnknownFlag";
 import { isBettableMatch } from "@/hooks/api/useMatches";
+import useGame from "@/hooks/useGame";
 
 interface MatchListItemProps {
   match: MatchWithUserBet | Match;
@@ -30,10 +31,13 @@ const MatchListItem = ({
   const isDraw = match.outcome === MatchOutcome.draw;
   const isFinished = match.status === MatchStatus.finished;
   const comment = match.comment;
-  const bet = (match as MatchWithUserBet)?.userbet;
-  const isUserBetTeamAWin = bet?.outcome === MatchOutcome.home;
-  const isUserBetTeamBWin = bet?.outcome === MatchOutcome.away;
-  const isUserBetDraw = bet?.outcome === MatchOutcome.draw;
+  const bets = (match as MatchWithUserBet)?.userbet;
+
+  const { userBetInfo } = useGame();
+
+  const { isUserBetTeamAWin, isUserBetTeamBWin, isUserBetDraw, isUserBet } = userBetInfo(
+    bets || []
+  );
 
   const statusInfoBadge = useMemo(() => {
     return getMatchStatusInfo(match.status);
@@ -108,10 +112,10 @@ const MatchListItem = ({
             <div
               onClick={() => onSelectMatch && onSelectMatch(match)}
               className={`px-2 py-2 rounded-md text-center 
-                ${bet ? "bg-button-secondary-bg" : "bg-button-light"}  
+                ${isUserBet ? "bg-button-secondary-bg" : "bg-button-light"}  
               cursor-pointer text-xs`}
             >
-              {bet ? "Módosít" : "Fogadás"}
+              {isUserBet ? "Módosít" : "Fogadás"}
             </div>
           )}
           {displayStatusBadge && match.status !== MatchStatus.enabled && (

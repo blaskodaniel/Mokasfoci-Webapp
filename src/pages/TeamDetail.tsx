@@ -1,4 +1,4 @@
-import BetModalDesktop from "@/components/BetModal/Desktop";
+import BetModal from "@/components/BetModal";
 import type { MatchWithUserBet } from "@/components/Matches/types";
 import MatchListItem from "@/components/MatchListItem";
 import MobileBackBar from "@/components/MobileBackBar";
@@ -8,8 +8,7 @@ import GroupStandings from "@/components/Widgets/GroupStandings";
 import { APP_CONFIG } from "@/config";
 import { useMyBets } from "@/hooks/api/usePlayers";
 import { useGetGroupStandingsById, useTeamDetails } from "@/hooks/api/useTeams";
-import { useBetting } from "@/hooks/useBetting";
-import { MatchOutcome, MatchStatus } from "@/utils/enums";
+import { MatchStatus } from "@/utils/enums";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
@@ -18,7 +17,6 @@ const TeamDetail = () => {
   const { data: details, isLoading } = useTeamDetails(teamId!);
   const teamStandingsQuery = useGetGroupStandingsById(String(details?.teamData?.groupid._id ?? ""));
   const { data: myBets } = useMyBets();
-  const { onSubmitCoupon: submitBet, isPending: isBettingPending } = useBetting();
 
   const teamData = useMemo(() => details?.teamData, [details?.teamData]);
   const favoriteUsers = useMemo(() => details?.favoriteUsers || [], [details?.favoriteUsers]);
@@ -33,7 +31,7 @@ const TeamDetail = () => {
     if (!matches || !myBets) return matches || [];
 
     const combined = matches.map((match) => {
-      const userBet = myBets.find((bet) => bet.matchid._id === match._id);
+      const userBet = myBets.filter((bet) => bet.matchid._id === match._id);
 
       return {
         ...match,
@@ -43,12 +41,6 @@ const TeamDetail = () => {
 
     return combined;
   }, [matches, myBets]);
-
-  const onSubmitCoupon = (betAmount: number, outcome: MatchOutcome) => {
-    if (!selectedMatch) return;
-
-    submitBet(selectedMatch, betAmount, outcome, () => setIsBetModalOpen(false));
-  };
 
   if (isLoading) {
     return <PageLoader message="Adatok betöltése..." />;
@@ -169,17 +161,13 @@ const TeamDetail = () => {
       </div>
 
       {selectedMatch && (
-        <BetModalDesktop
+        <BetModal
           key={selectedMatch._id}
           match={selectedMatch}
           isOpen={isBetModalOpen}
           onClose={() => setIsBetModalOpen(false)}
           onAfterClose={() => setSelectedMatch(null)}
-          onSave={onSubmitCoupon}
-          loading={isBettingPending}
-          editMode={!!selectedMatch.userbet}
-          initBetValue={selectedMatch.userbet?.amount}
-          initSelectedOutcome={selectedMatch.userbet?.outcome}
+          bets={myBets || []}
         />
       )}
     </div>

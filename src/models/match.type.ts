@@ -1,7 +1,5 @@
 import type { MatchOutcome, MatchStatus, MatchType } from "@/utils/enums";
 import type { Team } from "./team.type";
-import type { Bet } from "./bet.type";
-import type { User } from "./user.type";
 
 export interface Match {
   _id: string;
@@ -24,12 +22,15 @@ export interface Match {
   externalID?: string | null;
   isCalculated: boolean;
   [key: string]: unknown;
-}
-
-export interface MatchDetail {
-  match: Match;
-  coupons: Bet[];
-  users: User[];
-  totalBets: number;
-  totalUsers: number;
+  additionalOdds?: {
+    advancement?: {
+      teamAOdds: number;
+      teamBOdds: number;
+    };
+    scoreOdds?: {
+      exactMatch: number;
+      goalDifference: number;
+      outcome: number;
+    };
+  };
 }

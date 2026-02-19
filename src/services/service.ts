@@ -1,4 +1,4 @@
-import type { Match, MatchDetail } from "@/models/match.type";
+import type { Match } from "@/models/match.type";
 import type { User } from "../models/user.type";
 import { axiosInstance } from "./axiosConfig";
 import type {
@@ -7,6 +7,7 @@ import type {
   DefaultAvatar,
   GetTeamRankingsResponse,
   GroupDetailsResponse,
+  MatchDetail,
   ScoreByMatchResponse,
   SignInResponse,
   TeamDetails,
@@ -14,7 +15,7 @@ import type {
   UserDetails,
   WinLostStats,
 } from "./types";
-import type { MatchOutcome } from "@/utils/enums";
+import type { MatchOutcome, CouponType } from "@/utils/enums";
 import type { Bet } from "@/models/bet.type";
 import type { Transaction } from "@/models/transaction.type";
 import type { Team } from "@/models/team.type";
@@ -109,16 +110,16 @@ const Api = {
     return response.data;
   },
 
-  async createBet(
-    matchId: string,
-    amount: number,
-    predictedWinner: MatchOutcome
-  ): Promise<{ success: boolean }> {
-    const response = await axiosInstance.post(`/user/bets`, {
-      matchId,
-      amount,
-      outcome: predictedWinner,
-    });
+  async createBet(data: {
+    matchId: string;
+    amount: number;
+    type: CouponType;
+    outcome?: MatchOutcome;
+    scoreTeamA?: number;
+    scoreTeamB?: number;
+    teamId?: string;
+  }): Promise<{ success: boolean }> {
+    const response = await axiosInstance.post(`/user/bets`, data);
     return response.data;
   },
 

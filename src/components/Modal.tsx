@@ -8,6 +8,7 @@ type ModalProps = {
   children?: React.ReactNode;
   className?: string;
   onAfterClose?: () => void;
+  position?: "top" | "center";
 };
 
 const Modal: React.FC<ModalProps> = ({
@@ -17,6 +18,7 @@ const Modal: React.FC<ModalProps> = ({
   children,
   className,
   onAfterClose,
+  position = "top",
 }) => {
   return (
     <AnimatePresence onExitComplete={onAfterClose}>
@@ -25,8 +27,8 @@ const Modal: React.FC<ModalProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/80 bg-opacity-10 flex items-start justify-center 
-        pt-0 sm:pt-20 z-50"
+          className={`fixed inset-0 bg-black/80 bg-opacity-10 flex justify-center z-50 
+          ${position === "center" ? "items-center p-4" : "items-start pt-0 sm:pt-20"}`}
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}

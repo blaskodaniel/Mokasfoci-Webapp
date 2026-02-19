@@ -1,4 +1,4 @@
-import BetModalDesktop from "@/components/BetModal/Desktop";
+import BetModal from "@/components/BetModal";
 import type { MatchWithUserBet } from "@/components/Matches/types";
 import MatchListItem from "@/components/MatchListItem";
 import MobileBackBar from "@/components/MobileBackBar";
@@ -7,8 +7,7 @@ import GroupStandings from "@/components/Widgets/GroupStandings";
 import { useGroupById } from "@/hooks/api/useGroup";
 import { useMyBets } from "@/hooks/api/usePlayers";
 import { useGetGroupStandingsById } from "@/hooks/api/useTeams";
-import { useBetting } from "@/hooks/useBetting";
-import { MatchOutcome, MatchStatus } from "@/utils/enums";
+import { MatchStatus } from "@/utils/enums";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
@@ -17,7 +16,6 @@ const GroupDetail = () => {
   const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(null);
   const [isBetModalOpen, setIsBetModalOpen] = useState(false);
   const { data: myBets } = useMyBets();
-  const { onSubmitCoupon: submitBet, isPending: isBettingPending } = useBetting();
   const {
     data: standings,
     isLoading: standingsLoading,
@@ -32,7 +30,7 @@ const GroupDetail = () => {
     if (!groupMatches || !myBets) return groupMatches || [];
 
     const combined = groupMatches.map((match) => {
-      const userBet = myBets.find((bet) => bet.matchid._id === match._id);
+      const userBet = myBets.filter((bet) => bet.matchid._id === match._id);
 
       return {
         ...match,
@@ -42,12 +40,6 @@ const GroupDetail = () => {
 
     return combined;
   }, [groupMatches, myBets]);
-
-  const onSubmitCoupon = (betAmount: number, outcome: MatchOutcome) => {
-    if (!selectedMatch) return;
-
-    submitBet(selectedMatch, betAmount, outcome, () => setIsBetModalOpen(false));
-  };
 
   if (isLoading || standingsLoading) {
     return <div>Loading...</div>;
@@ -126,17 +118,13 @@ const GroupDetail = () => {
       </div>
 
       {selectedMatch && (
-        <BetModalDesktop
+        <BetModal
           key={selectedMatch._id}
           match={selectedMatch}
           isOpen={isBetModalOpen}
           onClose={() => setIsBetModalOpen(false)}
           onAfterClose={() => setSelectedMatch(null)}
-          onSave={onSubmitCoupon}
-          loading={isBettingPending}
-          editMode={!!selectedMatch.userbet}
-          initBetValue={selectedMatch.userbet?.amount}
-          initSelectedOutcome={selectedMatch.userbet?.outcome}
+          bets={myBets || []}
         />
       )}
     </div>

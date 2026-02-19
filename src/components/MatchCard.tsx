@@ -3,6 +3,7 @@ import { getDateDisplay } from "@/utils/dateTimefn";
 import { format } from "date-fns";
 import { MatchOutcome } from "@/utils/enums";
 import type { MatchWithUserBet } from "./Matches/types";
+import useGame from "@/hooks/useGame";
 
 interface MatchCardProps {
   match: MatchWithUserBet;
@@ -14,10 +15,13 @@ interface MatchCardProps {
 const MatchCard = ({ match, onClick, className, flagSize = "large" }: MatchCardProps) => {
   const defaultWrapperClass = "px-4 py-6";
   const userBet = match.userbet;
+  const { userBetInfo } = useGame();
+
+  const { outcomeBet } = userBetInfo(userBet || []);
 
   const getOddsClass = (outcome: MatchOutcome) => {
     const baseClass = "text-sm flex-1 py-1 rounded transition-colors duration-200 border";
-    if (userBet?.outcome === outcome) {
+    if (outcomeBet && outcomeBet?.outcome === outcome) {
       return `${baseClass} bg-green-600/20 text-green-400 font-bold border-green-500/50`;
     }
     return `${baseClass} border-transparent text-gray-400`;

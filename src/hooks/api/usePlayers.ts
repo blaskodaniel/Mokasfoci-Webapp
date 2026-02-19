@@ -4,7 +4,7 @@ import type { User } from "@/models/user.type";
 import type { Bet } from "@/models/bet.type";
 import { useAppDispatch } from "@/state/hooks";
 import { getMeAction } from "@/state/authSlice";
-import { MatchOutcome } from "@/utils/enums";
+import { MatchOutcome, CouponType } from "@/utils/enums";
 import type { Transaction } from "@/models/transaction.type";
 import type {
   BalanceHistoryEntry,
@@ -83,11 +83,25 @@ export const useCreateBet = () => {
       matchId,
       betAmount,
       outcome,
+      type,
+      scoreTeamA,
+      scoreTeamB,
     }: {
       matchId: string;
       betAmount: number;
-      outcome: MatchOutcome;
-    }) => Api.createBet(matchId, betAmount, outcome),
+      outcome?: MatchOutcome;
+      type: CouponType;
+      scoreTeamA?: number;
+      scoreTeamB?: number;
+    }) =>
+      Api.createBet({
+        matchId,
+        amount: betAmount,
+        outcome,
+        type,
+        scoreTeamA,
+        scoreTeamB,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
       dispatch(getMeAction());

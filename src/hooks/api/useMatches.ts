@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import Api from "@/services/service";
-import type { Match, MatchDetail } from "@/models/match.type";
+import type { Match } from "@/models/match.type";
 import { MatchStatus } from "@/utils/enums";
+import type { MatchDetail } from "@/services/types";
 
 const matchRefreshInterval = 60 * 1000; // 1 perc
 

@@ -1,16 +1,14 @@
-import BetModalDesktop from "@/components/BetModal/Desktop";
 import Table from "@/components/Table/Table";
 import type { Column } from "@/components/Table/types";
-import { useMyBets, useDeleteBet, useUpdateBet, playersKeys } from "@/hooks/api/usePlayers";
+import { useMyBets, useDeleteBet, playersKeys } from "@/hooks/api/usePlayers";
 import type { Bet } from "@/models/bet.type";
-import type { Match } from "@/models/match.type";
+import type { MatchWithUserBet } from "@/components/Matches/types";
 import { formatNumber, getCouponStatusInfo, potentialWinnings } from "@/utils/common";
-import { CouponStatus, MatchOutcome, MatchStatus } from "@/utils/enums";
+import { CouponStatus, CouponType, MatchOutcome, MatchStatus } from "@/utils/enums";
 import { useEffect, useMemo, useState } from "react";
 import { MdEdit, MdFavorite, MdOutlinePriceCheck } from "react-icons/md";
 import { IoTrashOutline } from "react-icons/io5";
 import ConfirmModal from "@/components/ConfirmModal";
-import { useNotification } from "@/hooks/useNotification";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import useResponsive from "@/hooks/useResponsive";
@@ -18,14 +16,14 @@ import MyBetsMobileView from "@/components/MyBets/MobileView";
 import { useConfig } from "@/hooks/useConfig";
 import useGame from "@/hooks/useGame";
 import { useQueryClient } from "@tanstack/react-query";
+import BetModal from "@/components/BetModal";
 
 const MyBetsPage = () => {
   const queryClient = useQueryClient();
   const { config } = useConfig();
   const { userFavoriteTeam } = useGame();
   const { isDesktop, isMobile } = useResponsive();
-  const { showSuccess, showError } = useNotification();
-  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
+  const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(null);
   const [selectedBet, setSelectedBet] = useState<Bet | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isBetModalOpen, setIsBetModalOpen] = useState(false);
@@ -39,7 +37,6 @@ const MyBetsPage = () => {
   } = useMyBets();
 
   const deleteBetMutation = useDeleteBet();
-  const updateBetMutation = useUpdateBet();
 
   const filteredCoupon = useMemo(() => {
     if (selectedStatus === "win")
@@ -50,7 +47,7 @@ const MyBetsPage = () => {
   }, [myBets, selectedStatus]);
 
   const handleEditRow = (coupon: Bet) => {
-    setSelectedMatch(coupon.matchid);
+    setSelectedMatch({ ...coupon.matchid, userbet: [coupon] });
     setSelectedBet(coupon);
     setIsBetModalOpen(true);
   };
@@ -67,32 +64,6 @@ const MyBetsPage = () => {
     });
   };
 
-  const onEditCoupon = async (betAmount: number, outcome: MatchOutcome) => {
-    if (!selectedBet) return;
-    updateBetMutation.mutate(
-      {
-        betId: selectedBet._id,
-        data: {
-          amount: betAmount,
-          outcome: outcome,
-        },
-      },
-      {
-        onSuccess: () => {
-          refetchMyBets();
-          setIsBetModalOpen(false);
-          setIsConfirmModalOpen(false);
-          queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
-          showSuccess("A fogadás sikeresen frissítve lett.");
-        },
-        onError: (error) => {
-          console.error("Error updating bet:", error);
-          showError("A fogadás frissítése sikertelen volt.");
-        },
-      }
-    );
-  };
-
   useEffect(() => {
     refetchMyBets();
   }, [refetchMyBets]);
@@ -101,8 +72,8 @@ const MyBetsPage = () => {
   useEffect(() => {
     if (selectedMatch && isBetModalOpen) {
       const updatedBet = myBets?.find((bet) => bet.matchid._id === selectedMatch._id);
-      if (updatedBet) {
-        setSelectedMatch(updatedBet.matchid);
+      if (updatedBet && selectedBet) {
+        setSelectedMatch({ ...updatedBet.matchid, userbet: [selectedBet] });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -356,7 +327,7 @@ const MyBetsPage = () => {
       )}
 
       {selectedMatch && (
-        <BetModalDesktop
+        <BetModal
           key={selectedMatch._id}
           match={selectedMatch}
           isOpen={isBetModalOpen}
@@ -365,11 +336,15 @@ const MyBetsPage = () => {
             setSelectedMatch(null);
             setSelectedBet(null);
           }}
-          onSave={onEditCoupon}
-          initBetValue={selectedBet ? selectedBet.amount : 1000}
-          initSelectedOutcome={selectedBet ? selectedBet.outcome : undefined}
-          editMode
-          loading={updateBetMutation.isPending}
+          onAfterSave={() => {
+            refetchMyBets();
+            setIsBetModalOpen(false);
+            setIsConfirmModalOpen(false);
+            queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
+          }}
+          disableTabs={Object.values(CouponType).filter((type) => type !== selectedBet?.type)}
+          selectedTab={selectedBet?.type}
+          bets={myBets || []}
         />
       )}
 
