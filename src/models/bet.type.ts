@@ -11,9 +11,31 @@ export interface Bet {
   totalWin: number;
   success: boolean;
   status: CouponStatus;
-  outcome: MatchOutcome;
+  outcome?: MatchOutcome;
   date: string;
   type: CouponType;
-  isFavoriteTeam: boolean;
+  isFavoriteTeam?: boolean;
+  scoreTeamA?: number;
+  scoreTeamB?: number;
+  teamId?: string;
   [key: string]: unknown;
 }
+
+export interface IOutcomeCoupon extends Bet {
+  type: CouponType.outcomeBet;
+  outcome: MatchOutcome;
+  isFavoriteTeam: boolean;
+}
+
+export interface IAdvancementCoupon extends Bet {
+  type: CouponType.advancementBet;
+  teamId: string;
+}
+
+export interface IScoreCoupon extends Bet {
+  type: CouponType.scoreBet;
+  scoreTeamA: number;
+  scoreTeamB: number;
+}
+
+export type ICoupon = IOutcomeCoupon | IAdvancementCoupon | IScoreCoupon;

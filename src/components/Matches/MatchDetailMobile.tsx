@@ -1,7 +1,7 @@
 import type { Bet } from "@/models/bet.type";
 import UserDisplay from "@/components/UserDisplay";
 import { outcomeText, potentialWinnings } from "@/utils/common";
-import { MatchStatus } from "@/utils/enums";
+import { CouponType, MatchStatus } from "@/utils/enums";
 import type { FC } from "react";
 import type { Match } from "@/models/match.type";
 
@@ -49,28 +49,39 @@ const MatchDetailMobile: FC<MatchDetailMobileProps> = ({ bets, match }) => {
             <div className="flex flex-wrap gap-1 text-xs">
               <div className="flex-1 min-w-[90px]">
                 <span className="text-gray-400">Tipp: </span>
-                <span className="font-semibold text-white">{outcomeText(bet, match)}</span>
+                {bet.type === CouponType.outcomeBet && (
+                  <span className="font-semibold text-white">{outcomeText(bet, match)}</span>
+                )}
+                {bet.type === CouponType.scoreBet && (
+                  <span className="font-semibold text-white">
+                    {bet.scoreTeamA} - {bet.scoreTeamB}
+                  </span>
+                )}
               </div>
-              <div className="flex-1 min-w-[60px]">
-                <span className="text-gray-400">Odds: </span>
-                <span className="font-semibold text-white">{bet.odds}</span>
-              </div>
+              {bet.type === CouponType.outcomeBet && (
+                <div className="flex-1 min-w-[60px]">
+                  <span className="text-gray-400">Odds: </span>
+                  <span className="font-semibold text-white">{bet.odds}</span>
+                </div>
+              )}
             </div>
             <div className="flex flex-wrap gap-1 text-xs">
               <div className="flex-1 min-w-[60px]">
                 <span className="text-gray-400">Tét: </span>
                 <span className="font-semibold text-white">{bet.amount}</span>
               </div>
-              <div className="flex-1 min-w-[70px]">
-                <span className="text-gray-400">Nyeremény: </span>
-                <span className="font-semibold text-white">
-                  {isFinished
-                    ? bet.success
-                      ? potentialWinnings(bet.amount, bet.odds)
-                      : 0
-                    : potentialWinnings(bet.amount, bet.odds)}
-                </span>
-              </div>
+              {bet.type === CouponType.outcomeBet && (
+                <div className="flex-1 min-w-[70px]">
+                  <span className="text-gray-400">Nyeremény: </span>
+                  <span className="font-semibold text-white">
+                    {isFinished
+                      ? bet.success
+                        ? potentialWinnings(bet.amount, bet.odds)
+                        : 0
+                      : potentialWinnings(bet.amount, bet.odds)}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         );

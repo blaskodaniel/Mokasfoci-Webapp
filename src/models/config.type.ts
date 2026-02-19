@@ -9,9 +9,9 @@ export interface Config {
   notBetPoint: number;
   maxBet: number;
   minBet: number;
-  enabledNegativeScore: boolean;
   enabledRegistration: boolean;
   enabledInvitation: boolean;
-  enabledNotBetPointSubtractByLaterRegister: boolean;
-  enabledNotBetPointSubtract: boolean;
+  scoreExactMatchOdds: number;
+  scoreGoalDifferenceOdds: number;
+  scoreOutcomeOdds: number;
 }

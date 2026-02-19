@@ -3,6 +3,7 @@ import type { User } from "../models/user.type";
 import type { Team } from "@/models/team.type";
 import type { Badge } from "@/models/badge.type";
 import type { Group } from "@/models/group.type";
+import type { Bet } from "@/models/bet.type";
 
 export interface SignInResponse {
   token: string;
@@ -43,6 +44,7 @@ export interface DefaultAvatar {
 export interface BalanceHistoryEntry {
   date: string;
   balance: number;
+  dailyBalance: number;
 }
 
 export interface DailyBalanceChange {
@@ -146,4 +148,12 @@ export interface BadgesResponse {
 export interface GroupDetailsResponse {
   group: Group;
   matches: Match[];
+}
+
+export interface MatchDetail {
+  match: Match;
+  coupons: Bet[];
+  users: User[];
+  totalBets: number;
+  totalUsers: number;
 }

@@ -3,7 +3,7 @@ import type { Match } from "@/models/match.type";
 import type { Column } from "../Table/types";
 
 export type MatchWithUserBet = Match & {
-  userbet?: Bet;
+  userbet?: Bet[];
 };
 
 export interface MatchesDesktopViewProps {

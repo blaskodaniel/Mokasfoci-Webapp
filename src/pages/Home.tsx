@@ -1,4 +1,3 @@
-import BetModalDesktop from "@/components/BetModal/Desktop";
 import MatchCard from "@/components/MatchCard";
 import MatchListItem from "@/components/MatchListItem";
 import Panel from "@/components/Panel";
@@ -8,34 +7,28 @@ import {
   matchesKeys,
   useLiveMatches,
 } from "@/hooks/api/useMatches";
-import { playersKeys, useCreateBet, useMyBets, useUpdateBet } from "@/hooks/api/usePlayers";
+import { playersKeys, useMyBets } from "@/hooks/api/usePlayers";
 import type { Match } from "@/models/match.type";
-import type { MatchOutcome } from "@/utils/enums";
 import { useState, useEffect, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import ToplistWidget from "@/components/Widgets/ToplistWidget";
 import Slider from "@/components/Slider";
 import useResponsive from "@/hooks/useResponsive";
-import { ApiError } from "@/utils/apiError";
-import { useNotification } from "@/hooks/useNotification";
 import type { MatchWithUserBet } from "@/components/Matches/types";
 import WelcomePanel from "@/components/WelcomePanel";
 import { useConfig } from "@/hooks/useConfig";
 import { isBefore } from "date-fns";
+import BetModal from "@/components/BetModal";
 
 const HomePage = () => {
   const { config } = useConfig();
   const navigate = useNavigate();
-  const { showError, showSuccess } = useNotification();
   const { isMobile } = useResponsive();
   const queryClient = useQueryClient();
   const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(null);
   const [isBetModalOpen, setIsBetModalOpen] = useState(false);
   const upcomingMatchesLength = 5;
-
-  const updateBetMutation = useUpdateBet();
-  const createBetMutation = useCreateBet();
 
   // Frissítjük az összes query-t amikor a komponens mount-olódik
   useEffect(() => {
@@ -61,7 +54,7 @@ const HomePage = () => {
     if (!myBets) return upcomingMatches;
     return upcomingMatches.map((match) => ({
       ...match,
-      userbet: myBets.find((b) => b.matchid._id === match._id),
+      userbet: myBets.filter((b) => b.matchid._id === match._id),
     }));
   }, [upcomingMatches, myBets]);
 
@@ -75,58 +68,6 @@ const HomePage = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [upcomingMatchesWithBets, isBetModalOpen, selectedMatch?._id]);
-
-  const onSubmitCouponHandling = async (
-    betAmount: number,
-    outcome: MatchOutcome,
-    editMode: boolean
-  ) => {
-    if (!selectedMatch) return;
-
-    if (editMode && selectedMatch.userbet) {
-      // Update bet
-      updateBetMutation.mutate(
-        {
-          betId: selectedMatch.userbet._id,
-          data: {
-            amount: betAmount,
-            outcome: outcome,
-          },
-        },
-        {
-          onSuccess: () => {
-            setIsBetModalOpen(false);
-            showSuccess("Frissítettük a fogadásodat!");
-            queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
-          },
-          onError: (error) => {
-            console.error("Error updating bet:", error);
-            showError("A fogadás frissítése sikertelen volt.");
-          },
-        }
-      );
-    } else {
-      // Create bet
-      createBetMutation.mutate(
-        {
-          matchId: selectedMatch._id,
-          betAmount,
-          outcome,
-        },
-        {
-          onSuccess: () => {
-            setIsBetModalOpen(false);
-            queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
-            showSuccess("A fogadásod sikeresen létrehoztuk.");
-          },
-          onError: (error) => {
-            const msg = ApiError.getErrorMessage(error);
-            showError(msg);
-          },
-        }
-      );
-    }
-  };
 
   return (
     <div>
@@ -218,17 +159,13 @@ const HomePage = () => {
       </div>
 
       {selectedMatch && (
-        <BetModalDesktop
+        <BetModal
           key={selectedMatch._id}
           match={selectedMatch}
           isOpen={isBetModalOpen}
           onClose={() => setIsBetModalOpen(false)}
           onAfterClose={() => setSelectedMatch(null)}
-          onSave={onSubmitCouponHandling}
-          loading={updateBetMutation.isPending || createBetMutation.isPending}
-          editMode={!!selectedMatch.userbet}
-          initBetValue={selectedMatch?.userbet?.amount}
-          initSelectedOutcome={selectedMatch?.userbet?.outcome}
+          bets={myBets || []}
         />
       )}
     </div>

@@ -1,24 +1,18 @@
-import BetModalDesktop from "@/components/BetModal/Desktop";
 import type { Column } from "@/components/Table/types";
 import { useMyBets } from "@/hooks/api/usePlayers";
-import {
-  getMatchStatusInfo,
-  getMatchTypeText,
-  outcomeText,
-  potentialWinnings,
-} from "@/utils/common";
-import { MatchOutcome, MatchStatus } from "@/utils/enums";
+import { getMatchStatusInfo, getMatchTypeText, outcomeText } from "@/utils/common";
+import { CouponType, MatchStatus } from "@/utils/enums";
 import { useEffect, useState, useMemo } from "react";
 import { isBettableMatch, useAllMatches } from "@/hooks/api/useMatches";
 import { format } from "date-fns";
 import { useAppSelector } from "@/state/hooks";
-import { useBetting } from "@/hooks/useBetting";
 import { Link } from "react-router-dom";
 import Calendar from "@/components/Calendar";
 import useResponsive from "@/hooks/useResponsive";
 import MatchesDesktopView from "@/components/Matches/DesktopView.tsx";
 import MatchesMobileView from "@/components/Matches/MobileView";
 import type { MatchWithUserBet } from "@/components/Matches/types";
+import BetModal from "@/components/BetModal";
 
 const MatchesPage = () => {
   const { isDesktop } = useResponsive();
@@ -46,15 +40,13 @@ const MatchesPage = () => {
     refetch: refetchMyBets,
   } = useMyBets();
 
-  const { onSubmitCoupon: submitBet, isPending: isBettingPending } = useBetting();
-
   // Matches és myBets összevonása
   const matchesWithBets = useMemo((): MatchWithUserBet[] => {
     if (!matches || !myBets) return matches || [];
 
     const combined = matches.map((match) => {
-      // Megkeressük a user bet-et ehhez a match-hez
-      const userBet = myBets.find((bet) => bet.matchid._id === match._id);
+      // Megkeressük a user fogadásokat ehhez a match-hez
+      const userBet = myBets.filter((bet) => bet.matchid._id === match._id);
 
       return {
         ...match,
@@ -90,12 +82,6 @@ const MatchesPage = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchesWithBets, isBetModalOpen, selectedMatch?._id]);
-
-  const onSubmitCoupon = (betAmount: number, outcome: MatchOutcome) => {
-    if (!selectedMatch) return;
-
-    submitBet(selectedMatch, betAmount, outcome, () => setIsBetModalOpen(false));
-  };
 
   useEffect(() => {
     refetchMatches();
@@ -187,20 +173,33 @@ const MatchesPage = () => {
           return <span className="text-gray-500 text-xs">-</span>;
         }
 
-        const bet = match.userbet;
+        const bets = match.userbet;
 
         return (
           <div className="flex flex-col">
-            <span className="text-xs text-blue-400">{outcomeText(bet, match)}</span>
-            <span className="text-xs text-gray-400">Tét: {bet.amount} pont</span>
-            {match.status === MatchStatus.finished && bet.success && (
-              <span className="text-xs text-green-400">
-                Nyeremény:{potentialWinnings(bet.amount, bet.odds)} pont
-              </span>
-            )}
-            {match.status === MatchStatus.finished && !bet.success && (
-              <span className="text-xs text-red-400">Vesztett</span>
-            )}
+            {bets.map((betItem) => (
+              <div key={betItem._id} className="flex flex-row gap-3">
+                {betItem.type === CouponType.outcomeBet && (
+                  <span className="text-xs text-blue-400">{outcomeText(betItem, match)}</span>
+                )}
+                {betItem.type === CouponType.scoreBet && (
+                  <span className="text-xs text-blue-400">
+                    {betItem.scoreTeamA} - {betItem.scoreTeamB}
+                  </span>
+                )}
+                <span className="text-xs text-gray-400">Tét: {betItem.amount} pont</span>
+                {/* {match.status === MatchStatus.finished &&
+                  betItem.success &&
+                  betItem.type === CouponType.outcomeBet && (
+                    <span className="text-xs text-green-400">
+                      Nyeremény:{potentialWinnings(betItem.amount, betItem.odds)} pont
+                    </span>
+                  )} */}
+                {/* {match.status === MatchStatus.finished && !betItem.success && (
+                  <span className="text-xs text-red-400">Vesztett</span>
+                )} */}
+              </div>
+            ))}
           </div>
         );
       },
@@ -276,7 +275,7 @@ const MatchesPage = () => {
               (matchesError?.message || myBetsError?.message) &&
               "Valami hiba történt, kérlek próbáld újra később."
             }
-            loading={matchesLoading || myBetsLoading || isBettingPending}
+            loading={matchesLoading || myBetsLoading}
           />
         </section>
       )}
@@ -289,7 +288,7 @@ const MatchesPage = () => {
               (matchesError?.message || myBetsError?.message) &&
               "Valami hiba történt, kérlek próbáld újra később."
             }
-            loading={matchesLoading || myBetsLoading || isBettingPending}
+            loading={matchesLoading || myBetsLoading}
             onSelectMatch={(match) => {
               setSelectedMatch(match);
               setIsBetModalOpen(true);
@@ -299,17 +298,13 @@ const MatchesPage = () => {
       )}
 
       {selectedMatch && (
-        <BetModalDesktop
+        <BetModal
           key={selectedMatch._id}
           match={selectedMatch}
           isOpen={isBetModalOpen}
           onClose={() => setIsBetModalOpen(false)}
           onAfterClose={() => setSelectedMatch(null)}
-          onSave={onSubmitCoupon}
-          loading={isBettingPending}
-          editMode={!!selectedMatch.userbet}
-          initBetValue={selectedMatch.userbet?.amount}
-          initSelectedOutcome={selectedMatch.userbet?.outcome}
+          bets={myBets || []}
         />
       )}
     </div>

@@ -8,12 +8,14 @@ interface MatchOutcomeSelectorProps {
   match: Match;
   selectedOutcome: MatchOutcome | null;
   onSelectOutcome: (outcome: MatchOutcome) => void;
+  showDraw?: boolean;
 }
 
 const MatchOutcomeSelector: FC<MatchOutcomeSelectorProps> = ({
   selectedOutcome,
   onSelectOutcome,
   match,
+  showDraw = true,
 }) => {
   const { userFavoriteTeam } = useGame();
   const { config } = useConfig();
@@ -40,27 +42,29 @@ const MatchOutcomeSelector: FC<MatchOutcomeSelectorProps> = ({
           )}
         </p>
       </div>
-      <div
-        onClick={() => onSelectOutcome(MatchOutcome.draw)}
-        className={`px-3 py-1 rounded-md border text-center text-sm font-medium flex-1 
-                  cursor-pointer transition-colors duration-300 ${
-                    selectedOutcome === MatchOutcome.draw
-                      ? "bg-button-light text-white border-primary"
-                      : "border-gray-300/20 hover:bg-primary/20"
-                  }`}
-      >
-        <p className="font-thin">döntetlen</p>{" "}
-        <p className="font-bold">
-          {userFavoriteTeam(match) ? (
-            <span>
-              {match.oddsDraw?.toFixed(2)}{" "}
-              <span className="text-green-500">x{config?.favoritTeamFactor}</span>
-            </span>
-          ) : (
-            match.oddsDraw?.toFixed(2) || "-"
-          )}
-        </p>
-      </div>
+      {showDraw && (
+        <div
+          onClick={() => onSelectOutcome(MatchOutcome.draw)}
+          className={`px-3 py-1 rounded-md border text-center text-sm font-medium flex-1 
+                    cursor-pointer transition-colors duration-300 ${
+                      selectedOutcome === MatchOutcome.draw
+                        ? "bg-button-light text-white border-primary"
+                        : "border-gray-300/20 hover:bg-primary/20"
+                    }`}
+        >
+          <p className="font-thin">döntetlen</p>{" "}
+          <p className="font-bold">
+            {userFavoriteTeam(match) ? (
+              <span>
+                {match.oddsDraw?.toFixed(2)}{" "}
+                <span className="text-green-500">x{config?.favoritTeamFactor}</span>
+              </span>
+            ) : (
+              match.oddsDraw?.toFixed(2) || "-"
+            )}
+          </p>
+        </div>
+      )}
       <div
         onClick={() => onSelectOutcome(MatchOutcome.away)}
         className={`px-3 py-1 rounded-md border text-center text-sm font-medium flex-1 

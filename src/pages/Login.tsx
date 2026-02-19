@@ -35,9 +35,8 @@ const Login: React.FC = () => {
         onSubmit={handleSubmit}
         className="px-4 py-4 sm:p-8 w-full max-w-md flex flex-col gap-6 h-fit mt-20"
       >
+        <img src="/logo.png" alt="WatchTogether Logo" className="h-20 mx-auto " />
         <h2 className="text-2xl font-bold text-center text-text-primary mb-4">Bejelentkezés</h2>
-
-        {/* <img src={AppLogo} alt="WatchTogether Logo" className="h-25 mx-auto " /> */}
 
         <div className="flex flex-col gap-2">
           <label htmlFor="username" className="text-sm font-medium text-white-700">

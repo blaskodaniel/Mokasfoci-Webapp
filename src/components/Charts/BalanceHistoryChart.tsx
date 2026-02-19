@@ -9,12 +9,13 @@ import {
   CartesianGrid,
   ReferenceLine,
   Legend,
+  Cell,
 } from "recharts";
 import Loader from "../Loader";
 import { playersKeys, useBalanceHistory } from "@/hooks/api/usePlayers";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import type { DailyBalanceChange } from "@/services/types";
+import type { BalanceHistoryEntry } from "@/services/types";
 
 interface CustomTooltipProps {
   active?: boolean;
@@ -22,32 +23,31 @@ interface CustomTooltipProps {
     value: number;
     name: string;
     dataKey: string;
-    payload: DailyBalanceChange;
+    payload: BalanceHistoryEntry;
   }>;
 }
 
 const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
-    const date = payload[0].payload._id;
-    const positiveBalance = payload.find((p) => p.dataKey === "positiveBalance")?.value || 0;
-    const negativeBalance = payload.find((p) => p.dataKey === "negativeBalance")?.value || 0;
+    const date = payload[0].payload.date;
+    const dailyBalance = payload.find((p) => p.dataKey === "dailyBalance")?.value || 0;
     const balance = payload.find((p) => p.dataKey === "balance")?.value || 0;
 
     return (
       <div className="bg-surface/95 backdrop-blur-sm border border-accent/20 rounded-lg px-4 py-3 shadow-lg">
         <p className="text-text-secondary text-sm mb-2 font-medium">{date}</p>
         <div className="space-y-1">
-          <p className="text-success text-sm">
-            <span className={`font-semibold`}>Nyeremény:</span> +{positiveBalance} Ft
-          </p>
-          <p className="text-error text-sm">
-            <span className={`font-semibold`}>Veszteség:</span> {negativeBalance} Ft
-          </p>
           <div className="border-t border-accent/20 mt-2 pt-2">
             <p className={`font-semibold ${balance >= 0 ? "text-success" : "text-error"}`}>
               Egyenleg: {balance >= 0 ? "+" : ""}
               {balance} Ft
             </p>
+            {dailyBalance !== 0 && (
+              <p className={`text-sm ${dailyBalance >= 0 ? "text-success" : "text-error"}`}>
+                Napi változás: {dailyBalance >= 0 ? "+" : ""}
+                {dailyBalance} Ft
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -117,7 +117,7 @@ export const BalanceHistoryChart = ({
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="#2a2543" vertical={false} />
         <XAxis
-          dataKey="_id"
+          dataKey="date"
           hide={!showXAxis}
           stroke="#b6b1d4"
           tick={{ fill: "#b6b1d4", fontSize: 12 }}
@@ -136,8 +136,7 @@ export const BalanceHistoryChart = ({
           iconType="rect"
           formatter={(value) => {
             const labels: Record<string, string> = {
-              positiveBalance: "Nyeremény",
-              negativeBalance: "Veszteség",
+              dailyBalance: "Napi változás",
               balance: "Napi egyenleg",
             };
             return (
@@ -172,18 +171,14 @@ export const BalanceHistoryChart = ({
           strokeDasharray="3 3"
           opacity={0.5}
         />
-        <Bar
-          dataKey="positiveBalance"
-          fill="url(#positiveGradient)"
-          radius={[8, 8, 0, 0]}
-          barSize={30}
-        />
-        <Bar
-          dataKey="negativeBalance"
-          fill="url(#negativeGradient)"
-          radius={[8, 8, 0, 0]}
-          barSize={30}
-        />
+        <Bar dataKey="dailyBalance" radius={[4, 4, 0, 0]} barSize={20}>
+          {data.map((entry, index) => (
+            <Cell
+              key={`cell-${index}`}
+              fill={entry.dailyBalance >= 0 ? "url(#positiveGradient)" : "url(#negativeGradient)"}
+            />
+          ))}
+        </Bar>
         <Line
           type="monotone"
           dataKey="balance"
