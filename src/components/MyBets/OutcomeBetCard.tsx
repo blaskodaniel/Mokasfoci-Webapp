@@ -7,7 +7,7 @@ import { CouponStatus } from "@/utils/enums";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { IoTrashOutline } from "react-icons/io5";
-import { MdEdit, MdFavorite, MdOutlinePriceCheck } from "react-icons/md";
+import { MdEdit, MdFavorite } from "react-icons/md";
 import { Link } from "react-router-dom";
 
 interface OutcomeBetCardProps {
@@ -31,17 +31,47 @@ const OutcomeBetCard = ({
   outcomeFlag,
   outcomeText,
   hasFavoriteTeam,
-  bgColor,
   canViewDetails,
   shouldShowPotentialWinnings,
   winnings,
-  profit,
   onEdit,
   onDelete,
 }: OutcomeBetCardProps) => {
   const { config } = useConfig();
   const statusInfo = getCouponStatusInfo(bet.status);
-  const matchName = `${bet.matchid?.teamA?.name || ""} - ${bet.matchid?.teamB?.name || ""}`;
+
+  const hasResult = bet.matchid?.goalA != null && bet.matchid?.goalB != null;
+
+  const renderMatchName = () => (
+    <span className="flex items-center gap-1.5 truncate">
+      <span className="truncate">{bet.matchid?.teamA?.name || ""}</span>
+      {hasResult ? (
+        <span className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-widest text-gray-700 dark:text-gray-300 shrink-0">
+          {bet.matchid?.goalA} - {bet.matchid?.goalB}
+        </span>
+      ) : (
+        <span className="shrink-0">-</span>
+      )}
+      <span className="truncate">{bet.matchid?.teamB?.name || ""}</span>
+    </span>
+  );
+
+  let stripClasses = "bg-amber-500 text-white";
+  let statusText = "Várható";
+  let bottomValue = `+${formatNumber(shouldShowPotentialWinnings ? winnings : 0)}`;
+
+  if (bet.status === CouponStatus.closed) {
+    if (bet.success) {
+      stripClasses = "bg-emerald-500 text-white";
+      statusText = "Nyert";
+      bottomValue = `+${formatNumber(winnings)}`;
+    } else {
+      stripClasses = "bg-rose-500 text-white";
+      statusText = "Vesztett";
+      bottomValue = "0";
+    }
+  }
+
   return (
     <motion.div
       layout
@@ -49,141 +79,145 @@ const OutcomeBetCard = ({
       animate={{
         y: 0,
         opacity: 1,
-        transition: {
-          delay: index * 0.05,
-          type: "spring",
-          damping: 30,
-          stiffness: 500,
-        },
+        transition: { delay: index * 0.05, duration: 0.2, ease: "easeInOut" },
       }}
-      exit={{ x: "100%", opacity: 0 }}
-      transition={{
-        layout: {
-          type: "spring",
-          damping: 50,
-          stiffness: 500,
-        },
-      }}
+      exit={{ opacity: 0 }}
       key={bet._id}
-      className={`${bgColor} border border-primary/20 rounded-lg overflow-hidden 
-            shadow-md hover:border-accent/30 transition-colors`}
+      className="group flex w-full rounded-lg overflow-hidden shadow-sm
+       bg-white dark:bg-[#1a1c23] border border-gray-200 dark:border-gray-800 
+       hover:shadow-md transition-all"
     >
-      {/* Header with outcome team/result */}
-      <div className="bg-panel-header-bg px-3 py-1 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {outcomeFlag && (
-            <img
-              src={`${APP_CONFIG.FLAG_PATH}${outcomeFlag}`}
-              alt="Team A Flag"
-              className="w-4 h-4 rounded-full object-cover"
-            />
-          )}
-          <span className="text-white font-semibold text-md">{outcomeText}</span>
-        </div>
-        {hasFavoriteTeam ? (
-          <div>
-            <span className="text-amber-500 text-md font-bold">x{bet.odds.toFixed(2)}</span>
-            <span className="text-green-500 text-md font-bold"> x{config?.favoritTeamFactor}</span>
-          </div>
-        ) : (
-          <span className="text-amber-500 text-md font-bold">x{bet.odds?.toFixed(2)}</span>
-        )}
-      </div>
-
-      {/* Match Result label and status */}
-      <div className="px-3 pt-2 pb-1">
-        <div className="flex items-center justify-between mb-0">
-          <span className="text-gray-400 text-xs">Mérkőzés</span>
+      {/* Left Content (White/Dark section) */}
+      <div className="flex flex-col flex-1 pl-3 pr-2 py-1.5 relative">
+        {/* Badge */}
+        <div className="absolute top-0 right-0">
           <span
-            className={`${statusInfo.color} px-2 py-0.5 rounded text-xs ${statusInfo.className}`}
+            className={`text-[10px] px-2 py-2 rounded-bl-lg uppercase font-bold 
+                tracking-wider`}
           >
             {statusInfo.text}
           </span>
         </div>
 
-        {/* Match name with flags */}
-        <div className="mb-2">
-          {canViewDetails ? (
-            <Link
-              to={`/merkozesek/${bet.matchid?._id}`}
-              className="text-white hover:text-amber-400 text-sm font-medium"
-            >
-              <div className="flex gap-1">
-                {matchName}
-                {hasFavoriteTeam && <MdFavorite color="red" />}
-              </div>
-            </Link>
-          ) : (
-            <span className="text-white text-sm font-medium">
-              <div className="flex gap-1">
-                {matchName}
-                {hasFavoriteTeam && <MdFavorite color="red" />}
-              </div>
-            </span>
-          )}
-        </div>
-
-        {/* Bet amount and potential winnings in a box */}
-        <div className="rounded mb-2">
-          <div className="flex justify-between items-center">
-            <div className="flex-1">
-              <div className="text-white font-bold text-xl">{bet.amount}</div>
-              <div className="text-gray-400 text-xs">Tét</div>
-            </div>
-            <div className="h-8 w-px bg-gray-700"></div>
-            <div className="flex-1 text-right">
-              <div
-                className={`font-bold text-xl ${shouldShowPotentialWinnings ? "text-green-400" : "text-gray-400"}`}
-              >
-                {shouldShowPotentialWinnings ? formatNumber(winnings) : 0}
-              </div>
-              <div className="text-gray-400 text-xs">
-                {bet.status === CouponStatus.active ? "Várható nyeremény" : "Nyeremény"}
-              </div>
+        {/* Top: Date */}
+        <div className="flex flex-1 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1 italic">
+              <span className="text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wide">
+                {bet.date ? format(new Date(bet.date), "MMM.dd") : ""}
+              </span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wide">
+                {bet.date ? format(new Date(bet.date), "HH:mm") : ""}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Result and date footer */}
-        <div className="flex justify-between items-center  mb-2">
-          <span className="text-gray-500 text-xs">
-            {bet.date && format(new Date(bet.date), "MMM dd HH:mm")}
-          </span>
-          {bet.status === CouponStatus.active && (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => onEdit(bet)}
-                className="p-1 hover:bg-gray-700 rounded-full transition-colors"
-                title="Módosítás"
-              >
-                <MdEdit className="text-gray-400 hover:text-blue-400" />
-              </button>
-              <button
-                onClick={() => onDelete(bet)}
-                className="p-1 hover:bg-gray-700 rounded-full transition-colors"
-                title="Törlés"
-              >
-                <IoTrashOutline className="text-gray-400 hover:text-red-400" />
-              </button>
-            </div>
-          )}
-          {bet.status === CouponStatus.closed && (
-            <div>
-              {bet.success === true ? (
-                <div className="flex items-center gap-1 text-green-600 font-semibold text-xs">
-                  Nyert <MdOutlinePriceCheck size={16} />
-                </div>
-              ) : (
-                <span className="text-red-400 font-semibold text-xs">Vesztett</span>
-              )}
-            </div>
-          )}
-          {profit > 0 && (
-            <span className="text-green-600 font-semibold text-xs">
-              +{formatNumber(profit)} profit
+        {/* Middle: Teams vs / Outcome */}
+        <div className="flex items-center justify-between my-2">
+          <div className="flex items-center gap-3">
+            {outcomeFlag && (
+              <img
+                src={`${APP_CONFIG.FLAG_PATH}${outcomeFlag}`}
+                alt="Flag"
+                className="w-6 h-6 rounded-full object-cover shadow-sm border
+                 border-gray-100 dark:border-gray-700"
+              />
+            )}
+            <span
+              className="text-sm sm:text-sidebar truncate font-black
+             text-gray-800 dark:text-gray-100 uppercase tracking-tight"
+            >
+              {outcomeText}
             </span>
+          </div>
+
+          <div className="flex flex-col items-end">
+            {hasFavoriteTeam ? (
+              <div className="flex flex-col items-end leading-tight">
+                <div className="flex items-center gap-1">
+                  <span className="text-amber-500 text-lg font-black">
+                    x{(bet.odds * (config?.favoritTeamFactor || 1)).toFixed(2)}
+                  </span>
+                  <MdFavorite color="red" size={16} />
+                </div>
+              </div>
+            ) : (
+              <span className="text-amber-500 text-lg font-black">x{bet.odds?.toFixed(2)}</span>
+            )}
+          </div>
+        </div>
+
+        {/* Bottom*/}
+        <div className="flex flex-1 items-center justify-between">
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate max-w-[85%]">
+            {canViewDetails ? (
+              <Link
+                to={`/merkozesek/${bet.matchid?._id}`}
+                className="hover:text-amber-500 transition-colors font-medium relative hover:underline underline-offset-2 flex items-center"
+              >
+                {renderMatchName()}
+              </Link>
+            ) : (
+              <span className="font-medium flex items-center">{renderMatchName()}</span>
+            )}
+          </div>
+          {bet.status === CouponStatus.active && (
+            <div className="flex items-center gap-3">
+              <button onClick={() => onEdit(bet)} className="text-white " title="Módosítás">
+                <MdEdit size={16} />
+              </button>
+              <button onClick={() => onDelete(bet)} className="text-gray-400 " title="Törlés">
+                <IoTrashOutline size={16} />
+              </button>
+            </div>
           )}
         </div>
+      </div>
+
+      {/* Perforated separator (Visual part for the ticket layout) */}
+      <div className="w-0 flex items-center relative h-full">
+        {/* The perforated line is transparent but creates dashed look through border */}
+        <div className="absolute left-[-2px] h-[calc(100%-16px)] w-px border-l-2 border-dashed border-gray-100 dark:border-[#1a1c23] z-20 mix-blend-overlay opacity-50" />
+      </div>
+
+      {/* Right Ticket Strip (Colored section) */}
+      <div
+        className={`w-[110px] sm:w-[130px] shrink-0 flex flex-col justify-between py-2.5 px-3 ${stripClasses} relative`}
+      >
+        {/* Barcode-like dots on extreme right edge to match screenshot */}
+        <div className="absolute right-1.5 top-2 bottom-2 w-[3px] flex flex-col items-center justify-between opacity-30 select-none">
+          {[...Array(12)].map((_, i) => (
+            <div
+              key={i}
+              className={`w-full bg-white rounded-sm ${i % 3 === 0 ? "h-2 w-1.5" : "h-1 w-1"}`}
+            />
+          ))}
+        </div>
+
+        <div className="z-10 w-full pl-0.5 mt-0.5">
+          <div className="text-[10px] uppercase opacity-90 leading-tight font-bold tracking-wider mb-0.5 drop-shadow-sm">
+            Tét
+          </div>
+          <div className="text-sm font-black leading-none drop-shadow-sm">
+            {formatNumber(bet.amount)}
+          </div>
+        </div>
+
+        <div className="z-10 w-full flex-1 flex items-center justify-start pl-0.5 my-1">
+          <span className="text-xl sm:text-2xl font-black tracking-tighter drop-shadow-md">
+            {statusText}
+          </span>
+        </div>
+
+        {(bet.status === CouponStatus.closed && bet.success) ||
+          (bet.status === CouponStatus.active && (
+            <div className="z-10 w-full pl-0.5 flex flex-col justify-end pb-0.5">
+              <div className="text-sm sm:text-base font-black truncate drop-shadow-sm w-[90%] tracking-tight">
+                {bottomValue}
+              </div>
+            </div>
+          ))}
       </div>
     </motion.div>
   );

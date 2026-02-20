@@ -82,6 +82,8 @@ const MyBetsMobileView = ({ bets, onEdit, onDelete }: MyBetsMobileViewProps) => 
                 bet={bet}
                 index={index}
                 onEdit={onEdit}
+                profit={profit}
+                winnings={bet.totalWin}
                 onDelete={onDelete}
                 hasFavoriteTeam={hasFavoriteTeam}
                 bgColor={bgColor}
