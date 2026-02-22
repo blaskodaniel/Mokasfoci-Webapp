@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import Api from "@/services/service";
 import type { Match } from "@/models/match.type";
 import { MatchStatus } from "@/utils/enums";
-import type { MatchDetail } from "@/services/types";
+import type { MatchDetail, TournamentBracketResponse } from "@/services/types";
 
 const matchRefreshInterval = 60 * 1000; // 1 perc
 
@@ -13,6 +13,7 @@ export const matchesKeys = {
   recent: () => [...matchesKeys.all, "recent"] as const,
   getDetails: (matchId: string) => [...matchesKeys.all, "details", matchId] as const,
   getLive: () => [...matchesKeys.all, "live"] as const,
+  getTournamentBracket: () => [...matchesKeys.all, "tournament-bracket"] as const,
 };
 
 export const useAllMatches = ({
@@ -87,4 +88,13 @@ export const isBettableMatch = (match: Match): boolean => {
   const isOddsAvailable =
     match.oddsAwin !== undefined && match.oddsBwin !== undefined && match.oddsDraw !== undefined;
   return isEnabledMatch && isExistTeams && isOddsAvailable;
+};
+
+export const useTournamentBracket = () => {
+  return useQuery<TournamentBracketResponse>({
+    queryKey: matchesKeys.getTournamentBracket(),
+    queryFn: () => Api.getTournamentBracket(),
+    staleTime: 2 * 60 * 1000, // 2 perc (gyakrabban frissül)
+    retry: 2,
+  });
 };

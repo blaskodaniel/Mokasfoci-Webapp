@@ -21,6 +21,7 @@ import TeamDetail from "./pages/TeamDetail";
 import Statistics from "./pages/Statistics";
 import MyBadges from "./pages/MyBadges";
 import GroupDetail from "./pages/GroupDetail";
+import BracketPage from "./pages/Bracket";
 
 function App() {
   useAxiosInterceptor();
@@ -49,6 +50,7 @@ function App() {
           <Route path="csoportok/:id" element={<GroupDetail />} />
           <Route path="ranglista" element={<ToplistPage />} />
           <Route path="csoportok" element={<GroupTables />} />
+          <Route path="kieseses" element={<BracketPage />} />
           <Route path="transactions" element={<MyTransactions />} />
           <Route path="statisztikak" element={<Statistics />} />
           <Route path="mybadges" element={<MyBadges />} />

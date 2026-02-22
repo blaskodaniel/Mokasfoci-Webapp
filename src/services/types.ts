@@ -157,3 +157,8 @@ export interface MatchDetail {
   totalBets: number;
   totalUsers: number;
 }
+
+export interface TournamentBracketResponse {
+  matches: Match[];
+  thirdPlaceMatch: Match;
+}

@@ -11,6 +11,7 @@ import type {
   ScoreByMatchResponse,
   SignInResponse,
   TeamDetails,
+  TournamentBracketResponse,
   UpdateUserProfileBody,
   UserDetails,
   WinLostStats,
@@ -285,6 +286,11 @@ const Api = {
 
   async getGroupById(groupId: string): Promise<GroupDetailsResponse> {
     const response = await axiosInstance.get(`/group/${groupId}/details`);
+    return response.data;
+  },
+
+  async getTournamentBracket(): Promise<TournamentBracketResponse> {
+    const response = await axiosInstance.get(`/match/bracket`);
     return response.data;
   },
 };

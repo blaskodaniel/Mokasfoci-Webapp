@@ -56,13 +56,13 @@ const MobileMenu = ({
                 key={menu.link}
                 to={menu.link}
                 onClick={() => setIsMenuOpen(false)}
-                className={`text-2xl transition-all duration-300 inline-block transform ${
+                className={`text-xl transition-all duration-100 inline-block transform ${
                   menu.isActive ? "text-yellow-500" : "text-white"
                 } font-bold cursor-pointer hover:-translate-x-2 ${
                   isOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
                 }`}
                 style={{
-                  transitionDelay: isOpen ? `${index * 50}ms` : "0ms",
+                  transitionDelay: isOpen ? `${index * 30}ms` : "0ms",
                 }}
               >
                 {menu.name}

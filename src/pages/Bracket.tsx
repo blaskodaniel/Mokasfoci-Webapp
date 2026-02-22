@@ -1,0 +1,62 @@
+import BracketComponent from "@/components/Bracket/BracketComponent";
+import Loader from "@/components/Loader";
+import { useTournamentBracket } from "@/hooks/api/useMatches";
+import { MatchType } from "@/utils/enums";
+import { useMemo } from "react";
+
+const BracketPage = () => {
+  const { data: bracketData, isLoading } = useTournamentBracket();
+
+  // 1. Kiszedjük a bronzmeccset (ha már letöltöttek)
+  const thirdPlaceMatch = bracketData?.thirdPlaceMatch || undefined;
+
+  // 2. Csoportosítjuk a meccseket a típusuk alapján, memórizálva a jobb teljesítményért
+  const rounds = useMemo(() => {
+    const allMatches = bracketData?.matches || [];
+
+    const getMatchesByType = (type: MatchType) => {
+      return allMatches.filter((m) => m.type === type);
+    };
+
+    const allRounds = [
+      {
+        id: "round-32",
+        title: "Legjobb 32 közé jutásért",
+        matches: getMatchesByType(MatchType.RoundOf32),
+      },
+      {
+        id: "round-16",
+        title: "Nyolcaddöntő",
+        matches: getMatchesByType(MatchType.RoundOf16),
+      },
+      {
+        id: "quarter-final",
+        title: "Negyeddöntő",
+        matches: getMatchesByType(MatchType.Quarterfinal),
+      },
+      {
+        id: "semi-final",
+        title: "Elődöntő",
+        matches: getMatchesByType(MatchType.Semifinal),
+      },
+      {
+        id: "final",
+        title: "Döntő",
+        matches: getMatchesByType(MatchType.Final),
+      },
+    ];
+
+    // Csak azokat az oszlopokat tartjuk meg, amelyekben már van legalább egy mérkőzés
+    // Erre azért van szükség, hogy ha még csak idáig jutott a bajnokság, ne legyenek üres oszlopok
+    // Ha azt szeretnéd, hogy az üres helyosztók is látsszanak üres kártyákkal, ezt a .filter()-t csak simán vedd ki!
+    return allRounds.filter((round) => round.matches.length > 0);
+  }, [bracketData?.matches]);
+
+  if (isLoading) {
+    return <Loader text="Ágrajz betöltése..." />;
+  }
+
+  return <BracketComponent rounds={rounds} thirdPlaceMatch={thirdPlaceMatch} />;
+};
+
+export default BracketPage;

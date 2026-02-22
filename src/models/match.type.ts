@@ -20,7 +20,7 @@ export interface Match {
   comment?: string | null;
   outcome?: MatchOutcome;
   externalID?: string | null;
-  isCalculated: boolean;
+  isCalculated?: boolean;
   [key: string]: unknown;
   additionalOdds?: {
     advancement?: {
