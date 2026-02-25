@@ -2,7 +2,7 @@ import type { Bet } from "@/models/bet.type";
 import UserDisplay from "@/components/UserDisplay";
 import { outcomeText, potentialWinnings } from "@/utils/common";
 import { CouponType, MatchStatus } from "@/utils/enums";
-import type { FC } from "react";
+import { useCallback, type FC } from "react";
 import type { Match } from "@/models/match.type";
 
 interface MatchDetailMobileProps {
@@ -12,11 +12,27 @@ interface MatchDetailMobileProps {
 
 const MatchDetailMobile: FC<MatchDetailMobileProps> = ({ bets, match }) => {
   const matchStatus = match.status;
-  const sortByPrdeictionWinnings = (a: Bet, b: Bet) => {
-    const aWinnings = potentialWinnings(a.amount, a.odds);
-    const bWinnings = potentialWinnings(b.amount, b.odds);
-    return bWinnings - aWinnings;
+  const isFinished = matchStatus === MatchStatus.finished;
+
+  const sorting = (a: Bet, b: Bet) => {
+    if (match.status === MatchStatus.playing) {
+      return a.amount - b.amount;
+    }
+    if (match.status === MatchStatus.finished) {
+      return (b.totalWin ?? 0) - (a.totalWin ?? 0);
+    }
+    return 0;
   };
+
+  const isShowOdds = useCallback(
+    (bet: Bet) => {
+      const isShowOutComeCase = bet.type === CouponType.outcomeBet && (bet.success || !isFinished);
+      const isShowScoreCase = bet.type === CouponType.scoreBet && bet.success;
+      return isShowOutComeCase || isShowScoreCase;
+    },
+    [isFinished]
+  );
+
   return (
     <div className="flex flex-col gap-2">
       {bets.length === 0 && (
@@ -26,8 +42,7 @@ const MatchDetailMobile: FC<MatchDetailMobileProps> = ({ bets, match }) => {
             : "Még nincsenek fogadások"}
         </div>
       )}
-      {bets.sort(sortByPrdeictionWinnings).map((bet) => {
-        const isFinished = matchStatus === MatchStatus.finished;
+      {bets.sort(sorting).map((bet) => {
         return (
           <div
             key={bet._id}
@@ -58,7 +73,7 @@ const MatchDetailMobile: FC<MatchDetailMobileProps> = ({ bets, match }) => {
                   </span>
                 )}
               </div>
-              {bet.type === CouponType.outcomeBet && (
+              {isShowOdds(bet) && (
                 <div className="flex-1 min-w-[60px]">
                   <span className="text-gray-400">Odds: </span>
                   <span className="font-semibold text-white">{bet.odds}</span>
@@ -70,16 +85,23 @@ const MatchDetailMobile: FC<MatchDetailMobileProps> = ({ bets, match }) => {
                 <span className="text-gray-400">Tét: </span>
                 <span className="font-semibold text-white">{bet.amount}</span>
               </div>
-              {bet.type === CouponType.outcomeBet && (
+              {bet.type === CouponType.outcomeBet &&
+                ((bet.success && isFinished) || match.status === MatchStatus.playing) && (
+                  <div className="flex-1 min-w-[70px]">
+                    <span className="text-gray-400">Nyeremény: </span>
+                    <span className="font-semibold text-white">
+                      {bet.success && isFinished
+                        ? bet.totalWin
+                        : match.status === MatchStatus.playing
+                          ? potentialWinnings(bet.amount, bet.odds)
+                          : null}
+                    </span>
+                  </div>
+                )}
+              {bet.type === CouponType.scoreBet && bet.success && (
                 <div className="flex-1 min-w-[70px]">
                   <span className="text-gray-400">Nyeremény: </span>
-                  <span className="font-semibold text-white">
-                    {isFinished
-                      ? bet.success
-                        ? potentialWinnings(bet.amount, bet.odds)
-                        : 0
-                      : potentialWinnings(bet.amount, bet.odds)}
-                  </span>
+                  <span className="font-semibold text-white">{bet.totalWin ?? "-"}</span>
                 </div>
               )}
             </div>

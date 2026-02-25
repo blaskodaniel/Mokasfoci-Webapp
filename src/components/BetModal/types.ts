@@ -6,9 +6,9 @@ export interface BetModalProps {
   isOpen: boolean;
   match: MatchWithUserBet;
   bets: Bet[];
-  editMode?: boolean;
   selectedTab?: CouponType;
   disableTabs?: CouponType[];
+  hideTabbar?: boolean;
   onClose: () => void;
   onAfterClose?: () => void;
   onAfterSave?: (bet: number, outcome: MatchOutcome, editMode: boolean) => void;

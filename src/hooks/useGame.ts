@@ -22,7 +22,7 @@ const useGame = () => {
     const isUserBetTeamAWin = outcomeBet?.outcome === MatchOutcome.home;
     const isUserBetTeamBWin = outcomeBet?.outcome === MatchOutcome.away;
     const isUserBetDraw = outcomeBet?.outcome === MatchOutcome.draw;
-    const isUserBetScore = scoreBet?.scoreA !== undefined && scoreBet?.scoreB !== undefined;
+    const isUserBetScore = scoreBet?.scoreTeamA !== undefined && scoreBet?.scoreTeamB !== undefined;
     const isUserBet = isUserBetTeamAWin || isUserBetTeamBWin || isUserBetDraw || isUserBetScore;
     return {
       isUserBetTeamAWin,

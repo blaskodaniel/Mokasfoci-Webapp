@@ -13,9 +13,9 @@ const BetModal: FC<BetModalProps> = ({
   onAfterSave,
   match,
   bets = [],
-  editMode = false,
   selectedTab,
   disableTabs,
+  hideTabbar = false,
   onAfterClose,
 }) => {
   const [activeTab, setActiveTab] = useState<CouponType>(selectedTab || CouponType.outcomeBet);
@@ -73,40 +73,42 @@ const BetModal: FC<BetModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={editMode ? "Fogadás módosítása" : "Fogadás létrehozása"}
+      title={"Fogadás"}
       className="sm:w-[455px] bg-primary px-4 py-3 sm:mx-3"
       onAfterClose={onAfterClose}
     >
       <div className="flex flex-col gap-2 mt-2 flex-1 sm:flex-none">
         {/* TABS */}
-        <div className="flex w-full mb-4 bg-tertiary rounded-lg p-1">
-          <button
-            onClick={() => {
-              if (disableTabs?.includes(CouponType.outcomeBet)) return;
-              setActiveTab(CouponType.outcomeBet);
-            }}
-            className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
-              activeTab === CouponType.outcomeBet
-                ? "bg-primary text-white shadow-sm"
-                : "text-gray-400 hover:text-white"
-            }`}
-          >
-            1 X 2
-          </button>
-          <button
-            onClick={() => {
-              if (disableTabs?.includes(CouponType.scoreBet)) return;
-              setActiveTab(CouponType.scoreBet);
-            }}
-            className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
-              activeTab === CouponType.scoreBet
-                ? "bg-primary text-white shadow-sm"
-                : "text-gray-400 hover:text-white"
-            }`}
-          >
-            Pontos eredmény 🚧
-          </button>
-        </div>
+        {!hideTabbar && (
+          <div className="flex w-full mb-4 bg-tertiary rounded-lg p-1">
+            <button
+              onClick={() => {
+                if (disableTabs?.includes(CouponType.outcomeBet)) return;
+                setActiveTab(CouponType.outcomeBet);
+              }}
+              className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
+                activeTab === CouponType.outcomeBet
+                  ? "bg-primary text-white shadow-sm"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              1 X 2
+            </button>
+            <button
+              onClick={() => {
+                if (disableTabs?.includes(CouponType.scoreBet)) return;
+                setActiveTab(CouponType.scoreBet);
+              }}
+              className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
+                activeTab === CouponType.scoreBet
+                  ? "bg-primary text-white shadow-sm"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              Pontos eredmény
+            </button>
+          </div>
+        )}
 
         <MatchTeamsPanel match={match} />
 
@@ -117,7 +119,7 @@ const BetModal: FC<BetModalProps> = ({
             loading={isBettingPending}
             initBetValue={initBetValues?.outcomeBet?.betAmount}
             initSelectedOutcome={initBetValues?.outcomeBet?.outcome}
-            editMode={editMode}
+            editMode={!!initBetValues?.outcomeBet?.betAmount}
           />
         ) : (
           <ScoreBetModule
@@ -127,7 +129,7 @@ const BetModal: FC<BetModalProps> = ({
             initBetValue={initBetValues?.scoreBet?.betAmount}
             initTeamAScore={initBetValues?.scoreBet?.homeScore}
             initTeamBScore={initBetValues?.scoreBet?.awayScore}
-            editMode={editMode}
+            editMode={!!initBetValues?.scoreBet?.betAmount}
           />
         )}
       </div>

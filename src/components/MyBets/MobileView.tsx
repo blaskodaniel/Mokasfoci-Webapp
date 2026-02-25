@@ -4,6 +4,7 @@ import { CouponStatus, CouponType, MatchOutcome, MatchStatus } from "@/utils/enu
 import { useConfig } from "@/hooks/useConfig";
 import useGame from "@/hooks/useGame";
 import { AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
 import OutcomeBetCard from "./OutcomeBetCard";
 import ScoreBetCard from "./ScoreBetCard";
 
@@ -16,13 +17,20 @@ interface MyBetsMobileViewProps {
 const MyBetsMobileView = ({ bets, onEdit, onDelete }: MyBetsMobileViewProps) => {
   const { userFavoriteTeam } = useGame();
   const { config } = useConfig();
+  const [isLayoutReady, setIsLayoutReady] = useState(false);
+
+  useEffect(() => {
+    // Enable layout animations after initial render to prevent jumping during page transitions
+    const timer = setTimeout(() => setIsLayoutReady(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
   if (!bets || bets.length === 0) {
     return <div className="text-center text-gray-400 py-8">Még nincsenek fogadásaid</div>;
   }
 
   return (
     <div className="flex flex-col gap-3">
-      <AnimatePresence mode="popLayout">
+      <AnimatePresence mode="popLayout" initial={false}>
         {bets.map((bet, index) => {
           const hasFavoriteTeam = userFavoriteTeam(bet.matchid);
           const favoritTeamFactor = hasFavoriteTeam ? config?.favoritTeamFactor : 1;
@@ -73,6 +81,7 @@ const MyBetsMobileView = ({ bets, onEdit, onDelete }: MyBetsMobileViewProps) => 
                 profit={profit}
                 outcomeText={outcomeText}
                 outcomeFlag={outcomeFlag}
+                isLayoutReady={isLayoutReady}
               />
             );
           if (bet.type === CouponType.scoreBet)
@@ -88,6 +97,7 @@ const MyBetsMobileView = ({ bets, onEdit, onDelete }: MyBetsMobileViewProps) => 
                 hasFavoriteTeam={hasFavoriteTeam}
                 bgColor={bgColor}
                 canViewDetails={canViewDetails}
+                isLayoutReady={isLayoutReady}
               />
             );
         })}

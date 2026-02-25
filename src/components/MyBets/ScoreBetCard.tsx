@@ -19,6 +19,7 @@ interface ScoreBetCardProps {
   canViewDetails: boolean;
   onEdit: (bet: Bet) => void;
   onDelete: (bet: Bet) => void;
+  isLayoutReady?: boolean;
 }
 
 const ScoreBetCard = ({
@@ -28,6 +29,7 @@ const ScoreBetCard = ({
   winnings,
   onEdit,
   onDelete,
+  isLayoutReady = true,
 }: ScoreBetCardProps) => {
   const statusInfo = getCouponStatusInfo(bet.status);
 
@@ -64,7 +66,7 @@ const ScoreBetCard = ({
 
   return (
     <motion.div
-      layout
+      layout={isLayoutReady ? true : false}
       initial={{ y: 1, opacity: 0 }}
       animate={{
         y: 0,

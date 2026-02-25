@@ -64,7 +64,7 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
     if (userScore < 99) {
       return "Nincs elég pontod a fogadáshoz";
     }
-    return `Elérhető pontjaid: ${userScore}`;
+    return `Felhasználható pontod: ${formatNumber(userScore)} pont`;
   }, [userScore, editMode]);
 
   const selectedOdds = useMemo(() => {

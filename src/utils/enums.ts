@@ -58,4 +58,13 @@ export enum BadgeType {
   // Stratégiai badge-ek
   groupOracle = "groupOracle", // Csoportgyőztes eltalálás
   championVisionary = "championVisionary", // Bajnok csapat eltalálás
+
+  sharpshooter = "sharpshooter", // 1 eltalált pontos végeredmény (Mesterlövész)
+  clairvoyant = "clairvoyant", // 3 eltalált pontos végeredmény (Látnok)
+  nostradamus = "nostradamus", // 5 eltalált pontos végeredmény (Nostradamus)
+
+  // Kombinált és speciális badge-ek
+  secondSight = "secondSight", // 2 egymást követő eltalált pontos végeredmény (Második Látás)
+  boreDraw = "boreDraw", // Sikeres 0-0 tipp (Betonvédelem)
+  doubleDynamite = "doubleDynamite", // Egyazon mec
 }

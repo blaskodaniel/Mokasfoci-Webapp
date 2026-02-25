@@ -48,7 +48,7 @@ const ScoreBetModule = ({
     if (userScore < 99) {
       return "Nincs elég pontod a fogadáshoz";
     }
-    return `Elérhető pontjaid: ${userScore}`;
+    return `Felhasználható pontod: ${formatNumber(userScore)} pont`;
   }, [userScore, editMode]);
 
   const isValidBet = useMemo(() => {
@@ -113,7 +113,7 @@ const ScoreBetModule = ({
       {/* Mobile: Sticky button at bottom, Desktop: Regular button */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-quaternary sm:relative sm:p-0 sm:bg-transparent sm:mt-6">
         <Button
-          text="Fejlesztés alatt 🚧"
+          text={editMode ? "Mentés" : "LÉTREHOZÁS"}
           subText={subText}
           onClick={() =>
             isValidBet && onSave(betValue, Number(homeScore), Number(awayScore), editMode)

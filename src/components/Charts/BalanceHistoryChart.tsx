@@ -8,7 +8,6 @@ import {
   ResponsiveContainer,
   CartesianGrid,
   ReferenceLine,
-  Legend,
   Cell,
 } from "recharts";
 import Loader from "../Loader";
@@ -63,7 +62,6 @@ interface BalanceHistoryChartProps {
   height?: number;
   showXAxis?: boolean;
   showYAxis?: boolean;
-  legendFontSize?: number;
 }
 
 export const BalanceHistoryChart = ({
@@ -73,7 +71,6 @@ export const BalanceHistoryChart = ({
   height = 300,
   showXAxis = true,
   showYAxis = true,
-  legendFontSize = 14,
 }: BalanceHistoryChartProps) => {
   const queryClient = useQueryClient();
   const { data, isLoading, isError } = useBalanceHistory(from, to, userId);
@@ -131,21 +128,7 @@ export const BalanceHistoryChart = ({
           tickFormatter={(value) => `${value} Ft`}
         />
         <Tooltip content={<CustomTooltip />} cursor={{ fill: "#2a2543", opacity: 0.3 }} />
-        <Legend
-          wrapperStyle={{ paddingTop: "20px" }}
-          iconType="rect"
-          formatter={(value) => {
-            const labels: Record<string, string> = {
-              dailyBalance: "Napi változás",
-              balance: "Napi egyenleg",
-            };
-            return (
-              <span style={{ color: "#b6b1d4", fontSize: legendFontSize }}>
-                {labels[value] || value}
-              </span>
-            );
-          }}
-        />
+
         <ReferenceLine y={0} stroke="#b6b1d4" strokeWidth={2} strokeDasharray="3 3" />
         <ReferenceLine
           y={maxBalance}

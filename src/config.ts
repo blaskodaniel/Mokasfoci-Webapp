@@ -34,4 +34,34 @@ export const BADGE_CONFIG: Record<
     label: "Champion Visionary",
     description: "Bajnokcsapat tipp jelvény.",
   },
+  [BadgeType.sharpshooter]: {
+    filename: "sharpshooter.svg",
+    label: "Mesterlövész",
+    description: "1 eltalált pontos végeredmény.",
+  },
+  [BadgeType.clairvoyant]: {
+    filename: "clairvoyant.svg",
+    label: "Látnok",
+    description: "3 eltalált pontos végeredmény.",
+  },
+  [BadgeType.nostradamus]: {
+    filename: "nostradamus.svg",
+    label: "Nostradamus",
+    description: "5 eltalált pontos végeredmény.",
+  },
+  [BadgeType.secondSight]: {
+    filename: "second_sight.svg",
+    label: "Második Látás",
+    description: "2 egymást követő eltalált pontos végeredmény.",
+  },
+  [BadgeType.boreDraw]: {
+    filename: "bore_draw.svg",
+    label: "Betonvédelem",
+    description: "Sikeres 0-0 tipp.",
+  },
+  [BadgeType.doubleDynamite]: {
+    filename: "double_dynamite.svg",
+    label: "Double Dynamite",
+    description: "Egyazon meccsre 2 sikeres fogadás.",
+  },
 };

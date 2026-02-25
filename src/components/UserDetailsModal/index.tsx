@@ -1,15 +1,19 @@
-import { useMemo, type FC } from "react";
+import { useMemo, useState, type FC } from "react";
 import type { UserDetailsModalProps } from "./types";
 import Modal from "../Modal";
 import { useGetPlayerDetails, useWinLostStats } from "@/hooks/api/usePlayers";
 import { useBadgesByUser } from "@/hooks/api/useBadges";
-import { APP_CONFIG, DEFAULT_AVATAR_URL, BADGE_CONFIG } from "@/config";
+import { APP_CONFIG, DEFAULT_AVATAR_URL } from "@/config";
 import { formatPoints } from "@/utils/common";
 import Loader from "../Loader";
 import BalanceHistoryChart from "../Charts/BalanceHistoryChart";
 import InfoTooltip from "../InfoTooltip";
+import HelpModal from "../HelpModal";
+import { FaMedal } from "react-icons/fa";
+import { BadgeCard } from "@/pages/MyBadges";
 
 const UserDetailsModal: FC<UserDetailsModalProps> = ({ isOpen, onClose, userId }) => {
+  const [isBadgesModalOpen, setIsBadgesModalOpen] = useState(false);
   const { data: playerData, isLoading, error } = useGetPlayerDetails(userId);
   const { data: winLostData } = useWinLostStats(userId);
   const { data: badgesData } = useBadgesByUser(userId);
@@ -59,26 +63,18 @@ const UserDetailsModal: FC<UserDetailsModalProps> = ({ isOpen, onClose, userId }
                 {playerDetails?.name || playerDetails?.username}
               </h2>
               {playerDetails?.data.winteamid && (
-                <p className="text-xs mt-0">
-                  Bajnok csapat tipp: {playerDetails?.data.winteamid?.name}
-                </p>
+                <p className="text-xs mt-0">{playerDetails?.username}</p>
               )}
 
               {badgesData?.badges && badgesData.badges.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {badgesData.badges.map((badge) => {
-                    const config = BADGE_CONFIG[badge.type];
-                    if (!config) return null;
-                    return (
-                      <InfoTooltip text={config.description} key={badge._id}>
-                        <img
-                          src={`/badges/${config.filename}`}
-                          alt={config.label}
-                          className="w-10 h-10 object-contain cursor-help hover:scale-110 transition-transform"
-                        />
-                      </InfoTooltip>
-                    );
-                  })}
+                <div
+                  className="inline-flex items-center gap-2 mt-2 cursor-pointer hover:text-amber-400 transition-colors text-amber-500 font-semibold max-w-max"
+                  onClick={() => setIsBadgesModalOpen(true)}
+                >
+                  <FaMedal size={20} />
+                  <span className="text-sm underline underline-offset-2">
+                    {badgesData.badges.length} jelvény
+                  </span>
                 </div>
               )}
               <div></div>
@@ -219,7 +215,18 @@ const UserDetailsModal: FC<UserDetailsModalProps> = ({ isOpen, onClose, userId }
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 pt-7">
+          <div>
+            <div className="mt-6 mb-1 text-gray-400 text-sm uppercase tracking-wider font-medium">
+              Bajnok csapat tipp
+            </div>
+            {playerDetails?.data.winteamid ? (
+              <p className="text-sm mt-0 font-medium">{playerDetails?.data.winteamid?.name}</p>
+            ) : (
+              <p className="text-xs italic mt-0">Nem adott le bajnok csapat tippet</p>
+            )}
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3">
             {playerDetails?._id && (
               <div className="flex-1">
                 <div className="mt-6 mb-2 text-gray-400 text-sm uppercase tracking-wider font-medium">
@@ -230,13 +237,32 @@ const UserDetailsModal: FC<UserDetailsModalProps> = ({ isOpen, onClose, userId }
                   height={200}
                   showXAxis={false}
                   showYAxis={false}
-                  legendFontSize={12}
                 />
               </div>
             )}
           </div>
         </div>
       </div>
+
+      <HelpModal
+        isOpen={isBadgesModalOpen}
+        onClose={() => setIsBadgesModalOpen(false)}
+        title={"Jelvények"}
+      >
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
+          {badgesData?.badges?.map((badge) => {
+            return (
+              <BadgeCard
+                key={badge._id}
+                type={badge.type}
+                userBadge={badge}
+                hasBadge={true}
+                size="sm"
+              />
+            );
+          })}
+        </div>
+      </HelpModal>
     </Modal>
   );
 };

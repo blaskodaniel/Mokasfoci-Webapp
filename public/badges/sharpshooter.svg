@@ -1,0 +1,23 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="glow-red" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Shield (Badge Base) -->
+  <path d="M100 10 L180 40 V100 C180 150 100 190 100 190 C100 190 20 150 20 100 V40 L100 10 Z" 
+        fill="#1a1a1a" stroke="#cd7f32" stroke-width="4" />
+        
+  <!-- Target rings -->
+  <circle cx="100" cy="90" r="45" fill="none" stroke="#cd7f32" stroke-width="4" />
+  <circle cx="100" cy="90" r="25" fill="none" stroke="#cd7f32" stroke-width="4" />
+  <circle cx="100" cy="90" r="8" fill="#ff4444" filter="url(#glow-red)" />
+  
+  <!-- Crosshairs -->
+  <path d="M100 35 L100 145 M45 90 L155 90" stroke="#cd7f32" stroke-width="4" opacity="0.8" />
+  
+  <text x="100" y="156" font-family="Arial, sans-serif" font-size="13" font-weight="900" fill="#cd7f32" text-anchor="middle" stroke="#5a3010" stroke-width="3" paint-order="stroke">MESTERLÖVÉSZ</text>
+  <text x="100" y="156" font-family="Arial, sans-serif" font-size="13" font-weight="900" fill="#cd7f32" text-anchor="middle">MESTERLÖVÉSZ</text>
+</svg>

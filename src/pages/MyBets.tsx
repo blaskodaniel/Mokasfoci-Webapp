@@ -39,11 +39,25 @@ const MyBetsPage = () => {
   const deleteBetMutation = useDeleteBet();
 
   const filteredCoupon = useMemo(() => {
-    if (selectedStatus === "win")
-      return myBets?.filter((x) => x.success && x.status === CouponStatus.closed);
-    if (selectedStatus === "lost")
-      return myBets?.filter((x) => !x.success && x.status === CouponStatus.closed);
-    return selectedStatus ? myBets?.filter((x) => x.status === selectedStatus) : myBets;
+    let filtered = myBets;
+
+    if (selectedStatus === "win") {
+      filtered = myBets?.filter((x) => x.success && x.status === CouponStatus.closed);
+    } else if (selectedStatus === "lost") {
+      filtered = myBets?.filter((x) => !x.success && x.status === CouponStatus.closed);
+    } else if (selectedStatus) {
+      filtered = myBets?.filter((x) => x.status === selectedStatus);
+    }
+
+    if (selectedStatus === CouponStatus.active && filtered) {
+      return [...filtered].sort((a, b) => {
+        const dateA = a.matchid?.date ? new Date(a.matchid.date).getTime() : 0;
+        const dateB = b.matchid?.date ? new Date(b.matchid.date).getTime() : 0;
+        return dateA - dateB;
+      });
+    }
+
+    return filtered;
   }, [myBets, selectedStatus]);
 
   const handleEditRow = (coupon: Bet) => {
@@ -345,6 +359,7 @@ const MyBetsPage = () => {
           disableTabs={Object.values(CouponType).filter((type) => type !== selectedBet?.type)}
           selectedTab={selectedBet?.type}
           bets={myBets || []}
+          hideTabbar={true}
         />
       )}
 
