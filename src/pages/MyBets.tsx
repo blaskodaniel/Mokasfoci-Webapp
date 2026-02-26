@@ -129,21 +129,34 @@ const MyBetsPage = () => {
     {
       header: "Kimenetel",
       key: "outcome",
-      render: (bet) => (
-        <span className="text-gray-400">
-          {bet.outcome === MatchOutcome.home
-            ? bet?.matchid?.teamA?.name
-            : bet.outcome === MatchOutcome.away
-              ? bet?.matchid?.teamB?.name
-              : "Döntetlen"}
-        </span>
-      ),
+      render: (bet: Bet) => {
+        if (bet.type === CouponType.scoreBet) {
+          return (
+            <span className="text-gray-400">
+              {bet.scoreTeamA} - {bet.scoreTeamB}
+            </span>
+          );
+        }
+        return (
+          <span className="text-gray-400">
+            {bet.outcome === MatchOutcome.home
+              ? bet?.matchid?.teamA?.name
+              : bet.outcome === MatchOutcome.away
+                ? bet?.matchid?.teamB?.name
+                : "Döntetlen"}
+          </span>
+        );
+      },
       sortable: true,
     },
     {
       header: "Odds",
       key: "odds",
       render: (bet) => {
+        const isScoreBet = bet.type === CouponType.scoreBet;
+        if (isScoreBet) {
+          return <span className="text-gray-400">-</span>;
+        }
         if (userFavoriteTeam(bet.matchid)) {
           return (
             <div className="text-gray-400">
@@ -200,6 +213,7 @@ const MyBetsPage = () => {
       key: "totalWin",
       valueBySort: (bet) => bet.totalWin,
       render: (bet) => {
+        const isScoreBet = bet.type === CouponType.scoreBet;
         const hasFavoriteTeam = userFavoriteTeam(bet.matchid);
         const favoritTeamFactor = hasFavoriteTeam ? config?.favoritTeamFactor : 1;
         const shouldShowPotentialWinnings =
@@ -210,7 +224,7 @@ const MyBetsPage = () => {
             : bet.totalWin;
         return (
           <span className="text-gray-400">
-            {shouldShowPotentialWinnings ? formatNumber(winnings) : 0}
+            {isScoreBet ? "-" : shouldShowPotentialWinnings ? formatNumber(winnings) : 0}
           </span>
         );
       },

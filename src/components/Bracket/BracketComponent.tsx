@@ -1,7 +1,9 @@
 import { APP_CONFIG } from "@/config";
 import useResponsive from "@/hooks/useResponsive";
 import type { Match } from "@/models/match.type";
+import { getMatchTypeText } from "@/utils/common";
 import { format } from "date-fns";
+import { FaQuestion } from "react-icons/fa";
 
 interface Round {
   id: string;
@@ -12,9 +14,11 @@ interface Round {
 const BracketComponent = ({
   rounds = [],
   thirdPlaceMatch,
+  positionVector,
 }: {
   rounds: Round[];
   thirdPlaceMatch?: Match;
+  positionVector: number[];
 }) => {
   const { isMobile } = useResponsive();
 
@@ -26,26 +30,33 @@ const BracketComponent = ({
     >
       <div className="flex justify-between items-center mb-2">
         <div className={`text-gray-400 truncate ${isSmall ? "text-[9px]" : "text-[10px]"}`}>
-          {match?.date ? format(new Date(match.date), "yyyy. MMMM d.") : "Ismeretlen időpont"}
+          {match?.date ? format(new Date(match.date), "MMMM d. HH:mm") : "Ismeretlen időpont"}{" "}
+          <span>({match.position})</span>
         </div>
         {match.type && (
           <div
             className={`text-amber-500 font-bold bg-amber-500/10 rounded ${isSmall ? "text-[9px] px-1 py-0.5" : "text-[10px] px-1.5 py-0.5"}`}
           >
-            {match.type}
+            {getMatchTypeText(match.type)}
           </div>
         )}
       </div>
       <div className="flex flex-col gap-1 w-full relative z-10">
         <div className="flex justify-between items-center py-1 border-b border-[#2d3148]/50">
           <div className="flex items-center gap-2">
-            <img
-              src={`${APP_CONFIG.FLAG_PATH}${match.teamA?.flag}`}
-              alt="Flag"
-              className="w-5 h-5 rounded-full object-cover shadow-sm border border-gray-100 dark:border-gray-700"
-            />
+            {match.teamA?.flag ? (
+              <img
+                src={`${APP_CONFIG.FLAG_PATH}${match.teamA.flag}`}
+                alt="Flag"
+                className="w-5 h-5 rounded-full object-cover shadow-sm border border-gray-100 dark:border-gray-700"
+              />
+            ) : (
+              <div className="w-5 h-5 flex items-center justify-center rounded-full bg-gray-700 border border-gray-600 shadow-sm text-gray-300 text-[10px]">
+                <FaQuestion />
+              </div>
+            )}
             <span className="text-white text-sm font-semibold truncate pr-2">
-              {match.teamA?.name || "???"}
+              {match.teamA?.name || match.teamAPlaceholder || "???"}
             </span>
           </div>
 
@@ -55,13 +66,19 @@ const BracketComponent = ({
         </div>
         <div className="flex justify-between items-center py-1">
           <div className="flex items-center gap-2">
-            <img
-              src={`${APP_CONFIG.FLAG_PATH}${match.teamB?.flag}`}
-              alt="Flag"
-              className="w-5 h-5 rounded-full object-cover shadow-sm border border-gray-100 dark:border-gray-700"
-            />
+            {match.teamB?.flag ? (
+              <img
+                src={`${APP_CONFIG.FLAG_PATH}${match.teamB.flag}`}
+                alt="Flag"
+                className="w-5 h-5 rounded-full object-cover shadow-sm border border-gray-100 dark:border-gray-700"
+              />
+            ) : (
+              <div className="w-5 h-5 flex items-center justify-center rounded-full bg-gray-700 border border-gray-600 shadow-sm text-gray-300 text-[10px]">
+                <FaQuestion />
+              </div>
+            )}
             <span className="text-white text-sm font-semibold truncate pr-2">
-              {match.teamB?.name || "???"}
+              {match.teamB?.name || match.teamBPlaceholder || "???"}
             </span>
           </div>
 
@@ -117,20 +134,28 @@ const BracketComponent = ({
 
                   {/* Mérkőzések */}
                   <div className="flex flex-col justify-around flex-1 h-full relative z-10">
-                    {round.matches.map((match) => (
-                      <div key={match._id} className="flex flex-col items-center relative">
-                        <MatchBox match={match} />
-                        {rIndex === rounds.length - 1 && thirdPlaceMatch && (
-                          <div className="mt-8 sm:mt-12">
-                            <MatchBox match={thirdPlaceMatch} isSmall={true} />
-                          </div>
-                        )}
-                        {/* Összekötő vonalak - Csak a fő ág kap vonalakat */}
-                        {rIndex < rounds.length - 1 && (
-                          <div className="hidden sm:block absolute -right-4 w-4 h-[2px] bg-[#3a3f5a] top-1/2 -translate-y-1/2 z-0" />
-                        )}
-                      </div>
-                    ))}
+                    {[...round.matches]
+                      .sort((a, b) => {
+                        const aPos = a.position != null ? positionVector.indexOf(a.position) : -1;
+                        const bPos = b.position != null ? positionVector.indexOf(b.position) : -1;
+                        const aOrder = aPos === -1 ? Infinity : aPos;
+                        const bOrder = bPos === -1 ? Infinity : bPos;
+                        return aOrder - bOrder;
+                      })
+                      .map((match) => (
+                        <div key={match._id} className="flex flex-col items-center relative">
+                          <MatchBox match={match} />
+                          {rIndex === rounds.length - 1 && thirdPlaceMatch && (
+                            <div className="mt-8 sm:mt-12">
+                              <MatchBox match={thirdPlaceMatch} isSmall={true} />
+                            </div>
+                          )}
+                          {/* Összekötő vonalak - Csak a fő ág kap vonalakat */}
+                          {rIndex < rounds.length - 1 && (
+                            <div className="hidden sm:block absolute -right-4 w-4 h-[2px] bg-[#3a3f5a] top-1/2 -translate-y-1/2 z-0" />
+                          )}
+                        </div>
+                      ))}
                   </div>
                 </div>
               ))}

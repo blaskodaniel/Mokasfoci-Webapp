@@ -21,6 +21,7 @@ export interface Match {
   outcome?: MatchOutcome;
   externalID?: string | null;
   isCalculated?: boolean;
+  position?: number;
   [key: string]: unknown;
   additionalOdds?: {
     advancement?: {

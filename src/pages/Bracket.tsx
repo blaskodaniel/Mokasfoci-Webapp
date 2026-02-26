@@ -56,7 +56,18 @@ const BracketPage = () => {
     return <Loader text="Ágrajz betöltése..." />;
   }
 
-  return <BracketComponent rounds={rounds} thirdPlaceMatch={thirdPlaceMatch} />;
+  return (
+    <BracketComponent
+      rounds={rounds}
+      thirdPlaceMatch={thirdPlaceMatch}
+      positionVector={BracketPositionVector}
+    />
+  );
 };
 
 export default BracketPage;
+
+const BracketPositionVector = [
+  74, 77, 73, 75, 83, 84, 81, 82, 76, 78, 79, 80, 86, 88, 85, 87, 89, 90, 93, 94, 91, 92, 95, 96,
+  97, 98, 99, 100, 101, 102,
+];

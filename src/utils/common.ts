@@ -62,6 +62,8 @@ export const getMatchTypeText = (type: MatchType): string => {
       return "Negyedöntő";
     case MatchType.RoundOf16:
       return "Nyolcaddöntő";
+    case MatchType.RoundOf32:
+      return "Legjobb 32";
     case MatchType.GroupStageRound1:
       return "Csoportkör 1. forduló";
     case MatchType.GroupStageRound2:
