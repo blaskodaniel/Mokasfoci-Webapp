@@ -20,6 +20,8 @@ import WelcomePanel from "@/components/WelcomePanel";
 import { useConfig } from "@/hooks/useConfig";
 import { isBefore } from "date-fns";
 import BetModal from "@/components/BetModal";
+import { getMatchTypeText } from "@/utils/common";
+import { MatchType } from "@/utils/enums";
 
 const HomePage = () => {
   const { config } = useConfig();
@@ -82,16 +84,31 @@ const HomePage = () => {
           <Slider itemsPerView={isMobile ? 1 : 3} gap={16}>
             {upcomingMatchesWithBets
               ?.slice(0, upcomingMatchesLength)
-              .map((match: MatchWithUserBet) => (
-                <MatchCard
-                  key={match._id}
-                  match={match}
-                  onClick={() => {
-                    setSelectedMatch(match);
-                    setIsBetModalOpen(true);
-                  }}
-                />
-              ))}
+              .map((match: MatchWithUserBet) => {
+                const badge =
+                  match.type === MatchType.RoundOf32 ||
+                  match.type === MatchType.RoundOf16 ||
+                  match.type === MatchType.Quarterfinal ||
+                  match.type === MatchType.Semifinal ||
+                  match.type === MatchType.ThirdPlacePlayoff ||
+                  match.type === MatchType.Final
+                    ? getMatchTypeText(match.type)
+                    : "";
+                return (
+                  <MatchCard
+                    key={match._id}
+                    match={match}
+                    badge={badge}
+                    onClick={() => {
+                      if (!match.teamA || !match.teamB || !match.date) {
+                        return;
+                      }
+                      setSelectedMatch(match);
+                      setIsBetModalOpen(true);
+                    }}
+                  />
+                );
+              })}
           </Slider>
         </section>
       </section>

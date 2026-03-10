@@ -225,6 +225,10 @@ const MatchesPage = () => {
         const isMatchEnabled = match.status === MatchStatus.enabled;
         const hasEnoughScore = currentUser && currentUser.data.availableScore > 99;
 
+        if (!match?.teamA || !match?.teamB || !match?.date) {
+          return;
+        }
+
         // Ha van fogadás és a mérkőzés aktív
         if (hasUserBet && isMatchEnabled) {
           return (

@@ -107,12 +107,30 @@ const MyProfilePage = () => {
   // Csapatok opciók készítése
   const teamOptions = useMemo(() => {
     if (!teams) return [];
-    return teams.map((team) => ({
-      value: team._id,
-      label: team.name,
-      group: team.groupid.name,
-    }));
-  }, [teams]);
+    return teams.map((team) => {
+      const groupName = team.groupid.name as string;
+      const userBet = currentUser?.data?.[groupName as keyof typeof currentUser.data];
+      const hasWinner = !!team.groupid?.groupWinnerId;
+      const isCalculated = !!team.groupid?.isCalculated;
+
+      let betStatus: "success" | "failed" | "pending" = "pending";
+
+      if (isCalculated && hasWinner) {
+        if (userBet === team.groupid.groupWinnerId) {
+          betStatus = "success";
+        } else {
+          betStatus = "failed";
+        }
+      }
+
+      return {
+        value: team._id,
+        label: team.name,
+        group: team.groupid.name,
+        betStatus,
+      };
+    });
+  }, [teams, currentUser]);
 
   const onSubmitForm = (data: ProfileFormData) => {
     const body = Object.keys(data).reduce((acc, key) => {
@@ -458,20 +476,34 @@ const MyProfilePage = () => {
             </span>
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-2 md:gap-4">
-            {GROUPS.map((group) => (
-              <Select
-                key={group}
-                name={group}
-                control={control}
-                options={teamOptions.filter(
-                  (option) => option.group.toUpperCase() === group.toUpperCase()
-                )}
-                label={`${group} csoport`}
-                placeholder={`${group}`}
-                error={errors[group as keyof ProfileFormData]?.message}
-                disabled={isBettingLocked}
-              />
-            ))}
+            {GROUPS.map((group) => {
+              const options = teamOptions.filter(
+                (option) => option.group.toUpperCase() === group.toUpperCase()
+              );
+              // It's safe to check the first option's betStatus because all teams in a group will have the same status
+              // since it's evaluating the user's bet for the *entire group*.
+              const firstOptionStatus = options.length > 0 ? options[0]?.betStatus : "pending";
+              const statusSuffix =
+                firstOptionStatus === "success"
+                  ? ` ✓ ( + ${config?.groupWinPoint} pont)`
+                  : firstOptionStatus === "failed"
+                    ? " (✗)"
+                    : "";
+
+              return (
+                <Select
+                  key={group}
+                  name={group}
+                  control={control}
+                  options={options}
+                  label={`${group} csoport${statusSuffix}`}
+                  placeholder={`${group}`}
+                  error={errors[group as keyof ProfileFormData]?.message}
+                  disabled={isBettingLocked}
+                  status={firstOptionStatus}
+                />
+              );
+            })}
           </div>
         </div>
 

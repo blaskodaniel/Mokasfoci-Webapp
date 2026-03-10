@@ -55,6 +55,18 @@ const ScoreBetModule = ({
     return homeScore !== "" && awayScore !== "" && betValue >= 100;
   }, [homeScore, awayScore, betValue]);
 
+  const exactMatchOdds = useMemo(() => {
+    return match.additionalOdds?.scoreOdds?.exactMatch ?? config?.scoreExactMatchOdds ?? 1;
+  }, [match, config]);
+
+  const goalDifferenceOdds = useMemo(() => {
+    return match.additionalOdds?.scoreOdds?.goalDifference ?? config?.scoreGoalDifferenceOdds ?? 1;
+  }, [match, config]);
+
+  const outcomeOdds = useMemo(() => {
+    return match.additionalOdds?.scoreOdds?.outcome ?? config?.scoreOutcomeOdds ?? 1;
+  }, [match, config]);
+
   return (
     <>
       <ScoreInputSelector
@@ -82,31 +94,27 @@ const ScoreBetModule = ({
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <span>🎯</span>
-            <span className="text-gray-400">{config?.scoreExactMatchOdds}x - Telitalálat:</span>
+            <span className="text-gray-400">{exactMatchOdds}x - Telitalálat:</span>
           </div>
           <div className="font-bold text-green-400">
-            {formatNumber(betValue * (config?.scoreExactMatchOdds ?? 1))} pont
+            {formatNumber(betValue * exactMatchOdds)} pont
           </div>
         </div>
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <span>↕️</span>
-            <span className="text-gray-400">
-              {config?.scoreGoalDifferenceOdds}x - Gólkülönbség:
-            </span>
+            <span className="text-gray-400">{goalDifferenceOdds}x - Gólkülönbség:</span>
           </div>
           <div className="font-bold text-yellow-400">
-            {formatNumber(betValue * (config?.scoreGoalDifferenceOdds ?? 1))} pont
+            {formatNumber(betValue * goalDifferenceOdds)} pont
           </div>
         </div>
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <span>✅</span>
-            <span className="text-gray-400">{config?.scoreOutcomeOdds}x - Kimenetel:</span>
+            <span className="text-gray-400">{outcomeOdds}x - Kimenetel:</span>
           </div>
-          <div className="font-bold text-blue-400">
-            {formatNumber(betValue * (config?.scoreOutcomeOdds ?? 1))} pont
-          </div>
+          <div className="font-bold text-blue-400">{formatNumber(betValue * outcomeOdds)} pont</div>
         </div>
       </div>
 
@@ -156,12 +164,10 @@ const ScoreBetModule = ({
               <li className="flex items-start gap-2">
                 <span className="text-xl">🎯</span>
                 <div>
-                  <span className="text-green-400 font-bold">
-                    {config?.scoreExactMatchOdds}x - Telitalálat
-                  </span>
+                  <span className="text-green-400 font-bold">{exactMatchOdds}x - Telitalálat</span>
                   <p className="text-xs text-gray-400">Ha az eredmény pontosan 2:1 lesz.</p>
                   <p className="text-sm font-medium text-green-300">
-                    Nyeremény: {formatNumber(1000 * (config?.scoreExactMatchOdds ?? 1))} pont
+                    Nyeremény: {formatNumber(1000 * (exactMatchOdds ?? 1))} pont
                   </p>
                 </div>
               </li>
@@ -169,25 +175,23 @@ const ScoreBetModule = ({
                 <span className="text-xl">↕️</span>
                 <div>
                   <span className="text-yellow-400 font-bold">
-                    {config?.scoreGoalDifferenceOdds}x - Gólkülönbség
+                    {goalDifferenceOdds}x - Gólkülönbség
                   </span>
                   <p className="text-xs text-gray-400">
                     Ha az eredmény pl. 3:2 vagy 1:0 (hazai +1 gól).
                   </p>
                   <p className="text-sm font-medium text-yellow-300">
-                    Nyeremény: {formatNumber(1000 * (config?.scoreGoalDifferenceOdds ?? 1))} pont
+                    Nyeremény: {formatNumber(1000 * (goalDifferenceOdds ?? 1))} pont
                   </p>
                 </div>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-xl">✅</span>
                 <div>
-                  <span className="text-blue-400 font-bold">
-                    {config?.scoreOutcomeOdds}x - Kimenetel
-                  </span>
+                  <span className="text-blue-400 font-bold">{outcomeOdds}x - Kimenetel</span>
                   <p className="text-xs text-gray-400">Ha bármilyen hazai győzelem születik.</p>
                   <p className="text-sm font-medium text-blue-300">
-                    Nyeremény: {formatNumber(1000 * (config?.scoreOutcomeOdds ?? 1))} pont
+                    Nyeremény: {formatNumber(1000 * (outcomeOdds ?? 1))} pont
                   </p>
                 </div>
               </li>
@@ -209,13 +213,13 @@ const ScoreBetModule = ({
               <p>
                 <span className="text-gray-400">Eredmény:</span> 1:1 →{" "}
                 <span className="text-green-400">
-                  Telitalálat ({formatNumber(1000 * (config?.scoreExactMatchOdds ?? 1))} pont)
+                  Telitalálat ({formatNumber(1000 * (exactMatchOdds ?? 1))} pont)
                 </span>
               </p>
               <p>
                 <span className="text-gray-400">Eredmény:</span> 2:2 →{" "}
                 <span className="text-yellow-400">
-                  Gólkülönbség ({formatNumber(1000 * (config?.scoreGoalDifferenceOdds ?? 1))} pont)
+                  Gólkülönbség ({formatNumber(1000 * (goalDifferenceOdds ?? 1))} pont)
                 </span>
               </p>
               <p className="italic text-gray-500 mt-1">

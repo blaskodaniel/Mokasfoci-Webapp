@@ -18,6 +18,7 @@ interface SelectProps {
   required?: boolean;
   disabled?: boolean;
   description?: string;
+  status?: "pending" | "success" | "failed" | "default";
 }
 
 const Select: React.FC<SelectProps> = ({
@@ -31,11 +32,31 @@ const Select: React.FC<SelectProps> = ({
   required,
   disabled,
   description,
+  status = "default",
 }) => {
+  let labelColorClass = "text-gray-300";
+  if (status === "success") labelColorClass = "text-green-400 font-bold";
+  else if (status === "failed") labelColorClass = "text-red-400 font-bold";
+
+  let selectBgColorClass = disabled
+    ? "bg-gray-800 border-gray-800 appearance-none"
+    : "bg-gray-700 border border-gray-600";
+  let selectTextColorClass = "text-white";
+
+  if (!disabled) {
+    if (status === "success") {
+      selectBgColorClass = "bg-green-900/20 border-green-500 focus:ring-green-500";
+      selectTextColorClass = "text-green-400 font-semibold";
+    } else if (status === "failed") {
+      selectBgColorClass = "bg-red-900/20 border-red-500 focus:ring-red-500";
+      selectTextColorClass = "text-red-400 font-semibold";
+    }
+  }
+
   return (
     <div className="mb-2 md:mb-4">
       {label && (
-        <label className="block text-sm font-medium text-gray-300 mb-2">
+        <label className={`block text-sm font-medium mb-2 ${labelColorClass}`}>
           {label} {required && <span className="text-red-400">*</span>}
         </label>
       )}
@@ -48,8 +69,8 @@ const Select: React.FC<SelectProps> = ({
             {...field}
             className={`
               w-full px-3 py-2 pr-10
-              ${disabled ? "bg-gray-800 border-gray-800 appearance-none" : "bg-gray-700 border border-gray-600"} 
-              text-white placeholder-gray-400
+              ${selectBgColorClass} 
+              ${selectTextColorClass} placeholder-gray-400
               rounded-md focus:outline-none 
               focus:ring-2 focus:ring-blue-500 
               focus:border-transparent

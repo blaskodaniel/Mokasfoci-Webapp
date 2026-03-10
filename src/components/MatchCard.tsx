@@ -4,15 +4,17 @@ import { format } from "date-fns";
 import { MatchOutcome } from "@/utils/enums";
 import type { MatchWithUserBet } from "./Matches/types";
 import useGame from "@/hooks/useGame";
+import UnknownFlag from "./UnknownFlag";
 
 interface MatchCardProps {
   match: MatchWithUserBet;
   onClick?: (match: MatchWithUserBet) => void;
   className?: string;
   flagSize?: "small" | "large";
+  badge?: string;
 }
 
-const MatchCard = ({ match, onClick, className, flagSize = "large" }: MatchCardProps) => {
+const MatchCard = ({ match, onClick, className, flagSize = "large", badge }: MatchCardProps) => {
   const defaultWrapperClass = "px-4 py-6";
   const userBet = match.userbet;
   const { userBetInfo } = useGame();
@@ -33,9 +35,19 @@ const MatchCard = ({ match, onClick, className, flagSize = "large" }: MatchCardP
       cursor-pointer hover:bg-black/30 transition-colors relative ${className || defaultWrapperClass}`}
       onClick={() => onClick?.(match)}
     >
+      {badge && (
+        <div
+          className="absolute top-0 right-0 bg-amber-500/20 px-2.5 py-1 rounded-bl-lg 
+            border border-amber-500/30 flex items-center justify-center"
+        >
+          <span className="text-[9px] leading-none text-amber-500 font-bold text-center">
+            {badge}
+          </span>
+        </div>
+      )}
       <div className="flex">
         <div className="flex-1 flex flex-col justify-center items-center gap-4">
-          {match.teamA?.flag && (
+          {match.teamA?.flag ? (
             <img
               src={`${APP_CONFIG.FLAG_PATH}${match.teamA.flag}`}
               alt={`${match.teamA.name} flag`}
@@ -45,6 +57,8 @@ const MatchCard = ({ match, onClick, className, flagSize = "large" }: MatchCardP
                   : "w-12 h-12 object-cover rounded-full"
               }
             />
+          ) : (
+            <UnknownFlag size={flagSize === "small" ? 8 : 12} />
           )}
         </div>
         <div
@@ -75,19 +89,27 @@ const MatchCard = ({ match, onClick, className, flagSize = "large" }: MatchCardP
           )}
         </div>
         <div className="flex-1 flex flex-col justify-center items-center gap-4">
-          {match.teamB?.flag && (
+          {match.teamB?.flag ? (
             <img
               src={`${APP_CONFIG.FLAG_PATH}${match.teamB.flag}`}
               alt={`${match.teamB.name} flag`}
               className="w-12 h-12 object-cover rounded-full"
             />
+          ) : (
+            <UnknownFlag size={flagSize === "small" ? 8 : 12} />
           )}
         </div>
       </div>
       <div className="flex gap-1 border-t border-gray-700/30 pt-3 text-center">
-        <div className={getOddsClass(MatchOutcome.home)}>{match.oddsAwin?.toFixed(2)}</div>
-        <div className={getOddsClass(MatchOutcome.draw)}>{match.oddsDraw?.toFixed(2)}</div>
-        <div className={getOddsClass(MatchOutcome.away)}>{match.oddsBwin?.toFixed(2)}</div>
+        <div className={getOddsClass(MatchOutcome.home)}>
+          {match.oddsAwin ? match.oddsAwin?.toFixed(2) : "-"}
+        </div>
+        <div className={getOddsClass(MatchOutcome.draw)}>
+          {match.oddsDraw ? match.oddsDraw?.toFixed(2) : "-"}
+        </div>
+        <div className={getOddsClass(MatchOutcome.away)}>
+          {match.oddsBwin ? match.oddsBwin?.toFixed(2) : "-"}
+        </div>
       </div>
     </div>
   );
