@@ -4,6 +4,10 @@ import type { Match } from "@/models/match.type";
 import { getMatchTypeText } from "@/utils/common";
 import { format } from "date-fns";
 import { FaQuestion } from "react-icons/fa";
+import BetModal from "../BetModal";
+import { useState } from "react";
+import type { MatchWithUserBet } from "../Matches/types";
+import { useMyBets } from "@/hooks/api/usePlayers";
 
 interface Round {
   id: string;
@@ -21,6 +25,9 @@ const BracketComponent = ({
   positionVector: number[];
 }) => {
   const { isMobile } = useResponsive();
+  const { data: myBets } = useMyBets();
+  const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(null);
+  const [isBetModalOpen, setIsBetModalOpen] = useState(false);
 
   const MatchBox = ({ match, isSmall }: { match: Match; isSmall?: boolean }) => (
     <div
@@ -143,7 +150,20 @@ const BracketComponent = ({
                         return aOrder - bOrder;
                       })
                       .map((match) => (
-                        <div key={match._id} className="flex flex-col items-center relative">
+                        <div
+                          key={match._id}
+                          className="flex flex-col items-center relative"
+                          onClick={() => {
+                            if (!match?.teamA || !match?.teamB) return;
+                            if (!myBets) return;
+                            const userBet = myBets.filter((bet) => bet.matchid._id === match._id);
+                            setSelectedMatch({
+                              ...match,
+                              userbet: userBet,
+                            });
+                            setIsBetModalOpen(true);
+                          }}
+                        >
                           <MatchBox match={match} />
                           {rIndex === rounds.length - 1 && thirdPlaceMatch && (
                             <div className="mt-8 sm:mt-12">
@@ -169,6 +189,17 @@ const BracketComponent = ({
             </div>
           )}
         </>
+      )}
+
+      {selectedMatch && (
+        <BetModal
+          key={selectedMatch._id}
+          match={selectedMatch}
+          isOpen={isBetModalOpen}
+          onClose={() => setIsBetModalOpen(false)}
+          onAfterClose={() => setSelectedMatch(null)}
+          bets={myBets || []}
+        />
       )}
     </div>
   );

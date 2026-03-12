@@ -49,7 +49,7 @@ export const useBetting = (): UseBettingReturn => {
         },
         {
           onSuccess: () => {
-            showSuccess("A fogadás sikeresen frissítve lett.");
+            showSuccess("A fogadásodat frissítettük.");
             queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
             onSuccess?.();
           },
@@ -70,7 +70,7 @@ export const useBetting = (): UseBettingReturn => {
         {
           onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
-            showSuccess("A fogadás sikeresen létrehozva lett.");
+            showSuccess("A fogadásod sikeresen létrejött");
             onSuccess?.();
           },
           onError: (error) => {
@@ -119,7 +119,7 @@ export const useBetting = (): UseBettingReturn => {
         },
         {
           onSuccess: () => {
-            showSuccess("A fogadás sikeresen frissítve lett.");
+            showSuccess("A fogadásodat frissítettük.");
             queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
             onSuccess?.();
           },
@@ -141,7 +141,7 @@ export const useBetting = (): UseBettingReturn => {
         {
           onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
-            showSuccess("A fogadás sikeresen létrehozva lett.");
+            showSuccess("A fogadásodat sikeresen létrehoztuk");
             onSuccess?.();
           },
           onError: (error) => {

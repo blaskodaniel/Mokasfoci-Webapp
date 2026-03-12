@@ -508,7 +508,7 @@ const MyProfilePage = () => {
         </div>
 
         {/* Submit Button - sticky on mobile */}
-        <div className="flex justify-end pb-8 md:static md:pb-8">
+        <div className="flex justify-end pb-8 md:static md:pb-8 z-50">
           <div
             className="w-full md:w-fit fixed bottom-0 left-0 right-0 z-50 p-4 bg-gray-900 md:static 
           md:bg-transparent md:p-0"

@@ -46,9 +46,6 @@ const BracketPage = () => {
       },
     ];
 
-    // Csak azokat az oszlopokat tartjuk meg, amelyekben már van legalább egy mérkőzés
-    // Erre azért van szükség, hogy ha még csak idáig jutott a bajnokság, ne legyenek üres oszlopok
-    // Ha azt szeretnéd, hogy az üres helyosztók is látsszanak üres kártyákkal, ezt a .filter()-t csak simán vedd ki!
     return allRounds.filter((round) => round.matches.length > 0);
   }, [bracketData?.matches]);
 

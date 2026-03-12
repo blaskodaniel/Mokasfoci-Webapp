@@ -43,7 +43,7 @@ const NotificationContainer = () => {
   }
 
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-3 pointer-events-none">
+    <div className="fixed top-4 left-4 z-50 space-y-3 pointer-events-none">
       {notifications.map((notification, index) => (
         <NotificationItem
           key={notification.id}

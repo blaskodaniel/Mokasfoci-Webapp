@@ -69,16 +69,16 @@ export const NotificationItem = ({ notification, onClose, index }: NotificationI
   `;
 
   const animationClasses = isRemoving
-    ? "translate-x-full opacity-0 scale-95"
+    ? "-translate-x-full opacity-0 scale-95"
     : isVisible
       ? "translate-x-0 opacity-100 scale-100"
-      : "translate-x-full opacity-0 scale-95";
+      : "-translate-x-full opacity-0 scale-95";
 
   return (
     <div
       className={`${baseClasses} ${animationClasses}`}
       style={{
-        transformOrigin: "right center",
+        transformOrigin: "left center",
       }}
     >
       {/* Progress bar */}

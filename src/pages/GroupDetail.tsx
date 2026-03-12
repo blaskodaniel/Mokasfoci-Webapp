@@ -94,7 +94,6 @@ const GroupDetail = () => {
                         displayTime
                         displayDate
                         onSelectMatch={(m: MatchWithUserBet) => {
-                          console.log(m);
                           setSelectedMatch(m);
                           setIsBetModalOpen(true);
                         }}
