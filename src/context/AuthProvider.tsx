@@ -1,6 +1,7 @@
 import type { User } from "@/models/user.type";
 import { setAuthToken } from "@/services/axiosConfig";
 import Api from "@/services/service";
+import { useQueryClient } from "@tanstack/react-query";
 import React, { useState, useEffect, type ReactNode } from "react";
 import AuthContext from "./AuthContext";
 
@@ -9,6 +10,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true); // App betöltés jelző
@@ -62,6 +64,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       console.error("Logout hiba", error);
     } finally {
+      // A React Query cache-t töröljük, hogy az előző user adatai ne maradjanak
+      queryClient.clear();
       // A kliens oldali állapotot mindenképp töröljük
       setAuthData(null, null);
     }
