@@ -1,6 +1,5 @@
 import { useConfig } from "@/hooks/useConfig";
 import useGame from "@/hooks/useGame";
-import { useAppSelector } from "@/state/hooks";
 import { MatchOutcome } from "@/utils/enums";
 import { useMemo, useState } from "react";
 import MatchOutcomeSelector from "./MatchOutcomeSelector";
@@ -8,6 +7,7 @@ import Button from "../Button";
 import BetValueSelector from "./BetValueSelector";
 import { formatNumber, potentialWinnings } from "@/utils/common";
 import type { Match } from "@/models/match.type";
+import { useAuth } from "@/hooks/useAuth";
 
 interface AdvancementBetModuleProps {
   match: Match;
@@ -27,7 +27,7 @@ const AdvancementBetModule = ({
   editMode = false,
 }: AdvancementBetModuleProps) => {
   const { config } = useConfig();
-  const { currentUser } = useAppSelector((state) => state.auth);
+  const { user: currentUser } = useAuth();
   const { userFavoriteTeam } = useGame();
   const [betValue, setBetValue] = useState<number>(initBetValue);
   const [selectedOutcome, setSelectedOutcome] = useState<MatchOutcome | null>(

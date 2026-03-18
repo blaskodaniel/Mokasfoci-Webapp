@@ -7,8 +7,9 @@ interface AuthContextType {
   accessToken: string | null;
   isLoading: boolean;
   login: (accessToken: string, user: User) => void;
-  logout: () => void;
-  setAuthData: (accessToken: string, user: User) => void;
+  logout: () => Promise<void>;
+  setAuthData: (accessToken: string | null, user: User | null) => void;
+  refreshMe: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

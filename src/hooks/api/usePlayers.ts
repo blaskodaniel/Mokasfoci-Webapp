@@ -2,8 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Api from "@/services/service";
 import type { User } from "@/models/user.type";
 import type { Bet } from "@/models/bet.type";
-import { useAppDispatch } from "@/state/hooks";
-import { getMeAction } from "@/state/authSlice";
+import { useAuth } from "@/hooks/useAuth";
 import { MatchOutcome, CouponType } from "@/utils/enums";
 import type { Transaction } from "@/models/transaction.type";
 import type {
@@ -50,33 +49,33 @@ export const useMyBets = () => {
 
 export const useDeleteBet = () => {
   const queryClient = useQueryClient();
-  const dispatch = useAppDispatch();
+  const { refreshMe } = useAuth();
 
   return useMutation({
     mutationFn: (betId: string) => Api.deleteBet(betId),
     onSuccess: () => {
       // React Query cache invalidation
       queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
-      dispatch(getMeAction());
+      refreshMe();
     },
   });
 };
 
 export const useUpdateBet = () => {
-  const dispatch = useAppDispatch();
+  const { refreshMe } = useAuth();
 
   return useMutation({
     mutationFn: ({ betId, data }: { betId: string; data: Partial<Bet> }) =>
       Api.updateBet(betId, data),
     onSuccess: () => {
-      dispatch(getMeAction());
+      refreshMe();
     },
   });
 };
 
 export const useCreateBet = () => {
   const queryClient = useQueryClient();
-  const dispatch = useAppDispatch();
+  const { refreshMe } = useAuth();
 
   return useMutation({
     mutationFn: ({
@@ -104,7 +103,7 @@ export const useCreateBet = () => {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
-      dispatch(getMeAction());
+      refreshMe();
     },
   });
 };
@@ -120,13 +119,13 @@ export const useMyTransactions = () => {
 
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
-  const dispatch = useAppDispatch();
+  const { refreshMe } = useAuth();
 
   return useMutation({
     mutationFn: (data: UpdateUserProfileBody) => Api.updateProfile(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: playersKeys.all });
-      dispatch(getMeAction());
+      refreshMe();
     },
   });
 };

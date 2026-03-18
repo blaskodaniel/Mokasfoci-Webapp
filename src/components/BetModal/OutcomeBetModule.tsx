@@ -1,7 +1,6 @@
 import { useMemo, useState, type FC } from "react";
 import Button from "../Button";
 import { MatchOutcome, MatchType } from "@/utils/enums";
-import { useAppSelector } from "@/state/hooks";
 import useGame from "@/hooks/useGame";
 import { useConfig } from "@/hooks/useConfig";
 import { formatNumber, potentialWinnings } from "@/utils/common";
@@ -10,6 +9,7 @@ import BetValueSelector from "./BetValueSelector";
 import GroupStandings from "../Widgets/GroupStandings";
 import { useGetGroupStandingsById } from "@/hooks/api/useTeams";
 import type { Match } from "@/models/match.type";
+import { useAuth } from "@/hooks/useAuth";
 
 interface OutcomeBetModuleProps {
   match: Match;
@@ -29,7 +29,7 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
   editMode = false,
 }) => {
   const { config } = useConfig();
-  const { currentUser } = useAppSelector((state) => state.auth);
+  const { user: currentUser } = useAuth();
   const { userFavoriteTeam } = useGame();
   const [betValue, setBetValue] = useState<number>(initBetValue);
   const [selectedOutcome, setSelectedOutcome] = useState<MatchOutcome | null>(

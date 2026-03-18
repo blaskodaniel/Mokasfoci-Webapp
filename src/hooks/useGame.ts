@@ -1,11 +1,11 @@
 import type { Bet } from "@/models/bet.type";
 import type { Match } from "@/models/match.type";
-import { useAppSelector } from "@/state/hooks";
 import { CouponType, MatchOutcome } from "@/utils/enums";
 import { useCallback } from "react";
+import { useAuth } from "./useAuth";
 
 const useGame = () => {
-  const { currentUser } = useAppSelector((state) => state.auth);
+  const { user: currentUser } = useAuth();
 
   const userFavoriteTeam = useCallback(
     (match: Match) => {

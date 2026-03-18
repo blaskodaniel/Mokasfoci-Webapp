@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { logoutAction } from "../state/authSlice";
-import { useAppDispatch, useAppSelector } from "../state/hooks";
 import { HiOutlineLogout, HiOutlineMenuAlt3 } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import useMenu from "@/hooks/useMenu";
@@ -17,10 +15,8 @@ const Header = ({
   setIsMenuOpen: (isOpen: boolean) => void;
 }) => {
   const { isDesktop } = useResponsive();
-  const { logout } = useAuth();
-  const dispatch = useAppDispatch();
+  const { logout, user: currentUser } = useAuth();
   const { menuList } = useMenu();
-  const { currentUser } = useAppSelector((state) => state.auth);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -91,7 +87,6 @@ const Header = ({
           <div
             className="text-white cursor-pointer flex items-center gap-1 hover:text-yellow-300 transition-colors"
             onClick={() => {
-              dispatch(logoutAction());
               logout();
             }}
           >

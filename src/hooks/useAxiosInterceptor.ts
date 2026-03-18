@@ -1,8 +1,15 @@
 import { useEffect } from "react";
-import axios from "axios";
+import axios, { type InternalAxiosRequestConfig } from "axios";
 import { useAuth } from "./useAuth";
 import { axiosInstance } from "@/services/axiosConfig";
 import Api from "@/services/service";
+import type { User } from "@/models/user.type";
+
+type RefreshTokenResponse = { accessToken: string; user: User };
+
+type RetriableRequestConfig = InternalAxiosRequestConfig & { _retry?: boolean };
+
+let refreshPromise: Promise<RefreshTokenResponse | null> | null = null;
 
 /**
  * Ez egy "Hook", amit a fő App komponensben hívunk meg.
@@ -16,7 +23,7 @@ export const useAxiosInterceptor = () => {
     const responseInterceptor = axiosInstance.interceptors.response.use(
       (response) => response, // Ha 2xx válasz jön, csak engedjük tovább
       async (error) => {
-        const originalRequest = error.config;
+        const originalRequest = error.config as RetriableRequestConfig;
 
         // 1. Ellenőrizzük, hogy 401-es hiba-e
         // 2. Ellenőrizzük, hogy ez NEM egy újrapróbálkozás-e (kerüljük a végtelen ciklust)
@@ -30,13 +37,25 @@ export const useAxiosInterceptor = () => {
 
           try {
             // 3. Megpróbáljuk frissíteni a tokent
-            const refreshResponse = await Api.refreshToken();
-            const { accessToken, user } = refreshResponse!;
+            if (!refreshPromise) {
+              refreshPromise = Api.refreshToken().finally(() => {
+                refreshPromise = null;
+              });
+            }
+
+            const refreshResponse = await refreshPromise;
+            if (!refreshResponse) {
+              await logout();
+              return Promise.reject(error);
+            }
+
+            const { accessToken, user } = refreshResponse;
 
             // 4. Frissítjük a globális állapotot és az Axios headert
             setAuthData(accessToken, user);
 
             // 5. Frissítjük az EREDETI kérés fejlécét az új tokennel
+            originalRequest.headers = originalRequest.headers ?? {};
             originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
             console.log("Token frissítve, újrapróbálkozás az eredeti kéréssel.");
             // 6. Újrapróbáljuk az eredeti kérést

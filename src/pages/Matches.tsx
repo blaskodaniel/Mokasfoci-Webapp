@@ -5,7 +5,6 @@ import { CouponType, MatchStatus } from "@/utils/enums";
 import { useEffect, useState, useMemo } from "react";
 import { isBettableMatch, useAllMatches } from "@/hooks/api/useMatches";
 import { format } from "date-fns";
-import { useAppSelector } from "@/state/hooks";
 import { Link } from "react-router-dom";
 import Calendar from "@/components/Calendar";
 import useResponsive from "@/hooks/useResponsive";
@@ -13,10 +12,11 @@ import MatchesDesktopView from "@/components/Matches/DesktopView.tsx";
 import MatchesMobileView from "@/components/Matches/MobileView";
 import type { MatchWithUserBet } from "@/components/Matches/types";
 import BetModal from "@/components/BetModal";
+import { useAuth } from "@/hooks/useAuth";
 
 const MatchesPage = () => {
   const { isDesktop } = useResponsive();
-  const { currentUser } = useAppSelector((state) => state.auth);
+  const { user: currentUser } = useAuth();
   const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(null);
   const [isBetModalOpen, setIsBetModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());

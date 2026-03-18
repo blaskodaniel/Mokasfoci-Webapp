@@ -1,7 +1,6 @@
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import Select from "@/components/Select";
-import { useAppSelector } from "@/state/hooks";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,19 +17,15 @@ import AvatarModal from "@/components/MyProfile/AvatarModal";
 import { useConfig } from "@/hooks/useConfig";
 import { format, isAfter } from "date-fns";
 import InfoTooltip from "@/components/InfoTooltip";
+import { useAuth } from "@/hooks/useAuth";
 
 const MyProfilePage = () => {
   const { config } = useConfig();
   const navigate = useNavigate();
   const { showSuccess, showError } = useNotification();
+  const { user: currentUser, isLoading: userLoading } = useAuth();
 
   const [isOpenAvatarModal, setIsOpenAvatarModal] = useState(false);
-
-  const {
-    currentUser,
-    isLoading: userLoading,
-    error: userError,
-  } = useAppSelector((state) => state.auth);
 
   const {
     data: teams,
@@ -196,7 +191,7 @@ const MyProfilePage = () => {
     return <p>Profil betöltése folyamatban...</p>;
   }
 
-  if (!currentUser || !teams || teamsError || userError) {
+  if (!currentUser || !teams || teamsError) {
     return <p>Hiba történt a betöltés során.</p>;
   }
 

@@ -1,4 +1,3 @@
-import { useAppSelector } from "@/state/hooks";
 import { useMemo, useState } from "react";
 import Button from "../Button";
 import BetValueSelector from "./BetValueSelector";
@@ -7,6 +6,7 @@ import { formatNumber } from "@/utils/common";
 import type { Match } from "@/models/match.type";
 import HelpModal from "../HelpModal";
 import { useConfig } from "@/hooks/useConfig";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ScoreBetModuleProps {
   match: Match;
@@ -27,7 +27,7 @@ const ScoreBetModule = ({
   initTeamBScore,
   editMode = false,
 }: ScoreBetModuleProps) => {
-  const { currentUser } = useAppSelector((state) => state.auth);
+  const { user: currentUser } = useAuth();
   const { config } = useConfig();
   const [betValue, setBetValue] = useState<number>(initBetValue);
   const [homeScore, setHomeScore] = useState<number | "">(

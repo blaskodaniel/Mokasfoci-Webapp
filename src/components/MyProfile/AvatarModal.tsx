@@ -6,12 +6,11 @@ import Button from "../Button";
 import { useEffect, useRef, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { useNotification } from "@/hooks/useNotification";
-import { useAppDispatch } from "@/state/hooks";
-import { getMeAction } from "@/state/authSlice";
+import { useAuth } from "@/hooks/useAuth";
 
 const AvatarModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const { showSuccess, showError } = useNotification();
-  const dispatch = useAppDispatch();
+  const { refreshMe } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -59,7 +58,7 @@ const AvatarModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
         onClose();
 
         setTimeout(() => {
-          dispatch(getMeAction());
+          refreshMe();
         }, 100);
       },
       onError: (error) => {
@@ -77,7 +76,7 @@ const AvatarModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
         onClose();
 
         setTimeout(() => {
-          dispatch(getMeAction());
+          refreshMe();
         }, 100);
       },
       onError: (error) => {
