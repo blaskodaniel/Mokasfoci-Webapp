@@ -42,7 +42,16 @@ export const useMyBets = () => {
   return useQuery<Bet[]>({
     queryKey: playersKeys.myBets(),
     queryFn: () => Api.getUserBets(),
+    select: (bets) =>
+      [...bets].sort((a, b) => {
+        const aTime = a.date ? new Date(a.date).getTime() : 0;
+        const bTime = b.date ? new Date(b.date).getTime() : 0;
+        if (aTime !== bTime) return bTime - aTime;
+        return String(b._id).localeCompare(String(a._id));
+      }),
     staleTime: 15 * 60 * 1000, // 15 perc (ritkábban változik)
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
     retry: 2,
   });
 };

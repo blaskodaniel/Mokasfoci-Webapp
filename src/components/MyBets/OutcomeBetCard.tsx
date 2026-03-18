@@ -23,7 +23,6 @@ interface OutcomeBetCardProps {
   profit: number;
   onEdit: (bet: Bet) => void;
   onDelete: (bet: Bet) => void;
-  isLayoutReady?: boolean;
 }
 
 const OutcomeBetCard = ({
@@ -37,7 +36,6 @@ const OutcomeBetCard = ({
   winnings,
   onEdit,
   onDelete,
-  isLayoutReady = true,
 }: OutcomeBetCardProps) => {
   const { config } = useConfig();
   const statusInfo = getCouponStatusInfo(bet.status);
@@ -76,14 +74,12 @@ const OutcomeBetCard = ({
 
   return (
     <motion.div
-      layout={isLayoutReady ? true : false}
-      initial={{ y: 1, opacity: 0 }}
+      initial={{ opacity: 0 }}
       animate={{
-        y: 0,
         opacity: 1,
-        transition: { delay: index * 0.05, duration: 0.2, ease: "easeInOut" },
+        transition: { delay: index * 0.03, duration: 0.18, ease: "easeOut" },
       }}
-      exit={{ opacity: 0 }}
+      exit={{ opacity: 0, transition: { duration: 0.12 } }}
       key={bet._id}
       className="group flex w-full rounded-lg overflow-hidden shadow-sm
        bg-white dark:bg-[#1a1c23] border border-gray-200 dark:border-gray-800 

@@ -29,12 +29,7 @@ const MyBetsPage = () => {
   const [isBetModalOpen, setIsBetModalOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
 
-  const {
-    data: myBets,
-    isLoading: myBetsLoading,
-    error: myBetsError,
-    refetch: refetchMyBets,
-  } = useMyBets();
+  const { data: myBets, isLoading: myBetsLoading, error: myBetsError } = useMyBets();
 
   const deleteBetMutation = useDeleteBet();
 
@@ -77,10 +72,6 @@ const MyBetsPage = () => {
       },
     });
   };
-
-  useEffect(() => {
-    refetchMyBets();
-  }, [refetchMyBets]);
 
   // Szinkronizáljuk a selectedMatch-et a frissült adatokkal amikor változnak az odds-ok
   useEffect(() => {
@@ -365,7 +356,6 @@ const MyBetsPage = () => {
             setSelectedBet(null);
           }}
           onAfterSave={() => {
-            refetchMyBets();
             setIsBetModalOpen(false);
             setIsConfirmModalOpen(false);
             queryClient.invalidateQueries({ queryKey: playersKeys.myBets() });
