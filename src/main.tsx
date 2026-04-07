@@ -7,6 +7,7 @@ import { store } from "./state/store.ts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./context/AuthProvider.tsx";
 import { ConfigProvider } from "./context/ConfigProvider.tsx";
+import { SocketProvider } from "./context/SocketProvider.tsx";
 
 const queryClient = new QueryClient();
 
@@ -15,9 +16,11 @@ createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <ConfigProvider>
-            <App />
-          </ConfigProvider>
+          <SocketProvider>
+            <ConfigProvider>
+              <App />
+            </ConfigProvider>
+          </SocketProvider>
         </AuthProvider>
       </QueryClientProvider>
     </BrowserRouter>

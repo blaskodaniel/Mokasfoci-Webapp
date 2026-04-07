@@ -21,6 +21,7 @@ import type { Bet } from "@/models/bet.type";
 import type { Transaction } from "@/models/transaction.type";
 import type { Team } from "@/models/team.type";
 import type { Config } from "@/models/config.type";
+import type { ChatMessage } from "@/models/chat.type";
 
 const Api = {
   async login(username: string, password: string): Promise<SignInResponse> {
@@ -291,6 +292,11 @@ const Api = {
 
   async getTournamentBracket(): Promise<TournamentBracketResponse> {
     const response = await axiosInstance.get(`/match/bracket`);
+    return response.data;
+  },
+
+  async getChatMessages(room: string): Promise<ChatMessage[]> {
+    const response = await axiosInstance.get(`/chat/${room}/messages`);
     return response.data;
   },
 };

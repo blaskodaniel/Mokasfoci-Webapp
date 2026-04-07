@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import MobileMenu from "@/components/MobileMenu";
 import useResponsive from "./hooks/useResponsive";
 import { NotificationContainer } from "./components/Notification";
+import ChatWidget from "./components/Chat/ChatWidget";
 
 const Layout = () => {
   const { isMobile } = useResponsive();
@@ -49,6 +50,7 @@ const Layout = () => {
 
           {/* Modals */}
           <NotificationContainer />
+          <ChatWidget />
         </div>
       </div>
 
