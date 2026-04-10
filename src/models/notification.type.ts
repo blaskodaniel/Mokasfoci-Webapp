@@ -1,6 +1,6 @@
 import type { NotificationType } from "@/utils/enums";
 
-export interface Notification {
+export interface AppNotification {
   _id: string;
   userId: string;
   text: string;

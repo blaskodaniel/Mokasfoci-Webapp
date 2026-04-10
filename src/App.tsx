@@ -22,6 +22,7 @@ import Statistics from "./pages/Statistics";
 import MyBadges from "./pages/MyBadges";
 import GroupDetail from "./pages/GroupDetail";
 import BracketPage from "./pages/Bracket";
+import NotificationsPage from "./pages/Notifications";
 
 function App() {
   useAxiosInterceptor();
@@ -54,6 +55,7 @@ function App() {
           <Route path="transactions" element={<MyTransactions />} />
           <Route path="statisztikak" element={<Statistics />} />
           <Route path="mybadges" element={<MyBadges />} />
+          <Route path="notification" element={<NotificationsPage />} />
 
           <Route path="*" element={<NotFound />} />
         </Route>

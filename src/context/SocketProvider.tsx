@@ -3,12 +3,17 @@ import { io, Socket } from "socket.io-client";
 import { APP_CONFIG } from "@/config";
 import { useAuth } from "@/hooks/useAuth";
 import { SocketContext } from "./SocketContext";
+import { useQueryClient } from "@tanstack/react-query";
+import { usePopup } from "@/hooks/usePopup";
+import type { AppNotification } from "@/models/notification.type";
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [authError, setAuthError] = useState(false);
   const { user, accessToken } = useAuth();
+  const queryClient = useQueryClient();
+  const { showInfo } = usePopup();
 
   useEffect(() => {
     // Csak akkor csatlakozunk, ha van bejelentkezett felhasználó
@@ -46,15 +51,29 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
     });
 
+    newSocket.on("new_notification", (notification: AppNotification) => {
+      console.log("New notification:", notification);
+
+      showInfo(notification.type === "system" ? "Rendszerüzenet" : "Új értesítés", {
+        description: notification.text || "Nézd meg a harang ikonra kattintva!",
+        autoClose: true,
+        duration: 5000,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    });
+
     setSocket(newSocket);
 
     return () => {
       newSocket.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, accessToken, queryClient]);
 
   return (
-    <SocketContext.Provider value={{ socket, isConnected, authError }}>{children}</SocketContext.Provider>
+    <SocketContext.Provider value={{ socket, isConnected, authError }}>
+      {children}
+    </SocketContext.Provider>
   );
 };

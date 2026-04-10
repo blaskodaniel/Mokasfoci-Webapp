@@ -6,6 +6,7 @@ import useResponsive from "@/hooks/useResponsive";
 import { useAuth } from "@/hooks/useAuth";
 import { formatPoints } from "@/utils/common";
 import { APP_CONFIG, DEFAULT_AVATAR_URL } from "@/config";
+import { NotificationDropdown } from "./NotificationDropdown";
 
 const Header = ({
   isMenuOpen,
@@ -68,12 +69,15 @@ const Header = ({
         ))}
       </div>
 
-      <HiOutlineMenuAlt3
-        color="white"
-        size={25}
-        className="sm:hidden cursor-pointer ml-auto"
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-      />
+      <div className="sm:hidden ml-auto flex items-center gap-3">
+        <NotificationDropdown />
+        <HiOutlineMenuAlt3
+          color="white"
+          size={25}
+          className="cursor-pointer"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        />
+      </div>
       {isDesktop && (
         <div className="flex items-center gap-2 ml-auto">
           <div className="flex flex-col items-end">
@@ -82,6 +86,8 @@ const Header = ({
               💰 {formatPoints(currentUser?.data.availableScore || 0)}
             </div>
           </div>
+
+          <NotificationDropdown />
 
           <div className="text-gray-400">|</div>
           <div

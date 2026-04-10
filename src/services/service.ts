@@ -22,6 +22,7 @@ import type { Transaction } from "@/models/transaction.type";
 import type { Team } from "@/models/team.type";
 import type { Config } from "@/models/config.type";
 import type { ChatMessage } from "@/models/chat.type";
+import type { AppNotification } from "@/models/notification.type";
 
 const Api = {
   async login(username: string, password: string): Promise<SignInResponse> {
@@ -175,8 +176,34 @@ const Api = {
   async getNotifications(
     page: number = 1,
     limit: number = 20
-  ): Promise<{ data: Notification[]; total: number; unreadCount: number; currentPage: number; totalPages: number }> {
-    const response = await axiosInstance.get(`/user/notifications?page=${page}&limit=${limit}`);
+  ): Promise<{
+    notifications: AppNotification[];
+    total: number;
+    unreadCount: number;
+    currentPage: number;
+    totalPages: number;
+  }> {
+    const response = await axiosInstance.get(`/notifications?page=${page}&limit=${limit}`);
+    return response.data;
+  },
+
+  async markNotificationAsRead(id: string): Promise<AppNotification> {
+    const response = await axiosInstance.patch(`/notifications/${id}`);
+    return response.data;
+  },
+
+  async markAllNotificationsAsRead(): Promise<void> {
+    const response = await axiosInstance.patch(`/notifications/read-all`);
+    return response.data;
+  },
+
+  async deleteNotification(id: string): Promise<void> {
+    const response = await axiosInstance.delete(`/notifications/${id}`);
+    return response.data;
+  },
+
+  async deleteAllNotifications(): Promise<void> {
+    const response = await axiosInstance.delete(`/notifications/delete-all`);
     return response.data;
   },
 
