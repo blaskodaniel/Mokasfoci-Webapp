@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import MobileMenu from "@/components/MobileMenu";
 import useResponsive from "./hooks/useResponsive";
-import { NotificationContainer } from "./components/Notification";
+import { PopupContainer } from "./components/Popup";
 import ChatWidget from "./components/Chat/ChatWidget";
 
 const Layout = () => {
@@ -49,7 +49,7 @@ const Layout = () => {
           </div>
 
           {/* Modals */}
-          <NotificationContainer />
+          <PopupContainer />
           <ChatWidget />
         </div>
       </div>

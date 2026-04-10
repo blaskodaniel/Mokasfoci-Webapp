@@ -172,6 +172,14 @@ const Api = {
     return response.data;
   },
 
+  async getNotifications(
+    page: number = 1,
+    limit: number = 20
+  ): Promise<{ data: Notification[]; total: number; unreadCount: number; currentPage: number; totalPages: number }> {
+    const response = await axiosInstance.get(`/user/notifications?page=${page}&limit=${limit}`);
+    return response.data;
+  },
+
   async getUserTransactions(): Promise<Transaction[]> {
     const response = await axiosInstance.get(`/user/mytransactions`);
     return response.data;

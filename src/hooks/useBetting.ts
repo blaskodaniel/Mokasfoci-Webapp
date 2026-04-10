@@ -1,5 +1,5 @@
 import { useUpdateBet, useCreateBet, playersKeys } from "@/hooks/api/usePlayers";
-import { useNotification } from "@/hooks/useNotification";
+import { usePopup } from "@/hooks/usePopup";
 import { useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { CouponType, MatchOutcome } from "@/utils/enums";
@@ -24,7 +24,7 @@ export interface UseBettingReturn {
 
 export const useBetting = (): UseBettingReturn => {
   const queryClient = useQueryClient();
-  const { showSuccess, showError } = useNotification();
+  const { showSuccess, showError } = usePopup();
   const updateBetMutation = useUpdateBet();
   const createBetMutation = useCreateBet();
 

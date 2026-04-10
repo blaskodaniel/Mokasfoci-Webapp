@@ -5,11 +5,11 @@ import { APP_CONFIG } from "@/config";
 import Button from "../Button";
 import { useEffect, useRef, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import { useNotification } from "@/hooks/useNotification";
+import { usePopup } from "@/hooks/usePopup";
 import { useAuth } from "@/hooks/useAuth";
 
 const AvatarModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-  const { showSuccess, showError } = useNotification();
+  const { showSuccess, showError } = usePopup();
   const { refreshMe } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);

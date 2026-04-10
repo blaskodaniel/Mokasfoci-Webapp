@@ -11,7 +11,7 @@ import { APP_CONFIG, DEFAULT_AVATAR_URL, GROUPS } from "@/config";
 import { formatPoints } from "@/utils/common";
 import { FiEdit3 } from "react-icons/fi";
 import { useUpdateProfile } from "@/hooks/api/usePlayers";
-import { useNotification } from "@/hooks/useNotification";
+import { usePopup } from "@/hooks/usePopup";
 import type { UpdateUserProfileBody } from "@/services/types";
 import AvatarModal from "@/components/MyProfile/AvatarModal";
 import { useConfig } from "@/hooks/useConfig";
@@ -22,7 +22,7 @@ import { useAuth } from "@/hooks/useAuth";
 const MyProfilePage = () => {
   const { config } = useConfig();
   const navigate = useNavigate();
-  const { showSuccess, showError } = useNotification();
+  const { showSuccess, showError } = usePopup();
   const { user: currentUser, isLoading: userLoading } = useAuth();
 
   const [isOpenAvatarModal, setIsOpenAvatarModal] = useState(false);

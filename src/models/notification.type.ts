@@ -1,10 +1,10 @@
-import type { MessageType } from "@/utils/enums";
+import type { NotificationType } from "@/utils/enums";
 
-export interface Message {
+export interface Notification {
   _id: string;
   userId: string;
   text: string;
-  type: MessageType;
+  type: NotificationType;
   actionUrl?: string;
   read: boolean;
   createdAt: Date;

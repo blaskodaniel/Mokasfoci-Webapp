@@ -74,8 +74,13 @@ export enum ChatMessageType {
   user = "user",
 }
 
-export enum MessageType {
+export enum NotificationType {
   system = "system",
   achievementUnlocked = "achievementUnlocked",
   oddsUpdate = "oddsUpdate",
+}
+
+export enum UserRole {
+  Admin = "admin",
+  User = "user",
 }

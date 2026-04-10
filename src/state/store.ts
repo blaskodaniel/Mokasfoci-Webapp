@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import notificationReducer from "@/state/notificationSlice";
+import popupReducer from "@/state/popupSlice";
 
 export const store = configureStore({
   reducer: {
-    notifications: notificationReducer,
+    popups: popupReducer,
   },
 });
 

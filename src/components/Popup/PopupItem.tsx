@@ -6,15 +6,15 @@ import {
   IoInformationCircleOutline,
   IoCloseOutline,
 } from "react-icons/io5";
-import type { NotificationItem as NotificationItemType } from "@/state/notificationSlice";
+import type { PopupItem as PopupItemType } from "@/state/popupSlice";
 
-interface NotificationItemProps {
-  notification: NotificationItemType;
+interface PopupItemProps {
+  popup: PopupItemType;
   onClose: (id: string) => void;
   index: number;
 }
 
-const defaultIcons: Record<NotificationItemType["type"], ReactNode> = {
+const defaultIcons: Record<PopupItemType["type"], ReactNode> = {
   success: <IoCheckmarkCircleOutline size={24} className="text-green-400" />,
   error: <IoCloseCircleOutline size={24} className="text-red-400" />,
   warning: <IoWarningOutline size={24} className="text-yellow-400" />,
@@ -44,12 +44,12 @@ const typeStyles = {
   },
 };
 
-export const NotificationItem = ({ notification, onClose, index }: NotificationItemProps) => {
+export const PopupItem = ({ popup, onClose, index }: PopupItemProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
 
-  const styles = typeStyles[notification.type];
-  const icon = notification.icon || defaultIcons[notification.type];
+  const styles = typeStyles[popup.type];
+  const icon = popup.icon || defaultIcons[popup.type];
 
   useEffect(() => {
     // Delay for staggered animation
@@ -59,7 +59,7 @@ export const NotificationItem = ({ notification, onClose, index }: NotificationI
 
   const handleClose = () => {
     setIsRemoving(true);
-    setTimeout(() => onClose(notification.id), 300);
+    setTimeout(() => onClose(popup.id), 300);
   };
 
   const baseClasses = `
@@ -82,12 +82,12 @@ export const NotificationItem = ({ notification, onClose, index }: NotificationI
       }}
     >
       {/* Progress bar */}
-      {notification.autoClose && notification.duration && (
+      {popup.autoClose && popup.duration && (
         <div className="absolute top-0 left-0 h-1 bg-gray-700 rounded-t-lg overflow-hidden">
           <div
             className={`h-full ${styles.accent} transform origin-left animate-progress`}
             style={{
-              animation: `progress ${notification.duration}ms linear forwards`,
+              animation: `progress ${popup.duration}ms linear forwards`,
             }}
           />
         </div>
@@ -100,20 +100,20 @@ export const NotificationItem = ({ notification, onClose, index }: NotificationI
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="font-semibold text-sm leading-5">{notification.title}</div>
+            <div className="font-semibold text-sm leading-5">{popup.title}</div>
 
-            {notification.subtitle && (
-              <div className="text-xs text-gray-300 mt-1">{notification.subtitle}</div>
+            {popup.subtitle && (
+              <div className="text-xs text-gray-300 mt-1">{popup.subtitle}</div>
             )}
 
-            {notification.description && (
-              <div className="text-xs text-gray-400 mt-2 leading-4">{notification.description}</div>
+            {popup.description && (
+              <div className="text-xs text-gray-400 mt-2 leading-4">{popup.description}</div>
             )}
 
             {/* Actions */}
-            {notification.actions && notification.actions.length > 0 && (
+            {popup.actions && popup.actions.length > 0 && (
               <div className="flex gap-2 mt-3">
-                {notification.actions.map((action, actionIndex) => (
+                {popup.actions.map((action, actionIndex) => (
                   <button
                     key={actionIndex}
                     onClick={action.onClick}
