@@ -68,3 +68,14 @@ export enum BadgeType {
   boreDraw = "boreDraw", // Sikeres 0-0 tipp (Betonvédelem)
   doubleDynamite = "doubleDynamite", // Egyazon mec
 }
+
+export enum ChatMessageType {
+  system = "system",
+  user = "user",
+}
+
+export enum MessageType {
+  system = "system",
+  achievementUnlocked = "achievementUnlocked",
+  oddsUpdate = "oddsUpdate",
+}

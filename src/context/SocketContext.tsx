@@ -4,11 +4,13 @@ import { Socket } from "socket.io-client";
 export interface SocketContextType {
   socket: Socket | null;
   isConnected: boolean;
+  authError: boolean;
 }
 
 export const SocketContext = createContext<SocketContextType>({
   socket: null,
   isConnected: false,
+  authError: false,
 });
 
 export const useSocketContext = () => {

@@ -5,6 +5,7 @@ import ChatMessageBubble from "./ChatMessage";
 import type { ChatMessage } from "@/models/chat.type";
 import { useChatMessages } from "@/hooks/api/useChat";
 import { useSocket } from "@/hooks/useSocket";
+import { useSocketContext } from "@/context/SocketContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -19,6 +20,7 @@ const ChatWidget = () => {
 
   const queryClient = useQueryClient();
   const socket = useSocket();
+  const { authError } = useSocketContext();
   const { user } = useAuth();
 
   const toggleChat = () => {
@@ -152,10 +154,18 @@ const ChatWidget = () => {
 
             {/* Chat Body */}
             <div className="flex-1 p-4 overflow-y-auto bg-panel-bg flex flex-col gap-4 min-h-0 scrollbar-hide">
-              {messages && messages.length > 0 ? (
+              {authError ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                  <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center mb-3 text-red-400">
+                    <FiX size={22} />
+                  </div>
+                  <p className="text-sm text-red-400 font-medium">A munkamenet lejárt</p>
+                  <p className="text-xs text-text-muted mt-1">Kérjük jelentkezz be újra a chat használatához.</p>
+                </div>
+              ) : messages && messages.length > 0 ? (
                 messages.map((msg) => {
                   const isOwn =
-                    msg.sender._id === user?._id || msg.sender.username === user?.username;
+                    msg.sender?._id === user?._id || msg.sender?.username === user?.username;
                   return (
                     <ChatMessageBubble
                       key={msg._id}
@@ -228,13 +238,14 @@ const ChatWidget = () => {
                 <textarea
                   ref={textareaRef}
                   value={message}
+                  disabled={authError}
                   onChange={(e) => {
                     setMessage(e.target.value);
                     handleTyping();
                   }}
-                  placeholder={editingMessage ? "Szerkesztett üzenet..." : "Üzenet írása..."}
+                  placeholder={authError ? "Munkamenet lejárt – jelentkezz be újra" : editingMessage ? "Szerkesztett üzenet..." : "Üzenet írása..."}
                   rows={1}
-                  className="w-full bg-tertiary text-text-primary text-sm rounded-2xl py-2.5 pl-4 pr-11 focus:outline-none focus:ring-1 focus:ring-(--color-accent) border border-(--color-border) transition-all placeholder:text-text-muted resize-none max-h-[120px] scrollbar-hide flex items-center"
+                  className={`w-full bg-tertiary text-text-primary text-sm rounded-2xl py-2.5 pl-4 pr-11 focus:outline-none focus:ring-1 focus:ring-(--color-accent) border border-(--color-border) transition-all placeholder:text-text-muted resize-none max-h-[120px] scrollbar-hide flex items-center ${authError ? "opacity-50 cursor-not-allowed" : ""}`}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();

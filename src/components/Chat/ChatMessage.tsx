@@ -1,7 +1,9 @@
 import { format } from "date-fns";
 import { useState } from "react";
 import { FiEdit2 } from "react-icons/fi";
+import { FaRobot } from "react-icons/fa";
 import type { ChatMessage } from "@/models/chat.type";
+import { ChatMessageType } from "@/utils/enums";
 import Avatar from "@/components/Avatar";
 
 const ChatMessageBubble = ({
@@ -16,11 +18,30 @@ const ChatMessageBubble = ({
   const time = format(new Date(message.createdAt), "HH:mm");
   const [hovered, setHovered] = useState(false);
 
+  if (message.type === ChatMessageType.system) {
+    return (
+      <div className="flex flex-col items-center justify-center w-full my-3 gap-1">
+        <div className="flex items-center gap-2 mb-1.5">
+          <div className="p-1.5 bg-linear-to-br from-indigo-500 to-purple-600 rounded-full shadow-[0_0_10px_rgba(139,92,246,0.5)]">
+            <FaRobot className="text-white" size={14} />
+          </div>
+          <span className="text-[10px] font-bold text-purple-300 tracking-wider">
+            Rendszerüzenet
+          </span>
+        </div>
+        <div className="text-sm py-2.5 px-4 rounded-2xl shadow-sm text-center bg-indigo-500/10 border border-indigo-500/30 text-indigo-100 max-w-[90%] backdrop-blur-sm">
+          {message.message}
+        </div>
+        <span className="text-[9px] text-text-muted px-1">{time}</span>
+      </div>
+    );
+  }
+
   return (
     <div className={`flex flex-col ${isOwn ? "items-end" : "items-start"} gap-1`}>
       {!isOwn && (
         <span className="text-[10px] text-text-muted ml-10 font-medium">
-          {message.sender.name || message.sender.username}
+          {message.sender?.name || message.sender?.username || "Ismeretlen"}
         </span>
       )}
 
@@ -31,7 +52,7 @@ const ChatMessageBubble = ({
       >
         {!isOwn && (
           <Avatar
-            avatar={message.sender.avatar || ""}
+            avatar={message.sender?.avatar || ""}
             size={8}
             className="mb-4 border border-white/10 shadow-sm rounded-full"
           />

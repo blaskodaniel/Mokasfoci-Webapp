@@ -7,6 +7,7 @@ import { SocketContext } from "./SocketContext";
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [authError, setAuthError] = useState(false);
   const { user, accessToken } = useAuth();
 
   useEffect(() => {
@@ -28,12 +29,21 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     newSocket.on("connect", () => {
       setIsConnected(true);
+      setAuthError(false);
       console.log("Socket connected:", newSocket.id);
     });
 
     newSocket.on("disconnect", () => {
       setIsConnected(false);
       console.log("Socket disconnected");
+    });
+
+    newSocket.on("connect_error", (err) => {
+      const msg = err.message?.toLowerCase() ?? "";
+      if (msg.includes("unauthorized") || msg.includes("jwt") || msg.includes("token")) {
+        setAuthError(true);
+        setIsConnected(false);
+      }
     });
 
     setSocket(newSocket);
@@ -45,6 +55,6 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, [user]);
 
   return (
-    <SocketContext.Provider value={{ socket, isConnected }}>{children}</SocketContext.Provider>
+    <SocketContext.Provider value={{ socket, isConnected, authError }}>{children}</SocketContext.Provider>
   );
 };
