@@ -1,4 +1,4 @@
-import { useMemo, useState, type FC } from "react";
+import { useMemo, useState, useEffect, type FC } from "react";
 import Button from "../Button";
 import { MatchOutcome, MatchType } from "@/utils/enums";
 import useGame from "@/hooks/useGame";
@@ -54,9 +54,19 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
     return currentUser ? currentUser.data.availableScore : 0;
   }, [currentUser]);
 
+  const maxAllowedScore = useMemo(() => {
+    return editMode ? userScore + initBetValue : userScore;
+  }, [userScore, editMode, initBetValue]);
+
+  useEffect(() => {
+    if (!editMode && betValue > maxAllowedScore && maxAllowedScore > 0) {
+      setBetValue(Math.max(100, Math.floor(maxAllowedScore / 100) * 100));
+    }
+  }, [maxAllowedScore, editMode, betValue]);
+
   const isValidBet = useMemo(
-    () => betValue > 0 && selectedOutcome !== null,
-    [betValue, selectedOutcome]
+    () => betValue >= 100 && betValue <= maxAllowedScore && selectedOutcome !== null,
+    [betValue, maxAllowedScore, selectedOutcome]
   );
 
   const subText = useMemo(() => {
@@ -88,7 +98,7 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
         showDraw
       />
 
-      <BetValueSelector betValue={betValue} onChangeBetValue={setBetValue} userScore={userScore} />
+      <BetValueSelector betValue={betValue} onChangeBetValue={setBetValue} maxAllowedScore={maxAllowedScore} />
 
       {isValidBet && (
         <div className="flex justify-center items-center gap-2 mt-3">

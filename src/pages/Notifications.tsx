@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { hu } from "date-fns/locale";
 import { FaTrash, FaCheck, FaCheckDouble } from "react-icons/fa";
@@ -10,6 +11,7 @@ import {
   useDeleteAllNotifications,
 } from "@/hooks/api/useNotifications";
 import Button from "@/components/Button";
+import { getNotificationTitle } from "@/utils/enums";
 
 const NotificationsPage = () => {
   const [page, setPage] = useState(1);
@@ -71,16 +73,16 @@ const NotificationsPage = () => {
             {notifications.map((notif) => (
               <div
                 key={notif._id}
-                className={`flex flex-col sm:flex-row justify-between sm:items-center p-4 rounded-xl border backdrop-blur-sm transition-colors
+                className={`flex flex-row justify-between items-center p-4 rounded-xl border backdrop-blur-sm transition-colors
                   ${!notif.read ? "bg-gray-800/80 border-gray-600 border-l-4 border-l-blue-500" : "bg-gray-800/30 border-gray-700/50"}
                 `}
               >
-                <div className="flex-1 pr-4 mb-3 sm:mb-0">
+                <div className="flex-1 pr-4">
                   <div className="flex items-center gap-2 mb-1">
                     <span
                       className={`text-sm ${!notif.read ? "font-bold text-white" : "font-medium text-gray-300"}`}
                     >
-                      {notif.type === "system" ? "Rendszerüzenet" : "Értesítés"}
+                      {getNotificationTitle(notif.type)}
                     </span>
                     <span className="text-xs text-gray-500">
                       •{" "}
@@ -90,12 +92,24 @@ const NotificationsPage = () => {
                       })}
                     </span>
                   </div>
-                  <p className={`text-sm ${!notif.read ? "text-gray-200" : "text-gray-400"}`}>
+                  <p
+                    className={`text-sm mt-1 whitespace-pre-wrap ${!notif.read ? "text-gray-200" : "text-gray-400"}`}
+                  >
                     {notif.text}
                   </p>
+                  {notif.actionUrl && (
+                    <div className="mt-2">
+                      <Link
+                        to={notif.actionUrl}
+                        className="text-sm font-semibold text-blue-400 hover:text-blue-300 transition-colors"
+                      >
+                        ➤ Tovább a részletekhez
+                      </Link>
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
                   {!notif.read && (
                     <button
                       onClick={() => markAsRead.mutate(notif._id)}

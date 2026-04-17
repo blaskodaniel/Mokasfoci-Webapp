@@ -29,11 +29,14 @@ const BracketComponent = ({
   const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(null);
   const [isBetModalOpen, setIsBetModalOpen] = useState(false);
 
-  const MatchBox = ({ match, isSmall }: { match: Match; isSmall?: boolean }) => (
+  const MatchBox = ({ match, isSmall, hasUserBet, onClick }: { match: Match; isSmall?: boolean; hasUserBet?: boolean; onClick?: (e: React.MouseEvent) => void }) => (
     <div
+      onClick={onClick}
       className={`relative flex flex-col justify-center my-2 bg-[#1e2338] rounded-xl 
-        border border-[#2d3148] shadow-lg shrink-0 transition-transform duration-300 
-        hover:-translate-y-1 ${isSmall ? "w-40 sm:w-48 p-2" : "w-48 sm:w-56 p-3"}`}
+        border shadow-lg shrink-0 transition-transform duration-300 
+        hover:-translate-y-1 ${onClick ? "cursor-pointer" : ""} 
+        ${hasUserBet ? "border-emerald-600/60" : "border-[#2d3148]"}
+        ${isSmall ? "w-40 sm:w-48 p-2" : "w-48 sm:w-56 p-3"}`}
     >
       <div className="flex justify-between items-center mb-2">
         <div className={`text-gray-400 truncate ${isSmall ? "text-[9px]" : "text-[10px]"}`}>
@@ -149,33 +152,48 @@ const BracketComponent = ({
                         const bOrder = bPos === -1 ? Infinity : bPos;
                         return aOrder - bOrder;
                       })
-                      .map((match) => (
-                        <div
-                          key={match._id}
-                          className="flex flex-col items-center relative"
-                          onClick={() => {
-                            if (!match?.teamA || !match?.teamB) return;
-                            if (!myBets) return;
-                            const userBet = myBets.filter((bet) => bet.matchid._id === match._id);
-                            setSelectedMatch({
-                              ...match,
-                              userbet: userBet,
-                            });
-                            setIsBetModalOpen(true);
-                          }}
-                        >
-                          <MatchBox match={match} />
-                          {rIndex === rounds.length - 1 && thirdPlaceMatch && (
-                            <div className="mt-8 sm:mt-12">
-                              <MatchBox match={thirdPlaceMatch} isSmall={true} />
-                            </div>
-                          )}
-                          {/* Összekötő vonalak - Csak a fő ág kap vonalakat */}
-                          {rIndex < rounds.length - 1 && (
-                            <div className="hidden sm:block absolute -right-4 w-4 h-[2px] bg-[#3a3f5a] top-1/2 -translate-y-1/2 z-0" />
-                          )}
-                        </div>
-                      ))}
+                      .map((match) => {
+                        const hasUserBet = myBets?.some((bet) => bet.matchid._id === match._id);
+                        
+                        const handleMatchClick = (m: Match) => (e?: React.MouseEvent) => {
+                          e?.stopPropagation();
+                          if (!m?.teamA || !m?.teamB) return;
+                          if (!myBets) return;
+                          const userBet = myBets.filter((bet) => bet.matchid._id === m._id);
+                          setSelectedMatch({
+                            ...m,
+                            userbet: userBet,
+                          });
+                          setIsBetModalOpen(true);
+                        };
+
+                        return (
+                          <div
+                            key={match._id}
+                            className="flex flex-col items-center relative"
+                          >
+                            <MatchBox 
+                              match={match} 
+                              hasUserBet={hasUserBet} 
+                              onClick={match?.teamA && match?.teamB ? handleMatchClick(match) : undefined} 
+                            />
+                            {rIndex === rounds.length - 1 && thirdPlaceMatch && (
+                              <div className="mt-8 sm:mt-12">
+                                <MatchBox 
+                                  match={thirdPlaceMatch} 
+                                  isSmall={true} 
+                                  hasUserBet={myBets?.some((bet) => bet.matchid._id === thirdPlaceMatch._id)}
+                                  onClick={thirdPlaceMatch?.teamA && thirdPlaceMatch?.teamB ? handleMatchClick(thirdPlaceMatch) : undefined}
+                                />
+                              </div>
+                            )}
+                            {/* Összekötő vonalak - Csak a fő ág kap vonalakat */}
+                            {rIndex < rounds.length - 1 && (
+                              <div className="hidden sm:block absolute -right-4 w-4 h-[2px] bg-[#3a3f5a] top-1/2 -translate-y-1/2 z-0" />
+                            )}
+                          </div>
+                        );
+                      })}
                   </div>
                 </div>
               ))}

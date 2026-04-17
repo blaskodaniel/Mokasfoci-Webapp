@@ -80,6 +80,19 @@ export enum NotificationType {
   oddsUpdate = "oddsUpdate",
 }
 
+export const getNotificationTitle = (type: NotificationType): string => {
+  switch (type) {
+    case NotificationType.system:
+      return "Rendszerüzenet";
+    case NotificationType.achievementUnlocked:
+      return "Új jelvényt kaptál!";
+    case NotificationType.oddsUpdate:
+      return "Szorzóváltozás történt";
+    default:
+      return "Új értesítés";
+  }
+};
+
 export enum UserRole {
   Admin = "admin",
   User = "user",

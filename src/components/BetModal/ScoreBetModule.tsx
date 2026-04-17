@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Button from "../Button";
 import BetValueSelector from "./BetValueSelector";
 import ScoreInputSelector from "./ScoreInputSelector";
@@ -43,6 +43,16 @@ const ScoreBetModule = ({
     return currentUser ? currentUser.data.availableScore : 0;
   }, [currentUser]);
 
+  const maxAllowedScore = useMemo(() => {
+    return editMode ? userScore + initBetValue : userScore;
+  }, [userScore, editMode, initBetValue]);
+
+  useEffect(() => {
+    if (!editMode && betValue > maxAllowedScore && maxAllowedScore > 0) {
+      setBetValue(Math.max(100, Math.floor(maxAllowedScore / 100) * 100));
+    }
+  }, [maxAllowedScore, editMode, betValue]);
+
   const subText = useMemo(() => {
     if (editMode) return "";
     if (userScore < 99) {
@@ -52,8 +62,8 @@ const ScoreBetModule = ({
   }, [userScore, editMode]);
 
   const isValidBet = useMemo(() => {
-    return homeScore !== "" && awayScore !== "" && betValue >= 100;
-  }, [homeScore, awayScore, betValue]);
+    return homeScore !== "" && awayScore !== "" && betValue >= 100 && betValue <= maxAllowedScore;
+  }, [homeScore, awayScore, betValue, maxAllowedScore]);
 
   const exactMatchOdds = useMemo(() => {
     return match.additionalOdds?.scoreOdds?.exactMatch ?? config?.scoreExactMatchOdds ?? 1;
@@ -79,7 +89,7 @@ const ScoreBetModule = ({
         }}
       />
 
-      <BetValueSelector betValue={betValue} onChangeBetValue={setBetValue} userScore={userScore} />
+      <BetValueSelector betValue={betValue} onChangeBetValue={setBetValue} maxAllowedScore={maxAllowedScore} />
 
       <div className="bg-secondary/50 rounded-lg p-3 my-4 space-y-2 text-sm border border-white/5">
         <div className="flex justify-between items-center mb-2">

@@ -1,4 +1,4 @@
-import { UserRole } from "@/state/enums";
+import { UserRole } from "@/utils/enums";
 
 export const mockUserData = {
   teamid: "",

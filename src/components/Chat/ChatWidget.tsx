@@ -1,12 +1,12 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useLayoutEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiMessageSquare, FiX, FiSend, FiEdit2 } from "react-icons/fi";
+import { FiMessageSquare, FiX, FiSend, FiEdit2, FiArrowDown } from "react-icons/fi";
 import ChatMessageBubble from "./ChatMessage";
 import type { ChatMessage } from "@/models/chat.type";
 import { useChatMessages } from "@/hooks/api/useChat";
 import { useSocket } from "@/hooks/useSocket";
 import { useSocketContext } from "@/context/SocketContext";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, type InfiniteData } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 
 const ChatWidget = () => {
@@ -15,8 +15,13 @@ const ChatWidget = () => {
   const [message, setMessage] = useState("");
   const [editingMessage, setEditingMessage] = useState<ChatMessage | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [typingUser, setTypingUser] = useState<string | null>(null);
+  const [hasNewMessage, setHasNewMessage] = useState(false);
+  const prevScrollHeightRef = useRef<number>(0);
+  const isLoadingOlderRef = useRef(false);
+  const justOpenedRef = useRef(false);
 
   const queryClient = useQueryClient();
   const socket = useSocket();
@@ -27,32 +32,70 @@ const ChatWidget = () => {
     setIsOpen(!isOpen);
     if (!isOpen) {
       setUnreadCount(0);
+      justOpenedRef.current = true;
     }
   };
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const isNearBottom = () => {
+    const container = messagesContainerRef.current;
+    if (!container) return true;
+    return container.scrollHeight - container.scrollTop - container.clientHeight < 100;
   };
 
-  const { data: messages } = useChatMessages("general");
+  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
+    messagesEndRef.current?.scrollIntoView({ behavior });
+  };
+
+  const handleContainerScroll = () => {
+    if (isNearBottom()) {
+      setHasNewMessage(false);
+    }
+  };
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useChatMessages("general", 50);
+
+  const messages = useMemo(() => {
+    return data?.pages ? [...data.pages].reverse().flatMap((page) => page) : [];
+  }, [data]);
 
   // WebSocket figyelés az új üzenetekre
   useEffect(() => {
     if (!socket) return;
 
     socket.on("receive_message", (newMessage: ChatMessage) => {
-      queryClient.setQueryData(["chat", "general"], (oldData: ChatMessage[] | undefined) => {
-        return oldData ? [...oldData, newMessage] : [newMessage];
-      });
+      console.log("receive_message", newMessage);
+      queryClient.setQueryData(
+        ["chat", "general"],
+        (oldData: InfiniteData<ChatMessage[]> | undefined) => {
+          if (!oldData) return { pages: [[newMessage]], pageParams: [undefined] };
+
+          const newPages = [...oldData.pages];
+          newPages[0] = [...newPages[0], newMessage];
+
+          return {
+            ...oldData,
+            pages: newPages,
+          };
+        }
+      );
       if (!isOpen) {
         setUnreadCount((prev) => prev + 1);
       }
     });
 
     socket.on("message_updated", (updatedMessage: ChatMessage) => {
-      queryClient.setQueryData(["chat", "general"], (oldData: ChatMessage[] | undefined) => {
-        return oldData?.map((m) => (m._id === updatedMessage._id ? updatedMessage : m)) ?? oldData;
-      });
+      queryClient.setQueryData(
+        ["chat", "general"],
+        (oldData: InfiniteData<ChatMessage[]> | undefined) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) =>
+              page.map((m) => (m._id === updatedMessage._id ? updatedMessage : m))
+            ),
+          };
+        }
+      );
     });
 
     socket.on("user_typing", ({ username, isTyping }) => {
@@ -80,11 +123,40 @@ const ChatWidget = () => {
     }
   }, [isOpen, socket]);
 
+  const newestMessageId = messages?.[messages.length - 1]?._id;
+
   useEffect(() => {
     if (isOpen) {
-      scrollToBottom();
+      if (justOpenedRef.current) {
+        scrollToBottom("instant");
+        if (newestMessageId) {
+          justOpenedRef.current = false;
+        }
+      } else if (isNearBottom()) {
+        scrollToBottom();
+      } else {
+        setHasNewMessage(true);
+      }
     }
-  }, [isOpen, messages]);
+  }, [isOpen, newestMessageId]);
+
+  // Scroll pozíció megőrzése régebbi üzenetek betöltése után
+  useLayoutEffect(() => {
+    if (isLoadingOlderRef.current && messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      container.scrollTop = container.scrollHeight - prevScrollHeightRef.current;
+      isLoadingOlderRef.current = false;
+    }
+  }, [messages]);
+
+  const handleLoadOlder = () => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      prevScrollHeightRef.current = container.scrollHeight;
+      isLoadingOlderRef.current = true;
+    }
+    fetchNextPage();
+  };
 
   const handleTyping = useMemo(() => {
     let timeout: ReturnType<typeof setTimeout>;
@@ -94,7 +166,7 @@ const ChatWidget = () => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         socket.emit("typing_stop", "general");
-      }, 2000); // 2mp tétlenség után leáll
+      }, 1000); // 1mp tétlenség után leáll
     };
   }, [socket]);
 
@@ -153,28 +225,47 @@ const ChatWidget = () => {
             </div>
 
             {/* Chat Body */}
-            <div className="flex-1 p-4 overflow-y-auto bg-panel-bg flex flex-col gap-4 min-h-0 scrollbar-hide">
+            <div
+              ref={messagesContainerRef}
+              onScroll={handleContainerScroll}
+              className="relative flex-1 p-4 overflow-y-auto bg-panel-bg flex flex-col gap-4 min-h-0 scrollbar-hide"
+            >
               {authError ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
                   <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center mb-3 text-red-400">
                     <FiX size={22} />
                   </div>
                   <p className="text-sm text-red-400 font-medium">A munkamenet lejárt</p>
-                  <p className="text-xs text-text-muted mt-1">Kérjük jelentkezz be újra a chat használatához.</p>
+                  <p className="text-xs text-text-muted mt-1">
+                    Kérjük jelentkezz be újra a chat használatához.
+                  </p>
                 </div>
               ) : messages && messages.length > 0 ? (
-                messages.map((msg) => {
-                  const isOwn =
-                    msg.sender?._id === user?._id || msg.sender?.username === user?.username;
-                  return (
-                    <ChatMessageBubble
-                      key={msg._id}
-                      message={msg}
-                      isOwn={isOwn}
-                      onEdit={isOwn ? handleStartEdit : undefined}
-                    />
-                  );
-                })
+                <>
+                  {hasNextPage && (
+                    <div className="flex justify-center shrink-0 mb-2">
+                      <button
+                        onClick={handleLoadOlder}
+                        disabled={isFetchingNextPage}
+                        className="text-[11px] text-white hover:text-yellow-300 bg-white/10 px-4 py-1.5 rounded-full cursor-pointer disabled:opacity-50 transition-colors"
+                      >
+                        {isFetchingNextPage ? "Betöltés..." : "Korábbi üzenetek betöltése"}
+                      </button>
+                    </div>
+                  )}
+                  {messages.map((msg) => {
+                    const isOwn =
+                      msg.sender?._id === user?._id || msg.sender?.username === user?.username;
+                    return (
+                      <ChatMessageBubble
+                        key={msg._id}
+                        message={msg}
+                        isOwn={isOwn}
+                        onEdit={isOwn ? handleStartEdit : undefined}
+                      />
+                    );
+                  })}
+                </>
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-white/5 rounded-xl border border-white/5 m-4">
                   <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-3 text-(--color-accent)">
@@ -185,6 +276,26 @@ const ChatWidget = () => {
                 </div>
               )}
               <div ref={messagesEndRef} />
+
+              {/* Új üzenet jelző */}
+              <AnimatePresence>
+                {hasNewMessage && (
+                  <motion.button
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.15 }}
+                    onClick={() => {
+                      scrollToBottom();
+                      setHasNewMessage(false);
+                    }}
+                    className="sticky bottom-2 self-center flex items-center gap-1.5 bg-(--color-accent) text-white text-[11px] font-medium px-3 py-1.5 rounded-full shadow-lg cursor-pointer hover:bg-accent-soft transition-colors"
+                  >
+                    <FiArrowDown size={12} />
+                    Új üzenet
+                  </motion.button>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Typing indicator */}
@@ -243,7 +354,13 @@ const ChatWidget = () => {
                     setMessage(e.target.value);
                     handleTyping();
                   }}
-                  placeholder={authError ? "Munkamenet lejárt – jelentkezz be újra" : editingMessage ? "Szerkesztett üzenet..." : "Üzenet írása..."}
+                  placeholder={
+                    authError
+                      ? "Munkamenet lejárt – jelentkezz be újra"
+                      : editingMessage
+                        ? "Szerkesztett üzenet..."
+                        : "Üzenet írása..."
+                  }
                   rows={1}
                   className={`w-full bg-tertiary text-text-primary text-sm rounded-2xl py-2.5 pl-4 pr-11 focus:outline-none focus:ring-1 focus:ring-(--color-accent) border border-(--color-border) transition-all placeholder:text-text-muted resize-none max-h-[120px] scrollbar-hide flex items-center ${authError ? "opacity-50 cursor-not-allowed" : ""}`}
                   onKeyDown={(e) => {
@@ -275,43 +392,29 @@ const ChatWidget = () => {
       </AnimatePresence>
 
       {/* Button */}
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={toggleChat}
-        className="w-14 h-14 bg-(--color-accent) hover:bg-accent-soft text-white rounded-full flex items-center justify-center shadow-lg shadow-black/30 transition-colors relative focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-(--color-secondary) focus:ring-(--color-accent)"
-      >
-        <AnimatePresence mode="wait">
-          {isOpen ? (
-            <motion.div
-              key="close"
-              initial={{ opacity: 0, rotate: -90 }}
-              animate={{ opacity: 1, rotate: 0 }}
-              exit={{ opacity: 0, rotate: 90 }}
-              transition={{ duration: 0.15 }}
-            >
-              <FiX size={24} />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="chat"
-              initial={{ opacity: 0, rotate: 90 }}
-              animate={{ opacity: 1, rotate: 0 }}
-              exit={{ opacity: 0, rotate: -90 }}
-              transition={{ duration: 0.15 }}
-            >
-              <FiMessageSquare size={24} />
+      <AnimatePresence>
+        {!isOpen && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.15 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={toggleChat}
+            className="w-14 h-14 bg-(--color-accent) hover:bg-accent-soft text-white rounded-full flex items-center justify-center shadow-lg shadow-black/30 transition-colors relative focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-(--color-secondary) focus:ring-(--color-accent)"
+          >
+            <FiMessageSquare size={24} />
 
-              {/* Unread badge - hide it if chat is open */}
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-(--color-secondary) text-[10px] flex items-center justify-center font-bold">
-                  {unreadCount}
-                </span>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.button>
+            {/* Unread badge */}
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-(--color-secondary) text-[10px] flex items-center justify-center font-bold">
+                {unreadCount}
+              </span>
+            )}
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

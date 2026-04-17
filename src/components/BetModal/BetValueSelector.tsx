@@ -3,10 +3,10 @@ import type { FC } from "react";
 interface BetValueSelectorProps {
   betValue: number;
   onChangeBetValue: (value: React.SetStateAction<number>) => void;
-  userScore: number;
+  maxAllowedScore: number;
 }
 
-const BetValueSelector: FC<BetValueSelectorProps> = ({ betValue, onChangeBetValue, userScore }) => {
+const BetValueSelector: FC<BetValueSelectorProps> = ({ betValue, onChangeBetValue, maxAllowedScore }) => {
   return (
     <div className="mt-6 flex-1 sm:flex-none">
       <label className="block text-sm font-medium mb-3 text-center">Feltett tét</label>
@@ -27,8 +27,8 @@ const BetValueSelector: FC<BetValueSelectorProps> = ({ betValue, onChangeBetValu
           type="button"
           aria-label="Növelés"
           className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-white text-2xl flex items-center justify-center shadow transition disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={() => onChangeBetValue((v) => Math.min(userScore, v + 100))}
-          disabled={betValue + 100 > 2000}
+          onClick={() => onChangeBetValue((v) => Math.min(maxAllowedScore, v + 100))}
+          disabled={betValue + 100 > Math.min(2000, maxAllowedScore)}
         >
           +
         </button>

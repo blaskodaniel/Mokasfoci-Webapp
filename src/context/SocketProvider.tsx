@@ -6,6 +6,7 @@ import { SocketContext } from "./SocketContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { usePopup } from "@/hooks/usePopup";
 import type { AppNotification } from "@/models/notification.type";
+import { getNotificationTitle } from "@/utils/enums";
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -54,7 +55,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     newSocket.on("new_notification", (notification: AppNotification) => {
       console.log("New notification:", notification);
 
-      showInfo(notification.type === "system" ? "Rendszerüzenet" : "Új értesítés", {
+      showInfo(getNotificationTitle(notification.type), {
         description: notification.text || "Nézd meg a harang ikonra kattintva!",
         autoClose: true,
         duration: 5000,

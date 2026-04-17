@@ -1,4 +1,4 @@
-import type { UserRole } from "@/state/enums";
+import type { UserRole } from "@/utils/enums";
 
 interface UserData {
   teamid: string;

@@ -330,8 +330,19 @@ const Api = {
     return response.data;
   },
 
-  async getChatMessages(room: string): Promise<ChatMessage[]> {
-    const response = await axiosInstance.get(`/chat/${room}/messages`);
+  async getChatMessages(
+    room: string,
+    before?: string,
+    limit?: number,
+    skip?: number
+  ): Promise<ChatMessage[]> {
+    const response = await axiosInstance.get(`/chat/${room}/messages`, {
+      params: {
+        before,
+        limit,
+        skip,
+      },
+    });
     return response.data;
   },
 };
