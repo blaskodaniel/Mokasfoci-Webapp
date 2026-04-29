@@ -8,6 +8,7 @@ import BetModal from "../BetModal";
 import { useState } from "react";
 import type { MatchWithUserBet } from "../Matches/types";
 import { useMyBets } from "@/hooks/api/usePlayers";
+import { MatchStatus } from "@/utils/enums";
 
 interface Round {
   id: string;
@@ -29,15 +30,32 @@ const BracketComponent = ({
   const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(null);
   const [isBetModalOpen, setIsBetModalOpen] = useState(false);
 
-  const MatchBox = ({ match, isSmall, hasUserBet, onClick }: { match: Match; isSmall?: boolean; hasUserBet?: boolean; onClick?: (e: React.MouseEvent) => void }) => (
-    <div
-      onClick={onClick}
-      className={`relative flex flex-col justify-center my-2 bg-[#1e2338] rounded-xl 
-        border shadow-lg shrink-0 transition-transform duration-300 
-        hover:-translate-y-1 ${onClick ? "cursor-pointer" : ""} 
+  const MatchBox = ({
+    match,
+    isSmall,
+    hasUserBet,
+    onClick,
+  }: {
+    match: Match;
+    isSmall?: boolean;
+    hasUserBet?: boolean;
+    onClick?: (e: React.MouseEvent) => void;
+  }) => {
+    const isTeamAAdvancing =
+      !!match.advancingTeam && match.advancingTeam._id === match.teamA?._id;
+    const isTeamBAdvancing =
+      !!match.advancingTeam && match.advancingTeam._id === match.teamB?._id;
+    const advancingRowClass = "bg-emerald-500/15 -mx-2 px-2 rounded-md";
+
+    return (
+      <div
+        onClick={onClick}
+        className={`relative flex flex-col justify-center my-2 bg-[#1e2338] rounded-xl
+        border shadow-lg shrink-0 transition-transform duration-300
+        hover:-translate-y-1 ${onClick ? "cursor-pointer" : ""}
         ${hasUserBet ? "border-emerald-600/60" : "border-[#2d3148]"}
         ${isSmall ? "w-40 sm:w-48 p-2" : "w-48 sm:w-56 p-3"}`}
-    >
+      >
       <div className="flex justify-between items-center mb-2">
         <div className={`text-gray-400 truncate ${isSmall ? "text-[9px]" : "text-[10px]"}`}>
           {match?.date ? format(new Date(match.date), "MMMM d. HH:mm") : "Ismeretlen időpont"}{" "}
@@ -52,7 +70,11 @@ const BracketComponent = ({
         )}
       </div>
       <div className="flex flex-col gap-1 w-full relative z-10">
-        <div className="flex justify-between items-center py-1 border-b border-[#2d3148]/50">
+        <div
+          className={`flex justify-between items-center py-1 border-b border-[#2d3148]/50 ${
+            isTeamAAdvancing ? advancingRowClass : ""
+          }`}
+        >
           <div className="flex items-center gap-2">
             {match.teamA?.flag ? (
               <img
@@ -65,7 +87,11 @@ const BracketComponent = ({
                 <FaQuestion />
               </div>
             )}
-            <span className="text-white text-sm font-semibold truncate pr-2">
+            <span
+              className={`text-sm font-semibold truncate pr-2 ${
+                isTeamAAdvancing ? "text-emerald-300" : "text-white"
+              }`}
+            >
               {match.teamA?.name || match.teamAPlaceholder || "???"}
             </span>
           </div>
@@ -74,7 +100,11 @@ const BracketComponent = ({
             {match.goalA ?? "-"}
           </span>
         </div>
-        <div className="flex justify-between items-center py-1">
+        <div
+          className={`flex justify-between items-center py-1 ${
+            isTeamBAdvancing ? advancingRowClass : ""
+          }`}
+        >
           <div className="flex items-center gap-2">
             {match.teamB?.flag ? (
               <img
@@ -87,7 +117,11 @@ const BracketComponent = ({
                 <FaQuestion />
               </div>
             )}
-            <span className="text-white text-sm font-semibold truncate pr-2">
+            <span
+              className={`text-sm font-semibold truncate pr-2 ${
+                isTeamBAdvancing ? "text-emerald-300" : "text-white"
+              }`}
+            >
               {match.teamB?.name || match.teamBPlaceholder || "???"}
             </span>
           </div>
@@ -97,8 +131,10 @@ const BracketComponent = ({
           </span>
         </div>
       </div>
-    </div>
-  );
+      {match.comment && <div className="text-xs text-gray-400">{match.comment}</div>}
+      </div>
+    );
+  };
 
   return (
     <div className="w-full h-full flex flex-col relative pb-10">
@@ -154,11 +190,13 @@ const BracketComponent = ({
                       })
                       .map((match) => {
                         const hasUserBet = myBets?.some((bet) => bet.matchid._id === match._id);
-                        
+
                         const handleMatchClick = (m: Match) => (e?: React.MouseEvent) => {
                           e?.stopPropagation();
                           if (!m?.teamA || !m?.teamB) return;
                           if (!myBets) return;
+                          if (!m.date) return;
+                          if (m.status !== MatchStatus.enabled) return;
                           const userBet = myBets.filter((bet) => bet.matchid._id === m._id);
                           setSelectedMatch({
                             ...m,
@@ -168,22 +206,27 @@ const BracketComponent = ({
                         };
 
                         return (
-                          <div
-                            key={match._id}
-                            className="flex flex-col items-center relative"
-                          >
-                            <MatchBox 
-                              match={match} 
-                              hasUserBet={hasUserBet} 
-                              onClick={match?.teamA && match?.teamB ? handleMatchClick(match) : undefined} 
+                          <div key={match._id} className="flex flex-col items-center relative">
+                            <MatchBox
+                              match={match}
+                              hasUserBet={hasUserBet}
+                              onClick={
+                                match?.teamA && match?.teamB ? handleMatchClick(match) : undefined
+                              }
                             />
                             {rIndex === rounds.length - 1 && thirdPlaceMatch && (
                               <div className="mt-8 sm:mt-12">
-                                <MatchBox 
-                                  match={thirdPlaceMatch} 
-                                  isSmall={true} 
-                                  hasUserBet={myBets?.some((bet) => bet.matchid._id === thirdPlaceMatch._id)}
-                                  onClick={thirdPlaceMatch?.teamA && thirdPlaceMatch?.teamB ? handleMatchClick(thirdPlaceMatch) : undefined}
+                                <MatchBox
+                                  match={thirdPlaceMatch}
+                                  isSmall={true}
+                                  hasUserBet={myBets?.some(
+                                    (bet) => bet.matchid._id === thirdPlaceMatch._id
+                                  )}
+                                  onClick={
+                                    thirdPlaceMatch?.teamA && thirdPlaceMatch?.teamB
+                                      ? handleMatchClick(thirdPlaceMatch)
+                                      : undefined
+                                  }
                                 />
                               </div>
                             )}

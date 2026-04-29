@@ -22,6 +22,7 @@ export interface Match {
   externalID?: string | null;
   isCalculated?: boolean;
   position?: number;
+  advancingTeam?: Team | null;
   [key: string]: unknown;
   additionalOdds?: {
     advancement?: {

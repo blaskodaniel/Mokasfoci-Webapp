@@ -21,7 +21,7 @@ const BracketPage = () => {
     const allRounds = [
       {
         id: "round-32",
-        title: "Legjobb 32 közé jutásért",
+        title: "Legjobb 32",
         matches: getMatchesByType(MatchType.RoundOf32),
       },
       {

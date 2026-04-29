@@ -17,6 +17,8 @@ import Slider from "@/components/Slider";
 import useResponsive from "@/hooks/useResponsive";
 import type { MatchWithUserBet } from "@/components/Matches/types";
 import WelcomePanel from "@/components/WelcomePanel";
+import TournamentEndPanel from "@/components/TournamentEndPanel";
+import { useAllTeams } from "@/hooks/api/useTeams";
 import { useConfig } from "@/hooks/useConfig";
 import { isBefore } from "date-fns";
 import BetModal from "@/components/BetModal";
@@ -41,6 +43,12 @@ const HomePage = () => {
   }, [queryClient]);
 
   const { data: upcomingMatches } = useUpcomingMatches(upcomingMatchesLength);
+  const { data: teams } = useAllTeams();
+  
+  const isTournamentOver = useMemo(() => {
+    if (!teams) return false;
+    return teams.some((t) => t.isTournamentWinner);
+  }, [teams]);
 
   const {
     data: liveMatches,
@@ -73,9 +81,15 @@ const HomePage = () => {
 
   return (
     <div>
-      {isBefore(new Date(), new Date(config?.championStartDate || "")) && (
+      {isBefore(new Date(), new Date(config?.championStartDate || "")) && !isTournamentOver && (
         <section className="w-full px-3">
           <WelcomePanel />
+        </section>
+      )}
+      
+      {isTournamentOver && (
+        <section className="w-full px-0 sm:px-3">
+          <TournamentEndPanel />
         </section>
       )}
       <section className="mt-6 mb-5">

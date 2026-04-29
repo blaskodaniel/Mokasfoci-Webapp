@@ -41,6 +41,14 @@ const MyProfilePage = () => {
     return isAfter(new Date(), new Date(config.championStartDate));
   }, [config]);
 
+  const championBetStatus = useMemo(() => {
+    if (!teams) return "pending";
+    const tournamentWinner = teams.find((t) => t.isTournamentWinner);
+    if (!tournamentWinner) return "pending";
+    if (currentUser?.data?.winteamid === tournamentWinner._id) return "success";
+    return "failed";
+  }, [teams, currentUser?.data?.winteamid]);
+
   // Form inicializálása
   const {
     handleSubmit,
@@ -292,24 +300,42 @@ const MyProfilePage = () => {
           </div>
 
           {/* Rewards & Achievements Section */}
-          <div className="grid grid-cols-2 gap-4 pt-6">
+          <div className="grid grid-cols-2 gap-2 sm:gap-4 pt-6">
             {/* Group Winners Achievement Badge */}
             <div
-              className="relative bg-linear-to-br from-purple-900/30 via-purple-800/20 to-transparent 
-              backdrop-blur-md rounded-2xl border border-purple-500/30 p-4
-              hover:border-purple-400/50 transition-all duration-300 hover:scale-[1.02] group"
+              className={`relative flex flex-col backdrop-blur-md rounded-2xl border p-2 sm:p-4 transition-all duration-300 hover:scale-[1.02] group
+                ${
+                  (currentUser?.data?.groupWinCount || 0) > 0
+                    ? "bg-linear-to-br from-green-900/40 via-green-800/20 to-transparent border-green-500/50 hover:border-green-400/60"
+                    : "bg-linear-to-br from-purple-900/30 via-purple-800/20 to-transparent border-purple-500/30 hover:border-purple-400/50"
+                }`}
             >
               {/* Glow effect */}
-              <div className="absolute inset-0 bg-linear-to-br from-purple-500/0 via-purple-400/10 to-purple-600/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div
+                className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500
+                ${
+                  (currentUser?.data?.groupWinCount || 0) > 0
+                    ? "bg-linear-to-br from-green-500/0 via-green-400/20 to-green-600/0"
+                    : "bg-linear-to-br from-purple-500/0 via-purple-400/10 to-purple-600/0"
+                }`}
+              />
 
               {/* Content */}
-              <div className="relative z-10">
+              <div className="relative z-10 flex flex-col grow">
                 {/* Icon and label row */}
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-start justify-between mb-2 sm:mb-3">
+                  <div className="flex items-center gap-1 sm:gap-2">
                     <div>
-                      <div className="text-purple-300 text-xs font-medium">Csoportgyőztes</div>
-                      <div className="text-gray-400 text-[10px]">találatok</div>
+                      <div
+                        className={`text-[10px] sm:text-xs font-medium ${
+                          (currentUser?.data?.groupWinCount || 0) > 0
+                            ? "text-green-300"
+                            : "text-purple-300"
+                        }`}
+                      >
+                        Csoportgyőztes
+                      </div>
+                      <div className="text-gray-400 text-[8px] sm:text-[10px]">találatok</div>
                     </div>
                   </div>
                   <InfoTooltip
@@ -318,19 +344,47 @@ const MyProfilePage = () => {
                 </div>
 
                 {/* Achievement display */}
-                <div className="flex items-end justify-between">
+                <div className="flex items-end justify-between mt-auto">
                   {/* Count badge */}
-                  <div className="flex items-baseline gap-2">
-                    <div className="text-3xl font-bold text-white">
+                  <div className="flex items-baseline gap-1 sm:gap-2">
+                    <div
+                      className={`text-xl sm:text-3xl font-bold ${
+                        (currentUser?.data?.groupWinCount || 0) > 0
+                          ? "text-green-400"
+                          : "text-white"
+                      }`}
+                    >
                       {currentUser?.data?.groupWinCount || 0}
                     </div>
-                    <div className="text-sm text-purple-400">/ 12</div>
+                    <div
+                      className={`text-xs sm:text-sm ${
+                        (currentUser?.data?.groupWinCount || 0) > 0
+                          ? "text-green-500/70"
+                          : "text-purple-400"
+                      }`}
+                    >
+                      / 12
+                    </div>
                   </div>
 
                   {/* Points earned */}
                   <div className="text-right">
-                    <div className="text-xs text-gray-500">Nyert</div>
-                    <div className="text-sm font-bold text-purple-400">
+                    <div
+                      className={`${
+                        (currentUser?.data?.groupWinCount || 0) > 0
+                          ? "text-[10px] sm:text-sm text-green-400 font-bold uppercase tracking-wider mb-0.5"
+                          : "text-[10px] sm:text-xs text-gray-500"
+                      }`}
+                    >
+                      Nyert
+                    </div>
+                    <div
+                      className={`font-bold ${
+                        (currentUser?.data?.groupWinCount || 0) > 0
+                          ? "text-lg sm:text-2xl text-green-400"
+                          : "text-xs sm:text-sm text-purple-400"
+                      }`}
+                    >
                       +
                       {formatPoints(
                         (currentUser?.data?.groupWinCount || 0) * (config?.groupWinPoint || 1500),
@@ -344,21 +398,45 @@ const MyProfilePage = () => {
 
             {/* Champion Team Achievement Badge */}
             <div
-              className="relative bg-linear-to-br from-amber-900/30 via-yellow-800/20 to-transparent 
-              backdrop-blur-md rounded-2xl border border-amber-500/30 p-4
-              hover:border-amber-400/50 transition-all duration-300 hover:scale-[1.02] group"
+              className={`relative flex flex-col backdrop-blur-md rounded-2xl border p-2 sm:p-4 transition-all duration-300 hover:scale-[1.02] group
+                ${
+                  championBetStatus === "success"
+                    ? "bg-linear-to-br from-green-900/40 via-green-800/20 to-transparent border-green-500/50 hover:border-green-400/60"
+                    : championBetStatus === "failed"
+                      ? "bg-linear-to-br from-red-900/20 via-red-800/10 to-transparent border-red-500/30 hover:border-red-400/50 opacity-80"
+                      : "bg-linear-to-br from-amber-900/30 via-yellow-800/20 to-transparent border-amber-500/30 hover:border-amber-400/50"
+                }`}
             >
               {/* Glow effect */}
-              <div className="absolute inset-0 bg-linear-to-br from-amber-500/0 via-yellow-400/10 to-amber-600/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div
+                className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500
+                ${
+                  championBetStatus === "success"
+                    ? "bg-linear-to-br from-green-500/0 via-green-400/20 to-green-600/0"
+                    : championBetStatus === "failed"
+                      ? "bg-linear-to-br from-red-500/0 via-red-400/10 to-red-600/0"
+                      : "bg-linear-to-br from-amber-500/0 via-yellow-400/10 to-amber-600/0"
+                }`}
+              />
 
               {/* Content */}
-              <div className="relative">
+              <div className="relative flex flex-col flex-grow">
                 {/* Icon and label row */}
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-start justify-between mb-2 sm:mb-3">
+                  <div className="flex items-center gap-1 sm:gap-2">
                     <div>
-                      <div className="text-amber-300 text-xs font-medium">Bajnok csapat</div>
-                      <div className="text-gray-400 text-[10px]">találat</div>
+                      <div
+                        className={`text-[10px] sm:text-xs font-medium ${
+                          championBetStatus === "success"
+                            ? "text-green-300"
+                            : championBetStatus === "failed"
+                              ? "text-red-300"
+                              : "text-amber-300"
+                        }`}
+                      >
+                        Bajnok csapat
+                      </div>
+                      <div className="text-gray-400 text-[8px] sm:text-[10px]">találat</div>
                     </div>
                   </div>
                   <InfoTooltip
@@ -367,28 +445,66 @@ const MyProfilePage = () => {
                 </div>
 
                 {/* Achievement display */}
-                <div className="flex items-end justify-between">
+                <div className="flex items-end justify-between mt-auto">
                   {/* Status badge */}
                   <div>
                     {currentUser?.data?.winteamid ? (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-amber-400">
+                      <div className="flex items-center gap-1 sm:gap-2">
+                        <span
+                          className={`font-semibold text-xs sm:text-sm ${
+                            championBetStatus === "success"
+                              ? "text-green-400"
+                              : championBetStatus === "failed"
+                                ? "text-red-400"
+                                : "text-amber-400"
+                          }`}
+                        >
                           {teams.find((t) => t._id === currentUser?.data?.winteamid)?.name}
                         </span>
+                        {championBetStatus === "success" && (
+                          <span className="text-green-500 font-bold ml-1">✓</span>
+                        )}
+                        {championBetStatus === "failed" && (
+                          <span className="text-red-500 font-bold">✗</span>
+                        )}
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-gray-600" />
-                        <span className="text-sm font-semibold text-gray-500">Nincs tipp</span>
+                      <div className="flex items-center gap-1 sm:gap-2">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-gray-600" />
+                        <span className="text-xs sm:text-sm font-semibold text-gray-500">
+                          Nincs tipp
+                        </span>
                       </div>
                     )}
                   </div>
 
                   {/* Points at stake */}
                   <div className="text-right">
-                    <div className="text-xs text-gray-500">Várható</div>
-                    <div className="text-sm font-bold text-amber-400">
-                      +{formatPoints(config?.championWinPoint || 5000, false)}
+                    <div
+                      className={`${
+                        championBetStatus === "success"
+                          ? "text-[10px] sm:text-sm text-green-400 font-bold uppercase tracking-wider mb-0.5"
+                          : "text-[10px] sm:text-xs text-gray-500"
+                      }`}
+                    >
+                      {championBetStatus === "pending"
+                        ? "Várható"
+                        : championBetStatus === "success"
+                          ? "Nyert"
+                          : "Nem nyert"}
+                    </div>
+                    <div
+                      className={`font-bold ${
+                        championBetStatus === "success"
+                          ? "text-lg sm:text-2xl text-green-400"
+                          : championBetStatus === "failed"
+                            ? "text-xs sm:text-sm text-gray-500"
+                            : "text-xs sm:text-sm text-amber-400"
+                      }`}
+                    >
+                      {championBetStatus === "failed"
+                        ? "0"
+                        : `+${formatPoints(config?.championWinPoint || 5000, false)}`}
                     </div>
                   </div>
                 </div>
@@ -442,11 +558,18 @@ const MyProfilePage = () => {
               name="winteamid"
               control={control}
               options={teamOptions}
-              label={`Világbajnok csapat (+${config?.championWinPoint} pont)`}
+              label={`Világbajnok csapat (+${config?.championWinPoint} pont)${
+                championBetStatus === "success"
+                  ? " ✓"
+                  : championBetStatus === "failed"
+                    ? " (✗)"
+                    : ""
+              }`}
               description={`Ha eltalálod a bajnok csapatot akkor plusz ${config?.championWinPoint} pont jóváírást kapsz`}
               placeholder="Melyik csapat nyeri a vb-t?"
               error={errors.winteamid?.message}
               disabled={isBettingLocked}
+              status={championBetStatus}
             />
           </div>
         </div>
