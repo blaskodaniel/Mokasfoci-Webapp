@@ -43,7 +43,7 @@ const Api = {
     password: string,
     invitationCode?: string
   ): Promise<{ user: User }> {
-    const response = await axiosInstance.post(`/auth/regisztracio`, {
+    const response = await axiosInstance.post(`/auth/register`, {
       username,
       email,
       password,

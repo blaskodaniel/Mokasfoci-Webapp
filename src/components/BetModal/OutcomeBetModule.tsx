@@ -11,6 +11,14 @@ import { useGetGroupStandingsById } from "@/hooks/api/useTeams";
 import type { Match } from "@/models/match.type";
 import { useAuth } from "@/hooks/useAuth";
 
+const MIN_BET = 100;
+
+const GROUP_STAGE_TYPES = new Set([
+  MatchType.GroupStageRound1,
+  MatchType.GroupStageRound2,
+  MatchType.GroupStageRound3,
+]);
+
 interface OutcomeBetModuleProps {
   match: Match;
   onSave: (betValue: number, selectedOutcome: MatchOutcome, editMode: boolean) => void;
@@ -33,59 +41,49 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
   const { userFavoriteTeam } = useGame();
   const [betValue, setBetValue] = useState<number>(initBetValue);
   const [selectedOutcome, setSelectedOutcome] = useState<MatchOutcome | null>(
-    initSelectedOutcome || null
+    initSelectedOutcome ?? null
   );
 
+  const isExistAllOdds = !!(match.oddsAwin && match.oddsBwin && match.oddsDraw);
+  const isGroupStageMatch = GROUP_STAGE_TYPES.has(match.type);
+  const isFavoriteTeam = useMemo(() => userFavoriteTeam(match), [userFavoriteTeam, match]);
   const teamStandingsQuery = useGetGroupStandingsById(String(match.teamA?.groupid ?? ""));
 
-  const groupName = useMemo(() => {
-    return teamStandingsQuery.data && teamStandingsQuery.data?.length > 0
-      ? teamStandingsQuery.data[0].groupid.name
-      : "";
-  }, [teamStandingsQuery]);
+  const groupStandings = useMemo(() => {
+    const first = teamStandingsQuery.data?.[0];
+    return first ? { name: first.groupid.name, id: first.groupid._id } : null;
+  }, [teamStandingsQuery.data]);
 
-  const groupId = useMemo(() => {
-    return teamStandingsQuery.data && teamStandingsQuery.data?.length > 0
-      ? teamStandingsQuery.data[0].groupid._id
-      : "";
-  }, [teamStandingsQuery]);
-
-  const userScore = useMemo(() => {
-    return currentUser ? currentUser.data.availableScore : 0;
-  }, [currentUser]);
-
-  const maxAllowedScore = useMemo(() => {
-    return editMode ? userScore + initBetValue : userScore;
-  }, [userScore, editMode, initBetValue]);
+  const userScore = currentUser?.data.availableScore ?? 0;
+  const maxAllowedScore = editMode ? userScore + initBetValue : userScore;
 
   useEffect(() => {
     if (!editMode && betValue > maxAllowedScore && maxAllowedScore > 0) {
-      setBetValue(Math.max(100, Math.floor(maxAllowedScore / 100) * 100));
+      setBetValue(Math.max(MIN_BET, Math.floor(maxAllowedScore / MIN_BET) * MIN_BET));
     }
   }, [maxAllowedScore, editMode, betValue]);
 
-  const isValidBet = useMemo(
-    () => betValue >= 100 && betValue <= maxAllowedScore && selectedOutcome !== null,
-    [betValue, maxAllowedScore, selectedOutcome]
-  );
+  const isValidBet =
+    betValue >= MIN_BET &&
+    betValue <= maxAllowedScore &&
+    selectedOutcome !== null &&
+    isExistAllOdds;
 
   const subText = useMemo(() => {
     if (editMode) return "";
-    if (userScore < 99) {
-      return "Nincs elég pontod a fogadáshoz";
-    }
+    if (userScore < 99) return "Nincs elég pontod a fogadáshoz";
     return `Felhasználható pontod: ${formatNumber(userScore)} pont`;
   }, [userScore, editMode]);
 
   const selectedOdds = useMemo(() => {
-    if (selectedOutcome === MatchOutcome.home) return match.oddsAwin || 0;
-    if (selectedOutcome === MatchOutcome.draw) return match.oddsDraw || 0;
-    return match.oddsBwin || 0;
+    if (selectedOutcome === MatchOutcome.home) return match.oddsAwin ?? 0;
+    if (selectedOutcome === MatchOutcome.draw) return match.oddsDraw ?? 0;
+    return match.oddsBwin ?? 0;
   }, [match.oddsAwin, match.oddsBwin, match.oddsDraw, selectedOutcome]);
 
   return (
     <>
-      {userFavoriteTeam(match) && (
+      {isFavoriteTeam && (
         <div className="text-center text-xs text-green-600">
           Kedvenc csapatod játszik! Minden odds-ra plusz {config?.favoritTeamFactor}x szorzó jár
         </div>
@@ -98,7 +96,11 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
         showDraw
       />
 
-      <BetValueSelector betValue={betValue} onChangeBetValue={setBetValue} maxAllowedScore={maxAllowedScore} />
+      <BetValueSelector
+        betValue={betValue}
+        onChangeBetValue={setBetValue}
+        maxAllowedScore={maxAllowedScore}
+      />
 
       {isValidBet && (
         <div className="flex justify-center items-center gap-2 mt-3">
@@ -108,7 +110,7 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
               potentialWinnings(
                 betValue,
                 selectedOdds,
-                userFavoriteTeam(match) ? config?.favoritTeamFactor : 1
+                isFavoriteTeam ? config?.favoritTeamFactor : 1
               )
             )}
             <span className="pl-1 text-base font-normal text-gray-400">pont</span>
@@ -116,15 +118,13 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
         </div>
       )}
 
-      {(match.type === MatchType.GroupStageRound1 ||
-        match.type === MatchType.GroupStageRound2 ||
-        match.type === MatchType.GroupStageRound3) && (
+      {isGroupStageMatch && groupStandings && (
         <section className="flex justify-center pt-3">
           <GroupStandings
             teams={teamStandingsQuery.data ?? []}
-            groupName={groupName}
+            groupName={groupStandings.name}
             size="sm"
-            groupId={groupId}
+            groupId={groupStandings.id}
           />
         </section>
       )}
