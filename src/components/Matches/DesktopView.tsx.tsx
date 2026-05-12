@@ -7,13 +7,14 @@ const MatchesDesktopView: FC<MatchesDesktopViewProps> = ({
   columns,
   loading,
   error,
+  emptyMessage,
 }) => {
   return (
     <Table
       data={matchesWithBets}
       columns={columns}
       pageSize={10}
-      emptyMessage="Még nincsenek mérkőzések"
+      emptyMessage={emptyMessage ?? "Még nincsenek mérkőzések erre a napra"}
       className="mt-4"
       loading={loading}
       error={error}

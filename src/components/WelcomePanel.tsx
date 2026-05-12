@@ -3,6 +3,7 @@ import type { FC } from "react";
 import { useEffect, useState } from "react";
 import { differenceInSeconds, parseISO } from "date-fns";
 import { parse } from "date-fns";
+import { Link } from "react-router-dom";
 
 const WelcomePanel: FC = () => {
   const { config } = useConfig();
@@ -60,6 +61,17 @@ const WelcomePanel: FC = () => {
           </div>
         </>
       )}
+      <div className="sm:w-[70%] mt-4 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-center text-sm text-gray-300 font-light leading-relaxed">
+        Ha még nem tetted, akkor állítsd be a{" "}
+        <Link
+          to="/profilom"
+          className="font-medium text-purple-400 hover:text-pink-400 transition-colors underline underline-offset-2 decoration-purple-400/50"
+        >
+          Profilom
+        </Link>{" "}
+        oldal alatt a csoportgyőztes tippjeidet és a bajnok csapat tipped, hogy ne maradj le a
+        pluszpontokról!
+      </div>
     </div>
   );
 };

@@ -1,26 +1,28 @@
-import { useState, useRef, useEffect } from "react";
-import { format, addDays, startOfWeek, isSameDay } from "date-fns";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { format, addDays, startOfWeek, isSameDay, differenceInCalendarDays } from "date-fns";
 import { hu } from "date-fns/locale";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 
 interface CalendarProps {
   onDateSelect?: (date: Date) => void;
   selectedDate?: Date;
+  minDate?: Date;
+  maxDate?: Date;
 }
 
-const Calendar = ({ onDateSelect, selectedDate }: CalendarProps) => {
+const Calendar = ({ onDateSelect, selectedDate, minDate, maxDate }: CalendarProps) => {
   const sliderRef = useRef<HTMLDivElement>(null);
-  const initializedRef = useRef(false);
 
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
 
-  // Generáljunk le egy széles skálát a naptárhoz (pl. 90 nap = 30 múlt, 60 jövő)
-  const [days] = useState(() => {
-    const start = addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), -30);
-    return Array.from({ length: 90 }, (_, i) => addDays(start, i));
-  });
+  const days = useMemo(() => {
+    const defaultStart = addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), -30);
+    const start = minDate ?? defaultStart;
+    const length = minDate && maxDate ? differenceInCalendarDays(maxDate, start) + 1 : 90;
+    return Array.from({ length: Math.max(length, 1) }, (_, i) => addDays(start, i));
+  }, [minDate, maxDate]);
 
   const [today] = useState(() => new Date());
   const [visibleMonth, setVisibleMonth] = useState(today);
@@ -29,21 +31,30 @@ const Calendar = ({ onDateSelect, selectedDate }: CalendarProps) => {
   const itemsPerView = 7;
   const gap = 4; // flex gap (1rem = 16px, de mi gap-1 = 4px)
 
+  // Pozicionálás a kiválasztott/mai napra, mindig a layout után (rAF)
+  // Csak akkor fut újra, ha a days tömb változik (config betöltés)
   useEffect(() => {
-    // Kezdeti pozicionálás rögtön a vizsgált/kiválasztott napra (csak az első betöltésnél!)
-    if (sliderRef.current && !initializedRef.current) {
+    const frame = requestAnimationFrame(() => {
+      if (!sliderRef.current) return;
       const targetDate = selectedDate || today;
       const index = days.findIndex((d) => isSameDay(d, targetDate));
-
-      if (index !== -1) {
-        const containerWidth = sliderRef.current.clientWidth;
-        const itemWidth = (containerWidth + gap) / itemsPerView;
-        // Középre húzzuk a mai napot a szalagon (ez miatt azonnal jó helyen áll meg indításkor)
-        sliderRef.current.scrollLeft = index * itemWidth - containerWidth / 2 + itemWidth / 2;
-        initializedRef.current = true;
+      const containerWidth = sliderRef.current.clientWidth;
+      const itemWidth = (containerWidth + gap) / itemsPerView;
+      if (index === -1) {
+        sliderRef.current.scrollLeft = 0;
+        if (days[0]) setVisibleMonth(days[0]);
+      } else {
+        sliderRef.current.scrollLeft = Math.max(
+          0,
+          index * itemWidth - containerWidth / 2 + itemWidth / 2
+        );
+        setVisibleMonth(days[index]);
       }
-    }
-  }, [selectedDate, days, itemsPerView, today]);
+    });
+    return () => cancelAnimationFrame(frame);
+    // selectedDate szándékosan nem szerepel a dep-ben: csak days változásakor (config load) scroll vissza
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [days]);
 
   // Akárhányszor görgetjük (húzással vagy nyilakkal), frissüljön a hónap a fejlécen
   const handleScroll = () => {
@@ -120,6 +131,7 @@ const Calendar = ({ onDateSelect, selectedDate }: CalendarProps) => {
   return (
     <div className="bg-panel-bg border border-primary/20 rounded-lg p-1 max-w-lg mx-auto mb-3">
       {/* Navigation Header */}
+      <div></div>
       <div className="flex items-center justify-between mb-1">
         <button
           onClick={() => jumpWeeks(-1)}
@@ -130,7 +142,7 @@ const Calendar = ({ onDateSelect, selectedDate }: CalendarProps) => {
         </button>
 
         <div className="text-sm text-gray-400 hover:text-white transition-colors capitalize font-medium">
-          {format(visibleMonth, "yyyy. MMMM", { locale: hu })}
+          {format(visibleMonth, "MMMM", { locale: hu })}
         </div>
 
         <button

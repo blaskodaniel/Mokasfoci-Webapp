@@ -11,11 +11,13 @@ export interface MatchesDesktopViewProps {
   columns: Column<MatchWithUserBet>[];
   loading: boolean;
   error?: string;
+  emptyMessage?: string;
 }
 
 export type MatchesMobileViewProps = {
   matchesWithBets: MatchWithUserBet[];
   loading: boolean;
   error?: string;
+  emptyMessage?: string;
   onSelectMatch?: (match: MatchWithUserBet | null) => void;
 };

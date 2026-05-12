@@ -9,6 +9,7 @@ const MatchesMobileView: FC<MatchesMobileViewProps> = ({
   matchesWithBets,
   loading,
   error,
+  emptyMessage,
   onSelectMatch,
 }) => {
   const navigate = useNavigate();
@@ -26,7 +27,9 @@ const MatchesMobileView: FC<MatchesMobileViewProps> = ({
 
   if (matchesWithBets.length === 0) {
     return (
-      <div className="text-center text-gray-400 py-10">Még nincsenek mérkőzések erre a napra</div>
+      <div className="text-center text-gray-400 py-10">
+        {emptyMessage ?? "Még nincsenek mérkőzések erre a napra"}
+      </div>
     );
   }
 
@@ -45,6 +48,7 @@ const MatchesMobileView: FC<MatchesMobileViewProps> = ({
             <MatchListItem
               match={match}
               displayTime
+              displayDate
               displayStatusBadge
               onSelectMatch={onSelectMatch}
             />

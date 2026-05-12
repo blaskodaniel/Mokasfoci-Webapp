@@ -13,13 +13,35 @@ import MatchesMobileView from "@/components/Matches/MobileView";
 import type { MatchWithUserBet } from "@/components/Matches/types";
 import BetModal from "@/components/BetModal";
 import { useAuth } from "@/hooks/useAuth";
+import { useConfig } from "@/hooks/useConfig";
 
 const MatchesPage = () => {
   const { isDesktop } = useResponsive();
   const { user: currentUser } = useAuth();
+  const { config } = useConfig();
+
+  const championMinDate = useMemo(
+    () => (config?.championStartDate ? new Date(config.championStartDate) : undefined),
+    [config?.championStartDate]
+  );
+  const championMaxDate = useMemo(
+    () => (config?.championEndDate ? new Date(config.championEndDate) : undefined),
+    [config?.championEndDate]
+  );
   const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(null);
   const [isBetModalOpen, setIsBetModalOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+
+  // Ha a mai nap szerepel a naptárban (a bajnokság range-en belül), selectáljuk alapértelmezetten
+  useEffect(() => {
+    if (!championMinDate && !championMaxDate) return; // config még nem töltött be
+    const now = new Date();
+    const afterMin = !championMinDate || now >= championMinDate;
+    const beforeMax = !championMaxDate || now <= championMaxDate;
+    if (afterMin && beforeMax) {
+      setSelectedDate((prev) => prev ?? now);
+    }
+  }, [championMinDate, championMaxDate]);
 
   const {
     data: matches,
@@ -221,7 +243,7 @@ const MatchesPage = () => {
       header: "",
       key: "actions",
       render: (match) => {
-        const hasUserBet = !!match.userbet;
+        const hasUserBet = Array.isArray(match.userbet) && match.userbet.length > 0;
         const isMatchEnabled = match.status === MatchStatus.enabled;
         const hasEnoughScore = currentUser && currentUser.data.availableScore > 99;
 
@@ -269,7 +291,12 @@ const MatchesPage = () => {
   return (
     <div>
       <div className="text-white text-center sm:text-left text-xl sm:text-2xl pb-2">Mérkőzések</div>
-      <Calendar onDateSelect={(date) => setSelectedDate(date)} selectedDate={selectedDate} />
+      <Calendar
+        onDateSelect={(date) => setSelectedDate(date)}
+        selectedDate={selectedDate}
+        minDate={championMinDate}
+        maxDate={championMaxDate}
+      />
       {isDesktop && (
         <section>
           <MatchesDesktopView
@@ -280,6 +307,11 @@ const MatchesPage = () => {
               "Valami hiba történt, kérlek próbáld újra később."
             }
             loading={matchesLoading || myBetsLoading}
+            emptyMessage={
+              !selectedDate
+                ? "Válassz egy napot a naptárból a mérkőzések megjelenítéséhez"
+                : "Még nincsenek mérkőzések erre a napra"
+            }
           />
         </section>
       )}
@@ -293,6 +325,11 @@ const MatchesPage = () => {
               "Valami hiba történt, kérlek próbáld újra később."
             }
             loading={matchesLoading || myBetsLoading}
+            emptyMessage={
+              !selectedDate
+                ? "Válassz egy napot a naptárból a mérkőzések megjelenítéséhez"
+                : "Még nincsenek mérkőzések erre a napra"
+            }
             onSelectMatch={(match) => {
               setSelectedMatch(match);
               setIsBetModalOpen(true);
