@@ -11,6 +11,7 @@ import {
   Cell,
 } from "recharts";
 import Loader from "../Loader";
+import { IoStatsChart } from "react-icons/io5";
 import { playersKeys, useBalanceHistory } from "@/hooks/api/usePlayers";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -89,8 +90,9 @@ export const BalanceHistoryChart = ({
 
   if (isError || !data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-text-secondary">
-        Nincs megjeleníthető adat
+      <div className="flex flex-col items-center justify-center h-64 gap-3 text-text-secondary">
+        <IoStatsChart size={48} className="opacity-20" />
+        <span className="text-sm">Még nincs megjeleníthető adat</span>
       </div>
     );
   }

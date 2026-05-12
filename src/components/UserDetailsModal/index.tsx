@@ -10,10 +10,12 @@ import BalanceHistoryChart from "../Charts/BalanceHistoryChart";
 import InfoTooltip from "../InfoTooltip";
 import HelpModal from "../HelpModal";
 import { FaMedal } from "react-icons/fa";
+import { IoClose } from "react-icons/io5";
 import { BadgeCard } from "@/pages/MyBadges";
 
 const UserDetailsModal: FC<UserDetailsModalProps> = ({ isOpen, onClose, userId }) => {
   const [isBadgesModalOpen, setIsBadgesModalOpen] = useState(false);
+  const [isAvatarPreviewOpen, setIsAvatarPreviewOpen] = useState(false);
   const { data: playerData, isLoading, error } = useGetPlayerDetails(userId);
   const { data: winLostData } = useWinLostStats(userId);
   const { data: badgesData } = useBadgesByUser(userId);
@@ -42,11 +44,14 @@ const UserDetailsModal: FC<UserDetailsModalProps> = ({ isOpen, onClose, userId }
         {/* Avatar and Stats Section */}
         <div className="mb-8 px-4">
           <div className="flex items-center">
-            <div className="relative w-15 h-15 sm:w-23 sm:h-23 rounded-full shadow-lg shrink-0">
+            <div
+              className="relative w-15 h-15 sm:w-23 sm:h-23 rounded-full shadow-lg shrink-0 cursor-pointer"
+              onClick={() => setIsAvatarPreviewOpen(true)}
+            >
               <img
                 src={userAvatarUrl}
                 alt="Avatar"
-                className="w-full h-full rounded-full object-cover"
+                className="w-full h-full rounded-full object-cover hover:opacity-80 transition-opacity"
               />
               {playerData?.details.data.teamid && (
                 <img
@@ -66,16 +71,23 @@ const UserDetailsModal: FC<UserDetailsModalProps> = ({ isOpen, onClose, userId }
                 <p className="text-xs mt-0">{playerDetails?.username}</p>
               )}
 
-              {badgesData?.badges && badgesData.badges.length > 0 && (
-                <div
-                  className="inline-flex items-center gap-2 mt-2 cursor-pointer hover:text-amber-400 transition-colors text-amber-500 font-semibold max-w-max"
-                  onClick={() => setIsBadgesModalOpen(true)}
-                >
-                  <FaMedal size={20} />
-                  <span className="text-sm underline underline-offset-2">
-                    {badgesData.badges.length} jelvény
-                  </span>
-                </div>
+              {badgesData && (
+                badgesData.badges.length > 0 ? (
+                  <div
+                    className="inline-flex items-center gap-2 mt-2 cursor-pointer hover:text-amber-400 transition-colors text-amber-500 font-semibold max-w-max"
+                    onClick={() => setIsBadgesModalOpen(true)}
+                  >
+                    <FaMedal size={20} />
+                    <span className="text-sm underline underline-offset-2">
+                      {badgesData.badges.length} jelvény
+                    </span>
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-2 mt-2 text-gray-500">
+                    <FaMedal size={18} />
+                    <span className="text-sm italic">még nem szerzett jelvényt</span>
+                  </div>
+                )
               )}
               <div></div>
             </div>
@@ -243,6 +255,27 @@ const UserDetailsModal: FC<UserDetailsModalProps> = ({ isOpen, onClose, userId }
           </div>
         </div>
       </div>
+
+      {isAvatarPreviewOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          onClick={() => setIsAvatarPreviewOpen(false)}
+        >
+          <button
+            className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
+            onClick={() => setIsAvatarPreviewOpen(false)}
+            aria-label="Bezárás"
+          >
+            <IoClose size={32} />
+          </button>
+          <img
+            src={userAvatarUrl}
+            alt="Avatar"
+            className="max-w-[90vw] max-h-[90vh] rounded-2xl object-contain shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
 
       <HelpModal
         isOpen={isBadgesModalOpen}

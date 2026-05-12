@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import Loader from "../Loader";
 import { formatNumber } from "@/utils/common";
+import { IoStatsChart } from "react-icons/io5";
 
 const COLORS = [
   "#e6194B", // Red
@@ -157,8 +158,9 @@ const ScoreByMatchChart = ({ userList = [] }: { userList?: string[] }) => {
 
   if (error || !chartData || chartData.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-text-secondary">
-        Nincs megjeleníthető adat
+      <div className="flex flex-col items-center justify-center h-64 gap-3 text-text-secondary">
+        <IoStatsChart size={48} className="opacity-20" />
+        <span className="text-sm">Még nincs megjeleníthető adat</span>
       </div>
     );
   }

@@ -4,7 +4,7 @@ import { hu } from "date-fns/locale";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 
 interface CalendarProps {
-  onDateSelect?: (date: Date) => void;
+  onDateSelect?: (date: Date | undefined) => void;
   selectedDate?: Date;
   minDate?: Date;
   maxDate?: Date;
@@ -124,8 +124,12 @@ const Calendar = ({ onDateSelect, selectedDate, minDate, maxDate }: CalendarProp
   };
 
   const handleDateClick = (date: Date) => {
-    onDateSelect?.(date);
-    setVisibleMonth(date);
+    if (selectedDate && isSameDay(date, selectedDate)) {
+      onDateSelect?.(undefined);
+    } else {
+      onDateSelect?.(date);
+      setVisibleMonth(date);
+    }
   };
 
   return (

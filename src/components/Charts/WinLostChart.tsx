@@ -2,6 +2,7 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { useWinLostStats } from "@/hooks/api/usePlayers";
 import Loader from "../Loader";
+import { IoStatsChart } from "react-icons/io5";
 
 interface CustomTooltipProps {
   active?: boolean;
@@ -58,8 +59,9 @@ export const WinLostChart = ({
 
   if (isError || !data) {
     return (
-      <div className="flex items-center justify-center h-64 text-text-secondary">
-        Nincs megjeleníthető adat
+      <div className="flex flex-col items-center justify-center h-64 gap-3 text-text-secondary">
+        <IoStatsChart size={48} className="opacity-20" />
+        <span className="text-sm">Még nincs megjeleníthető adat</span>
       </div>
     );
   }
@@ -68,8 +70,9 @@ export const WinLostChart = ({
 
   if (total === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-text-secondary">
-        Még nincs tipp
+      <div className="flex flex-col items-center justify-center h-64 gap-3 text-text-secondary">
+        <IoStatsChart size={48} className="opacity-20" />
+        <span className="text-sm">Még nincs megjeleníthető adat</span>
       </div>
     );
   }
