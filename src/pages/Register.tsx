@@ -5,6 +5,7 @@ import { AxiosError } from "axios";
 import Modal from "@/components/Modal";
 import Button from "@/components/Button";
 import { IoIosCheckmarkCircle } from "react-icons/io";
+import { IoEye, IoEyeOff } from "react-icons/io5";
 import { useConfig } from "@/hooks/useConfig";
 
 const Register: React.FC = () => {
@@ -18,6 +19,8 @@ const Register: React.FC = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,29 +97,47 @@ const Register: React.FC = () => {
           <label htmlFor="password" className="text-sm font-medium text-white-700">
             Jelszó
           </label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="text-white border border-gray-300/20  rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            placeholder="Jelszó"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full text-white border border-gray-300/20 rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Jelszó"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+            >
+              {showPassword ? <IoEyeOff size={18} /> : <IoEye size={18} />}
+            </button>
+          </div>
         </div>
         <div className="flex flex-col gap-2">
           <label htmlFor="confirmPassword" className="text-sm font-medium text-white-700">
             Jelszó megerősítése
           </label>
-          <input
-            type="password"
-            id="confirmPassword"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            className="text-white border border-gray-300/20  rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            placeholder="Jelszó megerősítése"
-          />
+          <div className="relative">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              id="confirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              className="w-full text-white border border-gray-300/20 rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Jelszó megerősítése"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+            >
+              {showConfirmPassword ? <IoEyeOff size={18} /> : <IoEye size={18} />}
+            </button>
+          </div>
         </div>
         {config?.enabledInvitation && (
           <div className="flex flex-col gap-2">

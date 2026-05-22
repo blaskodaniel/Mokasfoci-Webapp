@@ -10,7 +10,7 @@ export const ProtectedLayout: React.FC = () => {
 
   // Show loading while checking authentication
   if (isLoading) {
-    return <PageLoader message="Oldal betöltése...." />;
+    return <PageLoader />;
   }
 
   // Redirect to login if not authenticated

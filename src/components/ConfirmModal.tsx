@@ -8,6 +8,7 @@ interface ConfirmModalProps {
   description?: string;
   onConfirm: () => void;
   onCancel: () => void;
+  confirmClassName?: string;
 }
 
 const ConfirmModal: FC<ConfirmModalProps> = ({
@@ -16,6 +17,7 @@ const ConfirmModal: FC<ConfirmModalProps> = ({
   description,
   onConfirm,
   onCancel,
+  confirmClassName = "bg-red-600 hover:bg-red-700",
 }) => {
   return (
     <AnimatePresence>
@@ -50,7 +52,7 @@ const ConfirmModal: FC<ConfirmModalProps> = ({
               <Button
                 text="Igen"
                 onClick={onConfirm}
-                className="bg-red-600 hover:bg-red-700 w-full sm:w-auto px-6 py-2.5"
+                className={`${confirmClassName} w-full sm:w-auto px-6 py-2.5`}
               />
             </div>
           </motion.div>

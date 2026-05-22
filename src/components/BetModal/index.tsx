@@ -56,6 +56,7 @@ const BetModal: FC<BetModalProps> = ({
           outcomeBet: {
             betAmount: outcomeBet?.amount,
             outcome: outcomeBet?.outcome,
+            odds: outcomeBet?.odds,
           },
           scoreBet: {
             betAmount: scoreBet?.amount,
@@ -119,6 +120,7 @@ const BetModal: FC<BetModalProps> = ({
             loading={isBettingPending}
             initBetValue={initBetValues?.outcomeBet?.betAmount}
             initSelectedOutcome={initBetValues?.outcomeBet?.outcome}
+            initBetOdds={initBetValues?.outcomeBet?.odds}
             editMode={!!initBetValues?.outcomeBet?.betAmount}
           />
         ) : (

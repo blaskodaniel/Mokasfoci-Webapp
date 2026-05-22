@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect, type FC } from "react";
 import Button from "../Button";
+import ConfirmModal from "../ConfirmModal";
 import { MatchOutcome, MatchType } from "@/utils/enums";
 import useGame from "@/hooks/useGame";
 import { useConfig } from "@/hooks/useConfig";
@@ -25,6 +26,7 @@ interface OutcomeBetModuleProps {
   loading?: boolean;
   initBetValue?: number;
   initSelectedOutcome?: MatchOutcome;
+  initBetOdds?: number;
   editMode?: boolean;
 }
 
@@ -34,6 +36,7 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
   loading = false,
   initBetValue = 1000,
   initSelectedOutcome,
+  initBetOdds,
   editMode = false,
 }) => {
   const { config } = useConfig();
@@ -43,6 +46,7 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
   const [selectedOutcome, setSelectedOutcome] = useState<MatchOutcome | null>(
     initSelectedOutcome ?? null
   );
+  const [isOddsConfirmOpen, setIsOddsConfirmOpen] = useState(false);
 
   const isExistAllOdds = !!(match.oddsAwin && match.oddsBwin && match.oddsDraw);
   const isGroupStageMatch = GROUP_STAGE_TYPES.has(match.type);
@@ -94,6 +98,8 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
         onSelectOutcome={setSelectedOutcome}
         match={match}
         showDraw
+        existingOutcome={initSelectedOutcome}
+        existingOdds={initBetOdds}
       />
 
       <BetValueSelector
@@ -134,7 +140,19 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
         <Button
           text={editMode ? "Mentés" : "LÉTREHOZÁS"}
           subText={subText}
-          onClick={() => selectedOutcome && onSave(betValue, selectedOutcome, editMode)}
+          onClick={() => {
+            if (!selectedOutcome) return;
+            const oddsGotWorse =
+              editMode &&
+              initBetOdds != null &&
+              selectedOutcome === initSelectedOutcome &&
+              selectedOdds < initBetOdds;
+            if (oddsGotWorse) {
+              setIsOddsConfirmOpen(true);
+            } else {
+              onSave(betValue, selectedOutcome, editMode);
+            }
+          }}
           className={`${
             editMode ? "bg-blue-600 hover:bg-blue-700" : "bg-green-600 hover:bg-green-700"
           } w-full py-3 sm:py-2`}
@@ -142,6 +160,18 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
           loading={loading}
         />
       </div>
+
+      <ConfirmModal
+        isOpen={isOddsConfirmOpen}
+        title="Odds változtatás"
+        description={`Biztosan lecseréled a ${initBetOdds?.toFixed(2)} odds-ot → ${selectedOdds.toFixed(2)}-ra?`}
+        onConfirm={() => {
+          setIsOddsConfirmOpen(false);
+          if (selectedOutcome) onSave(betValue, selectedOutcome, editMode);
+        }}
+        onCancel={() => setIsOddsConfirmOpen(false)}
+        confirmClassName="bg-orange-600 hover:bg-orange-700"
+      />
     </>
   );
 };

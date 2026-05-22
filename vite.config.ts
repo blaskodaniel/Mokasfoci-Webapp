@@ -19,4 +19,18 @@ export default defineConfig({
     },
   },
   assetsInclude: ["**/*.lottie"],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return;
+          if (id.includes("recharts") || id.includes("d3-") || id.includes("victory-vendor")) return "vendor-charts";
+          if (id.includes("@lottiefiles") || id.includes("dotlottie")) return "vendor-lottie";
+          if (id.includes("socket.io")) return "vendor-socket";
+          if (id.includes("framer-motion") || id.includes("/motion/")) return "vendor-animation";
+          return "vendor";
+        },
+      },
+    },
+  },
 });

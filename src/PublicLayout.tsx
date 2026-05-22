@@ -6,7 +6,7 @@ export default function PublicRoute() {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return <PageLoader message="Oldal betöltése...." />;
+    return <PageLoader />;
   }
 
   // Ha be van jelentkezve → irány a főoldal

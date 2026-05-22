@@ -81,10 +81,5 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     refreshMe,
   };
 
-  // Amíg töltünk, ne mutassunk semmit
-  if (isLoading) {
-    return <div>Alkalmazás betöltése...</div>;
-  }
-
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -8,6 +8,7 @@ import type { MatchWithUserBet } from "./Matches/types";
 import UnknownFlag from "./UnknownFlag";
 import { isBettableMatch } from "@/hooks/api/useMatches";
 import useGame from "@/hooks/useGame";
+import { IoArrowUp, IoArrowDown } from "react-icons/io5";
 
 interface MatchListItemProps {
   match: MatchWithUserBet | Match;
@@ -35,9 +36,20 @@ const MatchListItem = ({
 
   const { userBetInfo } = useGame();
 
-  const { isUserBetTeamAWin, isUserBetTeamBWin, isUserBetDraw, isUserBet } = userBetInfo(
-    bets || []
-  );
+  const { isUserBetTeamAWin, isUserBetTeamBWin, isUserBetDraw, isUserBet, outcomeBet } =
+    userBetInfo(bets || []);
+
+  const betOdds = outcomeBet?.odds;
+  const currentBetOdds =
+    outcomeBet?.outcome === MatchOutcome.home
+      ? match.oddsAwin
+      : outcomeBet?.outcome === MatchOutcome.draw
+        ? match.oddsDraw
+        : outcomeBet?.outcome === MatchOutcome.away
+          ? match.oddsBwin
+          : undefined;
+  const oddsChanged = betOdds != null && currentBetOdds != null && betOdds !== currentBetOdds;
+  const oddsWentUp = oddsChanged && currentBetOdds! > betOdds!;
 
   const statusInfoBadge = useMemo(() => {
     return getMatchStatusInfo(match.status);
@@ -131,16 +143,24 @@ const MatchListItem = ({
               <div className="text-sm">{match.goalB}</div>
             </div>
           )}
-          <div className="flex flex-col items-end text-xs text-gray-400 gap-0.5 w-7">
-            <div className={`${isUserBetTeamAWin ? "text-white font-semibold" : "text-gray-400"}`}>
-              {match.oddsAwin?.toFixed(2) ?? "-"}
-            </div>
-            <div className={`${isUserBetDraw ? "text-white font-semibold" : "text-gray-400"}`}>
-              {match.oddsDraw?.toFixed(2) ?? "-"}
-            </div>
-            <div className={`${isUserBetTeamBWin ? "text-white font-semibold" : "text-gray-400"}`}>
-              {match.oddsBwin?.toFixed(2) ?? "-"}
-            </div>
+          <div className="flex flex-col items-end text-xs text-gray-400 gap-0.5">
+            {[
+              { isBet: isUserBetTeamAWin, odds: match.oddsAwin },
+              { isBet: isUserBetDraw, odds: match.oddsDraw },
+              { isBet: isUserBetTeamBWin, odds: match.oddsBwin },
+            ].map(({ isBet, odds }, i) => (
+              <div key={i} className={`flex items-center gap-0.5 leading-none ${isBet ? "text-white font-semibold" : "text-gray-400"}`}>
+                {isBet && oddsChanged && (
+                  <span className="flex items-center gap-0.5 text-[9px] font-normal">
+                    <span className="text-gray-400">({currentBetOdds!.toFixed(2)})</span>
+                    {oddsWentUp
+                      ? <IoArrowUp className="text-green-400" />
+                      : <IoArrowDown className="text-red-400" />}
+                  </span>
+                )}
+                <span>{isBet && oddsChanged ? betOdds!.toFixed(2) : (odds?.toFixed(2) ?? "-")}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -6,7 +6,6 @@ export const APP_CONFIG = {
   FLAG_PATH: "/flags/",
 };
 
-export const APP_NAME = "FIFAWorldCup26";
 export const DEFAULT_AVATAR_URL = "/default_avatar.png";
 export const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
 

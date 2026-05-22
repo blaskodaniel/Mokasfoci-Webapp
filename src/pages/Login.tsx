@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Api from "@/services/service";
 import { ApiError } from "@/utils/apiError";
 import { useConfig } from "@/hooks/useConfig";
+import { IoEye, IoEyeOff } from "react-icons/io5";
 
 const Login: React.FC = () => {
   const { login, refreshMe } = useAuth();
@@ -12,6 +13,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     try {
@@ -57,15 +59,24 @@ const Login: React.FC = () => {
           <label htmlFor="password" className="text-sm font-medium text-white-700">
             Jelszó
           </label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="text-white border border-gray-300/20 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-            placeholder="Jelszó"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full text-white border border-gray-300/20 rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-purple-400"
+              placeholder="Jelszó"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+            >
+              {showPassword ? <IoEyeOff size={18} /> : <IoEye size={18} />}
+            </button>
+          </div>
         </div>
         {errorMessage && <p className="text-red-500 text-sm text-center">{errorMessage}</p>}
         <button

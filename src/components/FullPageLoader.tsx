@@ -1,12 +1,9 @@
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
-import loaderLottie from "@/assets/lottie/loading_soccer.lottie";
+import { ImSpinner2 } from "react-icons/im";
 
 const FullPageLoader = () => {
   return (
-    <div className="min-h-svh flex flex-col justify-center items-center">
-      <div className="max-w-[200px] max-h-[200px] w-full">
-        <DotLottieReact src={loaderLottie} loop autoplay />
-      </div>
+    <div className="min-h-svh flex flex-col justify-center items-center gap-4">
+      <ImSpinner2 className="animate-spin text-6xl text-primary" />
       <p className="text-center">Betöltés</p>
     </div>
   );

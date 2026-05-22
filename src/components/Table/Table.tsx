@@ -201,7 +201,7 @@ const Table = <T extends Record<string, unknown>>({
       {totalPages > 1 && (
         <div className="bg-surface border-t border-primary/50 px-4 py-3 flex items-center justify-between">
           <div className="text-sm text-gray-400">
-            Összesen {sortedData.length} elem, {totalPages} oldal
+            Összesen {sortedData.length} mérkőzés, {totalPages} oldal
           </div>
 
           <div className="flex items-center gap-2">

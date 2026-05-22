@@ -5,6 +5,7 @@ import { MatchOutcome } from "@/utils/enums";
 import type { MatchWithUserBet } from "./Matches/types";
 import useGame from "@/hooks/useGame";
 import UnknownFlag from "./UnknownFlag";
+import { IoArrowUp, IoArrowDown } from "react-icons/io5";
 
 interface MatchCardProps {
   match: MatchWithUserBet;
@@ -21,12 +22,42 @@ const MatchCard = ({ match, onClick, className, flagSize = "large", badge }: Mat
 
   const { outcomeBet, scoreBet } = userBetInfo(userBet || []);
 
+  const getCurrentOddsForOutcome = (outcome: MatchOutcome) => {
+    if (outcome === MatchOutcome.home) return match.oddsAwin;
+    if (outcome === MatchOutcome.draw) return match.oddsDraw;
+    if (outcome === MatchOutcome.away) return match.oddsBwin;
+    return undefined;
+  };
+
+  const betOdds = outcomeBet?.odds;
+  const currentBetOdds =
+    outcomeBet?.outcome != null ? getCurrentOddsForOutcome(outcomeBet.outcome) : undefined;
+  const oddsChanged = betOdds != null && currentBetOdds != null && betOdds !== currentBetOdds;
+  const oddsWentUp = oddsChanged && currentBetOdds! > betOdds!;
+
   const getOddsClass = (outcome: MatchOutcome) => {
     const baseClass = "text-sm flex-1 py-1 rounded transition-colors duration-200 border";
     if (outcomeBet && outcomeBet?.outcome === outcome) {
       return `${baseClass} bg-green-600/20 text-green-400 font-bold border-green-500/50`;
     }
     return `${baseClass} border-transparent text-gray-400`;
+  };
+
+  const renderOdds = (outcome: MatchOutcome, currentOdds: number | null | undefined) => {
+    if (outcomeBet?.outcome === outcome && oddsChanged) {
+      return (
+        <div className="flex flex-col items-center gap-0.5 leading-none">
+          <span>{betOdds!.toFixed(2)}</span>
+          <span className="flex items-center gap-0.5 text-[9px]">
+            {oddsWentUp
+              ? <IoArrowUp className="text-green-400" />
+              : <IoArrowDown className="text-red-400" />}
+            <span className="text-gray-300/60">{currentBetOdds!.toFixed(2)}</span>
+          </span>
+        </div>
+      );
+    }
+    return <span>{currentOdds ? currentOdds.toFixed(2) : "-"}</span>;
   };
 
   return (
@@ -102,13 +133,13 @@ const MatchCard = ({ match, onClick, className, flagSize = "large", badge }: Mat
       </div>
       <div className="flex gap-1 border-t border-gray-700/30 pt-3 text-center">
         <div className={getOddsClass(MatchOutcome.home)}>
-          {match.oddsAwin ? match.oddsAwin?.toFixed(2) : "-"}
+          {renderOdds(MatchOutcome.home, match.oddsAwin)}
         </div>
         <div className={getOddsClass(MatchOutcome.draw)}>
-          {match.oddsDraw ? match.oddsDraw?.toFixed(2) : "-"}
+          {renderOdds(MatchOutcome.draw, match.oddsDraw)}
         </div>
         <div className={getOddsClass(MatchOutcome.away)}>
-          {match.oddsBwin ? match.oddsBwin?.toFixed(2) : "-"}
+          {renderOdds(MatchOutcome.away, match.oddsBwin)}
         </div>
       </div>
     </div>

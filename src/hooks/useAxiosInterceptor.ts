@@ -23,6 +23,7 @@ export const useAxiosInterceptor = () => {
     const responseInterceptor = axiosInstance.interceptors.response.use(
       (response) => response, // Ha 2xx válasz jön, csak engedjük tovább
       async (error) => {
+        // az eredeti Axios kérés konfigurációját elmentjük (error.config)
         const originalRequest = error.config as RetriableRequestConfig;
 
         // 1. Ellenőrizzük, hogy 401-es hiba-e
@@ -36,7 +37,7 @@ export const useAxiosInterceptor = () => {
           originalRequest._retry = true; // Megjelöljük, hogy ez már újrapróbálkozás lesz
 
           try {
-            // 3. Megpróbáljuk frissíteni a tokent
+            // 3. Megpróbáljuk frissíteni a tokent, de csak egyszer ha több request van egyszerre
             if (!refreshPromise) {
               refreshPromise = Api.refreshToken().finally(() => {
                 refreshPromise = null;
