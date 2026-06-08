@@ -47,13 +47,15 @@ const MatchCard = ({ match, onClick, className, flagSize = "large", badge }: Mat
     if (outcomeBet?.outcome === outcome && oddsChanged) {
       return (
         <div className="flex flex-col items-center gap-0.5 leading-none">
-          <span>{betOdds!.toFixed(2)}</span>
-          <span className="flex items-center gap-0.5 text-[9px]">
-            {oddsWentUp
-              ? <IoArrowUp className="text-green-400" />
-              : <IoArrowDown className="text-red-400" />}
-            <span className="text-gray-300/60">{currentBetOdds!.toFixed(2)}</span>
+          <span className="flex items-center gap-1">
+            {currentOdds ? currentOdds.toFixed(2) : "-"}
+            {oddsWentUp ? (
+              <IoArrowUp className="text-green-400 text-[10px]" />
+            ) : (
+              <IoArrowDown className="text-red-400 text-[10px]" />
+            )}
           </span>
+          <span className="text-[9px] font-normal text-gray-500">({betOdds!.toFixed(2)})</span>
         </div>
       );
     }

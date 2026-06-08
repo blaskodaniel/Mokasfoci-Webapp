@@ -28,13 +28,13 @@ const Modal: React.FC<ModalProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className={`fixed inset-0 bg-black/80 bg-opacity-10 flex justify-center z-50 
-          ${position === "center" ? "items-center p-4" : "items-start pt-0 sm:pt-20"}`}
+          ${position === "center" ? "items-center p-4" : "items-start pt-0 sm:pt-5"}`}
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className={`shadow-lg relative flex flex-col w-full h-full sm:h-auto sm:rounded-lg ${className}`}
+            className={`shadow-lg relative flex flex-col w-full h-full sm:h-auto sm:max-h-[calc(100vh-2rem)] sm:rounded-lg ${className}`}
           >
             {title && (
               <div
@@ -53,7 +53,7 @@ const Modal: React.FC<ModalProps> = ({
               />
             )}
 
-            <div>{children}</div>
+            <div className="sm:flex-1 sm:min-h-0 sm:overflow-y-auto">{children}</div>
           </motion.div>
         </motion.div>
       )}

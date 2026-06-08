@@ -1,7 +1,7 @@
 import type { Column } from "@/components/Table/types";
 import { useMyBets } from "@/hooks/api/usePlayers";
 import { getMatchStatusInfo, getMatchTypeText, outcomeText } from "@/utils/common";
-import { CouponType, MatchStatus } from "@/utils/enums";
+import { CouponType, MatchOutcome, MatchStatus } from "@/utils/enums";
 import { useEffect, useState, useMemo } from "react";
 import { isBettableMatch, useAllMatches } from "@/hooks/api/useMatches";
 import { format } from "date-fns";
@@ -14,6 +14,7 @@ import type { MatchWithUserBet } from "@/components/Matches/types";
 import BetModal from "@/components/BetModal";
 import { useAuth } from "@/hooks/useAuth";
 import { useConfig } from "@/hooks/useConfig";
+import OddsCell from "@/components/Matches/OddsCell";
 
 const MatchesPage = () => {
   const { isDesktop } = useResponsive();
@@ -169,21 +170,21 @@ const MatchesPage = () => {
     {
       header: "Hazai",
       key: "oddsAwin",
-      render: (match) => <span className="text-gray-400">{match.oddsAwin?.toFixed(2) || "-"}</span>,
+      render: (match) => <OddsCell match={match} outcome={MatchOutcome.home} />,
       sortable: true,
       width: "w-24",
     },
     {
       header: "Döntetlen",
       key: "oddsDraw",
-      render: (match) => <span className="text-gray-400">{match.oddsDraw?.toFixed(2) || "-"}</span>,
+      render: (match) => <OddsCell match={match} outcome={MatchOutcome.draw} />,
       sortable: true,
       width: "w-24",
     },
     {
       header: "Vendég",
       key: "oddsBwin",
-      render: (match) => <span className="text-gray-400">{match.oddsBwin?.toFixed(2) || "-"}</span>,
+      render: (match) => <OddsCell match={match} outcome={MatchOutcome.away} />,
       sortable: true,
       width: "w-24",
     },

@@ -136,7 +136,7 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
       )}
 
       {/* Mobile: Sticky button at bottom, Desktop: Regular button */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-quaternary sm:relative sm:p-0 sm:bg-transparent sm:mt-6">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-quaternary sm:sticky sm:bottom-0 sm:px-0 sm:pb-0 sm:pt-3 sm:bg-primary sm:mt-3">
         <Button
           text={editMode ? "Mentés" : "LÉTREHOZÁS"}
           subText={subText}

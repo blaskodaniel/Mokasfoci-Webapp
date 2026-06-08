@@ -149,16 +149,23 @@ const MatchListItem = ({
               { isBet: isUserBetDraw, odds: match.oddsDraw },
               { isBet: isUserBetTeamBWin, odds: match.oddsBwin },
             ].map(({ isBet, odds }, i) => (
-              <div key={i} className={`flex items-center gap-0.5 leading-none ${isBet ? "text-white font-semibold" : "text-gray-400"}`}>
+              <div
+                key={i}
+                className={`flex items-center gap-1 leading-none ${isBet ? "text-white font-semibold" : "text-gray-400"}`}
+              >
                 {isBet && oddsChanged && (
-                  <span className="flex items-center gap-0.5 text-[9px] font-normal">
-                    <span className="text-gray-400">({currentBetOdds!.toFixed(2)})</span>
-                    {oddsWentUp
-                      ? <IoArrowUp className="text-green-400" />
-                      : <IoArrowDown className="text-red-400" />}
-                  </span>
+                  <>
+                    <span className="text-[9px] font-normal text-gray-500">
+                      ({betOdds!.toFixed(2)})
+                    </span>
+                    {oddsWentUp ? (
+                      <IoArrowUp className="text-green-400 text-[10px]" />
+                    ) : (
+                      <IoArrowDown className="text-red-400 text-[10px]" />
+                    )}
+                  </>
                 )}
-                <span>{isBet && oddsChanged ? betOdds!.toFixed(2) : (odds?.toFixed(2) ?? "-")}</span>
+                <span>{odds?.toFixed(2) ?? "-"}</span>
               </div>
             ))}
           </div>
