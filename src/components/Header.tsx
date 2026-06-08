@@ -34,7 +34,7 @@ const Header = ({
     >
       {!isDesktop && (
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 sm:w-23 sm:h-23 rounded-full shadow-lg shrink-0">
+          <Link to="/fooldal" className="w-8 h-8 sm:w-23 sm:h-23 rounded-full shadow-lg shrink-0">
             <img
               src={
                 currentUser?.avatar
@@ -44,9 +44,11 @@ const Header = ({
               alt="Avatar"
               className="w-full h-full rounded-full object-cover"
             />
-          </div>
+          </Link>
           <div className="flex flex-col">
-            <div className="text-xs">Hi, {currentUser?.name || currentUser?.username}!</div>
+            <Link to="/profilom" className="text-xs">
+              Hi, {currentUser?.name || currentUser?.username}!
+            </Link>
             <div className={`text-white rounded-full font-bold text-sm`}>
               {formatPoints(currentUser?.data.availableScore || 0)}
             </div>
@@ -81,7 +83,9 @@ const Header = ({
       {isDesktop && (
         <div className="flex items-center gap-2 ml-auto">
           <div className="flex flex-col items-end">
-            <div className="text-xs text-right px-3">{currentUser?.username}</div>
+            <Link to="/profilom" className="text-xs text-right px-3 underline underline-offset-2">
+              {currentUser?.username}
+            </Link>
             <div className={`text-white px-3 rounded-full font-bold text-sm`}>
               💰 {formatPoints(currentUser?.data.availableScore || 0)}
             </div>
