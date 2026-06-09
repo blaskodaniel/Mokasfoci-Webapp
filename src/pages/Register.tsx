@@ -32,11 +32,12 @@ const Register: React.FC = () => {
     setLoading(true);
 
     try {
+      const trimmedUsername = username.trim();
       if (config?.enabledInvitation) {
-        await Api.register(username, email, password, invitationCode);
+        await Api.register(trimmedUsername, email, password, invitationCode);
         setInvitationCode("");
       } else {
-        await Api.register(username, email, password);
+        await Api.register(trimmedUsername, email, password);
       }
 
       setUsername("");
