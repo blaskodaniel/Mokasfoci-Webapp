@@ -19,19 +19,23 @@ const ChatMessageBubble = ({
 
   if (message.type === ChatMessageType.system) {
     return (
-      <div className="flex flex-col items-center justify-center w-full my-3 gap-1">
-        <div className="flex items-center gap-2 mb-1.5">
-          <img
-            src="/spori_icon.jpeg"
-            alt="Spori"
-            className="w-8 h-8 rounded-full object-cover shadow-[0_0_10px_rgba(139,92,246,0.5)]"
-          />
-          <span className="text-[10px] font-bold text-purple-300 tracking-wider">Spori</span>
+      <div className="flex flex-col items-center w-full my-3 gap-1">
+        <div className="flex flex-col max-w-[90%]">
+          <span className="text-[10px] font-bold text-purple-300 tracking-wider ml-10 mb-1">
+            SporiBot
+          </span>
+          <div className="relative">
+            <img
+              src="/spori_icon.jpeg"
+              alt="Spori"
+              className="absolute -top-3 -left-4 w-12 h-12 rounded-full object-cover  border border-white/10 z-10"
+            />
+            <div className="text-sm py-2.5 px-4 pl-9 rounded-2xl shadow-sm bg-indigo-500/10 border border-indigo-500/30 text-indigo-100 backdrop-blur-sm">
+              {message.message}
+            </div>
+          </div>
+          <span className="text-[9px] text-text-muted px-1 mt-0.5 ml-2">{time}</span>
         </div>
-        <div className="text-sm py-2.5 px-4 rounded-2xl shadow-sm text-center bg-indigo-500/10 border border-indigo-500/30 text-indigo-100 max-w-[90%] backdrop-blur-sm">
-          {message.message}
-        </div>
-        <span className="text-[9px] text-text-muted px-1">{time}</span>
       </div>
     );
   }
