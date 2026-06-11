@@ -20,7 +20,7 @@ import WelcomePanel from "@/components/WelcomePanel";
 import TournamentEndPanel from "@/components/TournamentEndPanel";
 import { useAllTeams } from "@/hooks/api/useTeams";
 import { useConfig } from "@/hooks/useConfig";
-import { isBefore } from "date-fns";
+import { isBefore, subDays } from "date-fns";
 import BetModal from "@/components/BetModal";
 import { getMatchTypeText } from "@/utils/common";
 import { MatchType } from "@/utils/enums";
@@ -44,7 +44,7 @@ const HomePage = () => {
 
   const { data: upcomingMatches } = useUpcomingMatches(upcomingMatchesLength);
   const { data: teams } = useAllTeams();
-  
+
   const isTournamentOver = useMemo(() => {
     if (!teams) return false;
     return teams.some((t) => t.isTournamentWinner);
@@ -81,12 +81,13 @@ const HomePage = () => {
 
   return (
     <div>
-      {isBefore(new Date(), new Date(config?.championStartDate || "")) && !isTournamentOver && (
-        <section className="w-full px-3">
-          <WelcomePanel />
-        </section>
-      )}
-      
+      {isBefore(new Date(), subDays(new Date(config?.championStartDate || ""), 1)) &&
+        !isTournamentOver && (
+          <section className="w-full px-3">
+            <WelcomePanel />
+          </section>
+        )}
+
       {isTournamentOver && (
         <section className="w-full px-0 sm:px-3">
           <TournamentEndPanel />

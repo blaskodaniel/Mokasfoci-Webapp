@@ -34,7 +34,7 @@ const WelcomePanel: FC = () => {
         setTimeLeft("A bajnokság elkezdődött!");
         return;
       }
-      const days = Math.ceil(diff / (24 * 3600));
+      const days = Math.ceil(diff / (24 * 3600)) - 1;
       setTimeLeft(`${days} nap`);
     };
     updateCountdown();
