@@ -153,7 +153,7 @@ const MatchListItem = ({
                 key={i}
                 className={`flex items-center gap-1 leading-none ${isBet ? "text-white font-semibold" : "text-gray-400"}`}
               >
-                {isBet && oddsChanged && (
+                {isBet && oddsChanged && match.status === MatchStatus.enabled && (
                   <>
                     <span className="text-[9px] font-normal text-gray-500">
                       ({betOdds!.toFixed(2)})

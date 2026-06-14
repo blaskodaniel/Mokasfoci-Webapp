@@ -1,9 +1,11 @@
 import type { Bet } from "@/models/bet.type";
 import UserDisplay from "@/components/UserDisplay";
+import FavoriteTeamBadge from "@/components/Matches/FavoriteTeamBadge";
 import { outcomeText, potentialWinnings } from "@/utils/common";
 import { CouponType, MatchStatus } from "@/utils/enums";
 import { useCallback, type FC } from "react";
 import type { Match } from "@/models/match.type";
+import { useConfig } from "@/hooks/useConfig";
 
 interface MatchDetailMobileProps {
   bets: Bet[];
@@ -12,6 +14,7 @@ interface MatchDetailMobileProps {
 
 const MatchDetailMobile: FC<MatchDetailMobileProps> = ({ bets, match }) => {
   const matchStatus = match.status;
+  const { config } = useConfig();
   const isFinished = matchStatus === MatchStatus.finished;
 
   const sorting = (a: Bet, b: Bet) => {
@@ -50,7 +53,10 @@ const MatchDetailMobile: FC<MatchDetailMobileProps> = ({ bets, match }) => {
             px-3 py-2 border flex flex-col gap-1 mx-3 border-[#00000070]"
           >
             <div className="flex items-center justify-between mb-0.5">
-              <UserDisplay user={bet.userid!} showAvatar={true} avatarSize="sm" />
+              <div className="flex items-center gap-1.5 justify-between w-full">
+                <UserDisplay user={bet.userid!} showAvatar={true} avatarSize="sm" />
+                <FavoriteTeamBadge user={bet.userid} match={match} variant="pill" />
+              </div>
               {isFinished && (
                 <span
                   className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
@@ -93,7 +99,11 @@ const MatchDetailMobile: FC<MatchDetailMobileProps> = ({ bets, match }) => {
                       {bet.success && isFinished
                         ? bet.totalWin
                         : match.status === MatchStatus.playing
-                          ? potentialWinnings(bet.amount, bet.odds)
+                          ? potentialWinnings(
+                              bet.amount,
+                              bet.odds,
+                              bet.isFavoriteTeam ? config?.favoritTeamFactor : 1
+                            )
                           : null}
                     </span>
                   </div>

@@ -1,6 +1,7 @@
 import Table from "@/components/Table/Table";
 import type { Column } from "@/components/Table/types";
 import MatchDetailMobile from "@/components/Matches/MatchDetailMobile";
+import MatchBetStats from "@/components/Matches/MatchBetStats";
 import useResponsive from "@/hooks/useResponsive";
 import type { Bet } from "@/models/bet.type";
 import { getMatchStatusInfo, outcomeText, potentialWinnings } from "@/utils/common";
@@ -10,12 +11,14 @@ import { useMatchDetails } from "@/hooks/api/useMatches";
 import Loader from "@/components/Loader";
 import { APP_CONFIG } from "@/config";
 import { format } from "date-fns";
-import { MatchStatus } from "@/utils/enums";
+import { CouponType, MatchStatus } from "@/utils/enums";
 import UserDisplay from "@/components/UserDisplay";
 import MobileBackBar from "@/components/MobileBackBar";
+import useGame from "@/hooks/useGame";
 
 const MatchDetailPage = () => {
   const { id } = useParams();
+  const { getFavoriteTeam } = useGame();
 
   const {
     data: matchDetails,
@@ -57,14 +60,39 @@ const MatchDetailPage = () => {
     {
       header: "Játékos",
       key: "user",
-      render: (bet) => <UserDisplay user={bet.userid!} showAvatar={true} avatarSize="sm" />,
+      render: (bet) => {
+        const favoriteTeamId = getFavoriteTeam(bet.userid, bet.matchid);
+
+        return (
+          <div className="flex items-center gap-1.5">
+            <UserDisplay
+              user={bet.userid!}
+              showAvatar={true}
+              avatarSize="sm"
+              showFavoriteTeam={!!favoriteTeamId}
+            />
+          </div>
+        );
+      },
       sortable: true,
       // width: "w-48",
     },
     {
       header: "Tipp",
       key: "team",
-      render: (bet) => <span className="text-gray-400">{match && outcomeText(bet, match)}</span>,
+      render: (bet) => {
+        if (bet.type === CouponType.outcomeBet && match) {
+          return <span className="text-gray-400">{outcomeText(bet, match)}</span>;
+        }
+        if (bet.type === CouponType.scoreBet) {
+          return (
+            <span className="text-gray-400">
+              {bet.scoreTeamA} - {bet.scoreTeamB}
+            </span>
+          );
+        }
+        return null;
+      },
       sortable: true,
     },
     {
@@ -105,7 +133,11 @@ const MatchDetailPage = () => {
         const isFinished = match?.status === MatchStatus.finished;
 
         if (!isFinished) {
-          return <span className="text-gray-400">{potentialWinnings(bet.amount, bet.odds)}</span>;
+          return (
+            <span className="text-gray-400">
+              {bet.type !== CouponType.outcomeBet ? null : potentialWinnings(bet.amount, bet.odds)}
+            </span>
+          );
         }
 
         return (
@@ -210,7 +242,8 @@ const MatchDetailPage = () => {
         </div>
       </div>
 
-      <section>
+      <section className="mb-3">
+        <MatchBetStats bets={matchDetails?.coupons || []} match={match} showPercentages={false} />
         {isMobile ? (
           <MatchDetailMobile bets={matchDetails?.coupons || []} match={match} />
         ) : (

@@ -41,6 +41,8 @@ const OutcomeBetCard = ({
   const statusInfo = getCouponStatusInfo(bet.status);
 
   const hasResult = bet.matchid?.goalA != null && bet.matchid?.goalB != null;
+  const showWinnigs =
+    (bet.status === CouponStatus.closed && bet.success) || bet.status === CouponStatus.active;
 
   const renderMatchName = () => (
     <span className="flex items-center gap-1.5 truncate">
@@ -176,7 +178,7 @@ const OutcomeBetCard = ({
       {/* Perforated separator (Visual part for the ticket layout) */}
       <div className="w-0 flex items-center relative h-full">
         {/* The perforated line is transparent but creates dashed look through border */}
-        <div className="absolute left-[-2px] h-[calc(100%-16px)] w-px border-l-2 border-dashed border-gray-100 dark:border-[#1a1c23] z-20 mix-blend-overlay opacity-50" />
+        <div className="absolute -left-0.5 h-[calc(100%-16px)] w-px border-l-2 border-dashed border-gray-100 dark:border-[#1a1c23] z-20 mix-blend-overlay opacity-50" />
       </div>
 
       {/* Right Ticket Strip (Colored section) */}
@@ -208,14 +210,13 @@ const OutcomeBetCard = ({
           </span>
         </div>
 
-        {(bet.status === CouponStatus.closed && bet.success) ||
-          (bet.status === CouponStatus.active && (
-            <div className="z-10 w-full pl-0.5 flex flex-col justify-end pb-0.5">
-              <div className="text-sm sm:text-base font-black truncate drop-shadow-sm w-[90%] tracking-tight">
-                {bottomValue}
-              </div>
+        {showWinnigs && (
+          <div className="z-10 w-full pl-0.5 flex flex-col justify-end pb-0.5">
+            <div className="text-sm sm:text-base font-black truncate drop-shadow-sm w-[90%] tracking-tight">
+              {bottomValue}
             </div>
-          ))}
+          </div>
+        )}
       </div>
     </motion.div>
   );

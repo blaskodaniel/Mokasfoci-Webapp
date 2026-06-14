@@ -3,6 +3,8 @@ import type { Match } from "@/models/match.type";
 import { CouponType, MatchOutcome } from "@/utils/enums";
 import { useCallback } from "react";
 import { useAuth } from "./useAuth";
+import type { User } from "@/models/user.type";
+import type { Team } from "@/models/team.type";
 
 const useGame = () => {
   const { user: currentUser } = useAuth();
@@ -35,9 +37,29 @@ const useGame = () => {
     };
   }, []);
 
+  // A user kedvenc csapata (data.teamid) lehet sima id string vagy populált team objektum is,
+  // attól függően, melyik endpoint adta vissza – mindkettőt kezeljük.
+  const resolveTeamId = (teamid: unknown): string | null => {
+    if (!teamid) return null;
+
+    if (typeof teamid === "string") return teamid;
+    return (teamid as { _id?: string })._id ?? null;
+  };
+
+  // Visszaadja a meccs azon csapatát, amelyik a user kedvence – ha egyik sem, akkor null.
+  const getFavoriteTeam = (user: User | undefined, match: Match): Team | undefined => {
+    const favId = resolveTeamId(user?.data?.teamid);
+    if (!favId) return undefined;
+
+    if (resolveTeamId(match.teamA)?.toString() === favId.toString()) return match.teamA;
+    if (resolveTeamId(match.teamB)?.toString() === favId.toString()) return match.teamB;
+    return undefined;
+  };
+
   return {
     userFavoriteTeam,
     userBetInfo,
+    getFavoriteTeam,
   };
 };
 

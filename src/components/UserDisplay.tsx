@@ -10,6 +10,7 @@ interface UserDisplayProps {
   nameClassName?: string;
   onClick?: () => void;
   withBackground?: boolean;
+  showFavoriteTeam?: boolean;
 }
 
 const UserDisplay = ({
@@ -21,6 +22,7 @@ const UserDisplay = ({
   nameClassName = "",
   onClick,
   withBackground = false,
+  showFavoriteTeam = false,
 }: UserDisplayProps) => {
   const getAvatarUrl = () => {
     if (user?.avatar && user.avatar.trim() !== "") {
@@ -74,11 +76,16 @@ const UserDisplay = ({
         </div>
       )}
       {showUsername && (
-        <div
-          className={`font-semibold truncate ${nameClassName} ${onClick ? "cursor-pointer" : ""}`}
-          onClick={() => onClick && onClick()}
-        >
-          {user?.name || user.username || ""}
+        <div>
+          <div
+            className={`font-semibold truncate ${nameClassName} ${onClick ? "cursor-pointer" : ""}`}
+            onClick={() => onClick && onClick()}
+          >
+            {user?.name || user.username || ""}
+          </div>
+          {showFavoriteTeam && (
+            <span className="text-gray-400 text-xs italic">Kedvenc csapata játszik</span>
+          )}
         </div>
       )}
     </div>

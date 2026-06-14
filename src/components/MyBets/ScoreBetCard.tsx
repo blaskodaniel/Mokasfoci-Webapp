@@ -58,7 +58,7 @@ const ScoreBetCard = ({
     } else {
       stripClasses = "bg-rose-500 text-white";
       statusText = "Vesztett";
-      bottomValue = "0";
+      bottomValue = "";
     }
   }
 
