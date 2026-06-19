@@ -15,9 +15,11 @@ import { CouponType, MatchStatus } from "@/utils/enums";
 import UserDisplay from "@/components/UserDisplay";
 import MobileBackBar from "@/components/MobileBackBar";
 import useGame from "@/hooks/useGame";
+import { useConfig } from "@/hooks/useConfig";
 
 const MatchDetailPage = () => {
   const { id } = useParams();
+  const { config } = useConfig();
   const { getFavoriteTeam } = useGame();
 
   const {
@@ -69,7 +71,7 @@ const MatchDetailPage = () => {
               user={bet.userid!}
               showAvatar={true}
               avatarSize="sm"
-              showFavoriteTeam={!!favoriteTeamId}
+              showFavoriteTeam={!!favoriteTeamId && bet.type === CouponType.outcomeBet}
             />
           </div>
         );
@@ -130,12 +132,19 @@ const MatchDetailPage = () => {
       key: "custom_key",
       valueBySort: (bet) => potentialWinnings(bet.amount, bet.odds),
       render: (bet) => {
+        const favoriteTeamId = getFavoriteTeam(bet.userid, bet.matchid);
         const isFinished = match?.status === MatchStatus.finished;
 
         if (!isFinished) {
           return (
             <span className="text-gray-400">
-              {bet.type !== CouponType.outcomeBet ? null : potentialWinnings(bet.amount, bet.odds)}
+              {bet.type !== CouponType.outcomeBet
+                ? null
+                : potentialWinnings(
+                    bet.amount,
+                    bet.odds,
+                    favoriteTeamId ? config?.favoritTeamFactor : 1
+                  )}
             </span>
           );
         }

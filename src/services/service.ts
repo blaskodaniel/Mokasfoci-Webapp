@@ -11,6 +11,7 @@ import type {
   ScoreByMatchResponse,
   SignInResponse,
   TeamDetails,
+  ToplistResponse,
   TournamentBracketResponse,
   UpdateUserProfileBody,
   UserDetails,
@@ -163,7 +164,7 @@ const Api = {
     return response.data;
   },
 
-  async getToplist(): Promise<User[]> {
+  async getToplist(): Promise<ToplistResponse> {
     const response = await axiosInstance.get(`/user/toplist`);
     return response.data;
   },

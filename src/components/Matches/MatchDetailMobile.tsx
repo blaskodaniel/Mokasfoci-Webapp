@@ -6,6 +6,7 @@ import { CouponType, MatchStatus } from "@/utils/enums";
 import { useCallback, type FC } from "react";
 import type { Match } from "@/models/match.type";
 import { useConfig } from "@/hooks/useConfig";
+import useGame from "@/hooks/useGame";
 
 interface MatchDetailMobileProps {
   bets: Bet[];
@@ -14,6 +15,7 @@ interface MatchDetailMobileProps {
 
 const MatchDetailMobile: FC<MatchDetailMobileProps> = ({ bets, match }) => {
   const matchStatus = match.status;
+  const { getFavoriteTeam } = useGame();
   const { config } = useConfig();
   const isFinished = matchStatus === MatchStatus.finished;
 
@@ -46,6 +48,7 @@ const MatchDetailMobile: FC<MatchDetailMobileProps> = ({ bets, match }) => {
         </div>
       )}
       {bets.sort(sorting).map((bet) => {
+        const favoriteTeam = getFavoriteTeam(bet.userid, match);
         return (
           <div
             key={bet._id}
@@ -55,7 +58,9 @@ const MatchDetailMobile: FC<MatchDetailMobileProps> = ({ bets, match }) => {
             <div className="flex items-center justify-between mb-0.5">
               <div className="flex items-center gap-1.5 justify-between w-full">
                 <UserDisplay user={bet.userid!} showAvatar={true} avatarSize="sm" />
-                <FavoriteTeamBadge user={bet.userid} match={match} variant="pill" />
+                {bet.type === CouponType.outcomeBet && (
+                  <FavoriteTeamBadge user={bet.userid} match={match} variant="pill" />
+                )}
               </div>
               {isFinished && (
                 <span
@@ -102,7 +107,7 @@ const MatchDetailMobile: FC<MatchDetailMobileProps> = ({ bets, match }) => {
                           ? potentialWinnings(
                               bet.amount,
                               bet.odds,
-                              bet.isFavoriteTeam ? config?.favoritTeamFactor : 1
+                              favoriteTeam ? config?.favoritTeamFactor : 1
                             )
                           : null}
                     </span>

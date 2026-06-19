@@ -21,7 +21,7 @@ const ToplistWidget = ({ showHeader = true }) => {
         loading={toplistLoading}
         error={toplistError?.message ? "Error loading top scorers" : undefined}
       >
-        {toplist && toplist.length > 0 && (
+        {toplist && toplist.toplist.length > 0 && (
           <div className="px-2 py-4">
             {showHeader && (
               <>
@@ -39,7 +39,7 @@ const ToplistWidget = ({ showHeader = true }) => {
             )}
 
             <div className="space-y-3">
-              {toplist.slice(0, 3).map((player: User, index: number) => {
+              {toplist.toplist.slice(0, 3).map((player: User, index: number) => {
                 const positionIcon = getToplistCrownIcon(index, 15);
                 return (
                   <div key={player._id} className="flex justify-between">

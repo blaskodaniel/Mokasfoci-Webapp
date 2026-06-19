@@ -162,3 +162,17 @@ export interface TournamentBracketResponse {
   matches: Match[];
   thirdPlaceMatch: Match;
 }
+
+export interface ToplistResponse {
+  toplist: User[];
+  roilist: {
+    avatar: string;
+    couponCount: number;
+    roi: number;
+    totalWagered: number;
+    totalWon: number;
+    userid: string;
+    username: string;
+    name: string;
+  };
+}

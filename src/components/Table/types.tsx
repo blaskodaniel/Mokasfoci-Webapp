@@ -16,6 +16,7 @@ export interface TableProps<T> {
   emptyMessage?: string;
   loading?: boolean;
   error?: string;
+  itemLabel?: string;
 }
 
 export type SortDirection = "asc" | "desc" | null;

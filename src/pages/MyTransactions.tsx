@@ -117,6 +117,7 @@ const MyTransactions = () => {
             error={
               myTransactionsError?.message && "Valami hiba történt, kérlek próbáld újra később."
             }
+            itemLabel="tranzakció"
           />
         </section>
       ) : (

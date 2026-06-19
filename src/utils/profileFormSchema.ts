@@ -7,7 +7,7 @@ export const profileFormSchema = z.object({
     .max(50, "A neved legfeljebb 50 karakter hosszú lehet")
     .optional()
     .or(z.literal("")),
-  teamid: z.string().optional().or(z.literal("")),
+  teamid: z.string().optional().or(z.literal("")), // = string | undefined | ""
   avatar: z.string().optional().or(z.literal("")),
   winteamid: z.string().optional().or(z.literal("")),
   A: z.string().optional().or(z.literal("")),

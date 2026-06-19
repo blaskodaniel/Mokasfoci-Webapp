@@ -7,9 +7,9 @@ import { APP_CONFIG, DEFAULT_AVATAR_URL } from "@/config";
 const TournamentEndPanel: FC = () => {
   const { data: toplist, isLoading } = useToplist();
 
-  if (isLoading || !toplist || toplist.length < 3) return null;
+  if (isLoading || !toplist || toplist.toplist.length < 3) return null;
 
-  const top3 = toplist.slice(0, 3);
+  const top3 = toplist.toplist.slice(0, 3);
   const first = top3[0];
   const second = top3[1];
   const third = top3[2];

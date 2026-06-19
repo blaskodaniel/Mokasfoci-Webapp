@@ -79,8 +79,8 @@ const Statistics = () => {
           <MultiSelect
             placeholder="Válassz játékost..."
             options={
-              users
-                ?.filter((x) => x._id !== currentUser.user?._id)
+              users?.toplist
+                .filter((x) => x._id !== currentUser.user?._id)
                 .map((x) => ({ value: x._id, label: x.username })) || []
             }
             selectedValues={selectedUsers}

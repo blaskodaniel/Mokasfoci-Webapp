@@ -18,6 +18,7 @@ const MatchesDesktopView: FC<MatchesDesktopViewProps> = ({
       className="mt-4"
       loading={loading}
       error={error}
+      itemLabel="merkozés"
     />
   );
 };

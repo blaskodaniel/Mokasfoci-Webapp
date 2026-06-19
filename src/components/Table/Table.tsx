@@ -4,6 +4,8 @@ import type { SortDirection, TableProps } from "./types";
 import { FaLongArrowAltUp } from "react-icons/fa";
 import Loader from "../Loader";
 
+// <T extends Record<string, unknown> – ez egy megkötés (constraint) a T-re:
+// "a T-nek olyan objektumnak kell lennie, aminek string kulcsai vannak, bármilyen értékkel
 const Table = <T extends Record<string, unknown>>({
   data,
   columns,
@@ -12,6 +14,7 @@ const Table = <T extends Record<string, unknown>>({
   emptyMessage = "Nincs adat",
   loading = false,
   error = "",
+  itemLabel = "elem",
 }: TableProps<T>) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortKey, setSortKey] = useState<string | null>(null);
@@ -21,9 +24,11 @@ const Table = <T extends Record<string, unknown>>({
   const sortedData = useMemo(() => {
     if (!sortKey || !sortDirection) return data;
 
+    const sortColumn = columns.find((col) => col.key === sortKey);
+
     return [...data].sort((a, b) => {
-      const aValue = a[sortKey];
-      const bValue = b[sortKey];
+      const aValue = sortColumn?.valueBySort ? sortColumn.valueBySort(a) : a[sortKey];
+      const bValue = sortColumn?.valueBySort ? sortColumn.valueBySort(b) : b[sortKey];
 
       // Ha ugyanaz az érték
       if (aValue === bValue) return 0;
@@ -55,9 +60,11 @@ const Table = <T extends Record<string, unknown>>({
       const aStr = String(aValue);
       const bStr = String(bValue);
 
-      return sortDirection === "asc" ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
+      return sortDirection === "asc"
+        ? aStr.localeCompare(bStr, "hu", { sensitivity: "base", numeric: true })
+        : bStr.localeCompare(aStr, "hu", { sensitivity: "base", numeric: true });
     });
-  }, [data, sortKey, sortDirection]);
+  }, [data, sortKey, sortDirection, columns]);
 
   // Lapozás logika
   const totalPages = Math.ceil(sortedData.length / pageSize);
@@ -201,7 +208,7 @@ const Table = <T extends Record<string, unknown>>({
       {totalPages > 1 && (
         <div className="bg-surface border-t border-primary/50 px-4 py-3 flex items-center justify-between">
           <div className="text-sm text-gray-400">
-            Összesen {sortedData.length} mérkőzés, {totalPages} oldal
+            Összesen {sortedData.length} {itemLabel}, {totalPages} oldal
           </div>
 
           <div className="flex items-center gap-2">

@@ -61,7 +61,9 @@ const ToplistMobileView: FC<ToplistProps> = ({ users, loading, error, onSelect }
                 <div className="font-bold text-lg text-blue-700 flex items-center">
                   {formatNumber(user.data.profitScore)}
                 </div>
-                {/* <div className="text-xs text-gray-500">pont</div> */}
+                <div className="text-[10px] leading-tight text-gray-500">
+                  {formatNumber(user.data.availableScore)} pont
+                </div>
                 <div className="font-bold text-sm text-gray-500 mt-0">#{i + 1}</div>
               </div>
             </motion.div>

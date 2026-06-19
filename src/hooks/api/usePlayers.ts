@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Api from "@/services/service";
-import type { User } from "@/models/user.type";
 import type { Bet } from "@/models/bet.type";
 import { useAuth } from "@/hooks/useAuth";
 import { MatchOutcome, CouponType } from "@/utils/enums";
@@ -9,6 +8,7 @@ import type {
   BalanceHistoryEntry,
   DefaultAvatar,
   ScoreByMatchResponse,
+  ToplistResponse,
   UpdateUserProfileBody,
   WinLostStats,
 } from "@/services/types";
@@ -29,7 +29,7 @@ export const playersKeys = {
 
 // Toplist hook
 export const useToplist = () => {
-  return useQuery<User[]>({
+  return useQuery<ToplistResponse>({
     queryKey: [...playersKeys.toplist()],
     queryFn: () => Api.getToplist(),
     staleTime: 15 * 60 * 1000, // 15 perc (ritkábban változik)

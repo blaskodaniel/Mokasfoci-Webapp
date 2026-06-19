@@ -26,7 +26,7 @@ const ToplistPage = () => {
     },
     {
       header: "Játékos",
-      key: "username",
+      key: "name",
       render: (user) => (
         <UserDisplay
           user={user}
@@ -38,18 +38,21 @@ const ToplistPage = () => {
           }}
         />
       ),
+      valueBySort: (user) => user.name ?? "",
       sortable: true,
     },
     {
       header: "Összpontszám",
       key: "data.availableScore",
       render: (user) => <div>{formatNumber(user?.data.availableScore)}</div>,
+      valueBySort: (user) => user.data.availableScore,
       sortable: true,
     },
     {
       header: "Nyeremény",
       key: "data.profitScore",
       render: (user) => <div>{formatNumber(user?.data.profitScore)}</div>,
+      valueBySort: (user) => user.data.profitScore,
       sortable: true,
     },
   ];
@@ -59,18 +62,19 @@ const ToplistPage = () => {
       <section>
         {!isMobile && (
           <Table
-            data={toplist || []}
+            data={toplist?.toplist || []}
             columns={columns}
             pageSize={10}
-            emptyMessage="Még nincsenek mérkőzések"
+            emptyMessage="Még nincsenek játékosok"
             className="mt-4"
             loading={toplistLoading}
             error={toplistError?.message && "Valami hiba történt, kérlek próbáld újra később."}
+            itemLabel="játékos"
           />
         )}
         {isMobile && (
           <ToplistMobileView
-            users={toplist || []}
+            users={toplist?.toplist || []}
             loading={toplistLoading}
             error={toplistError?.message && "Valami hiba történt, kérlek próbáld újra később."}
             onSelect={(userId: string) => {

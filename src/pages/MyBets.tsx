@@ -329,6 +329,7 @@ const MyBetsPage = () => {
             className="mt-4"
             loading={myBetsLoading || deleteBetMutation.isPending}
             error={myBetsError?.message && "Valami hiba történt, kérlek próbáld újra később."}
+            itemLabel="fogadás"
           />
         </section>
       )}

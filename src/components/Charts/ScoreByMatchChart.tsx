@@ -14,6 +14,7 @@ import {
 import Loader from "../Loader";
 import { formatNumber } from "@/utils/common";
 import { IoStatsChart } from "react-icons/io5";
+import type { CouponType } from "@/utils/enums";
 
 const COLORS = [
   "#e6194B", // Red
@@ -33,6 +34,15 @@ const COLORS = [
   "#aaffc3", // Mint
 ];
 
+interface IChangeByCoupon {
+  amount: number;
+  change: number;
+  couponId: string;
+  success: boolean;
+  totalWin: number;
+  type: CouponType;
+}
+
 interface CustomTooltipProps {
   active?: boolean;
   payload?: Array<{
@@ -41,12 +51,18 @@ interface CustomTooltipProps {
     dataKey: string;
     payload: any;
     color: string;
+    changesByCoupon: IChangeByCoupon[];
   }>;
 }
 
 const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
+
+    // Vesszővel elválasztott, előjeles lista a szelvényenkénti változásokból, pl. "+3000, -1000"
+    const couponBreakdown = (changes: IChangeByCoupon[]) =>
+      changes.map((c) => `${c.change >= 0 ? "+" : ""}${formatNumber(c.change)}`).join(", ");
+
     return (
       <div
         className="bg-surface/95 backdrop-blur-sm border border-accent/20 rounded-lg px-4 py-3 
@@ -56,9 +72,29 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
           {data.isInitial ? "Kezdeti állapot" : `${data.teamA} - ${data.teamB}`}
         </p>
         <div className="space-y-1">
-          {data.change >= 0 && <p className="text-green-400">+{data.change}</p>}
-          {data.isNotBetting && <p className="text-red-400">Nem fogadtál</p>}
-          {!data.isNotBetting && data.change < 0 && <p className="text-red-400">Vesztett</p>}
+          {data.change >= 0 && (
+            <div>
+              <p className="text-green-400">
+                +{formatNumber(data.change)}
+                {data.changesByCoupon.length > 1 && (
+                  <span className="text-xs text-text-secondary ml-1.5">
+                    ({couponBreakdown(data.changesByCoupon)})
+                  </span>
+                )}
+              </p>
+            </div>
+          )}
+          {data.isNotBetting && <p className="text-red-400">Nem fogadtál (-300)</p>}
+          {!data.isNotBetting && data.change < 0 && (
+            <p className="text-red-400">
+              {formatNumber(data.change)}
+              {data.changesByCoupon.length > 1 && (
+                <span className="text-xs text-text-secondary ml-1.5">
+                  ({couponBreakdown(data.changesByCoupon)})
+                </span>
+              )}
+            </p>
+          )}
           <div className="border-t border-gray-600 my-2" />
           <p className="text-sm text-text-secondary">
             <span className="text-text-secondary">Pontod:</span>{" "}
