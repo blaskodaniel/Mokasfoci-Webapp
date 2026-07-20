@@ -67,7 +67,7 @@ const TournamentEndPanel: FC = () => {
                 {second.username}
               </div>
               <div className="text-xs sm:text-sm text-gray-400 mt-1">
-                {formatPoints(second.data?.profitScore || 0, false)}
+                {formatPoints(second.data?.availableScore || 0, false)}
               </div>
             </motion.div>
             <motion.div
@@ -110,7 +110,7 @@ const TournamentEndPanel: FC = () => {
                 {first.username}
               </div>
               <div className="text-xs sm:text-sm text-yellow-200 mt-1 font-semibold">
-                {formatPoints(first.data?.profitScore || 0, false)}
+                {formatPoints(first.data?.availableScore || 0, false)}
               </div>
             </motion.div>
             <motion.div
@@ -145,7 +145,7 @@ const TournamentEndPanel: FC = () => {
                 {third.username}
               </div>
               <div className="text-[10px] sm:text-xs text-gray-400 mt-1">
-                {formatPoints(third.data?.profitScore || 0, false)}
+                {formatPoints(third.data?.availableScore || 0, false)}
               </div>
             </motion.div>
             <motion.div

@@ -5,7 +5,15 @@ import { motion } from "framer-motion";
 import UserDisplay from "../UserDisplay";
 import { formatNumber } from "@/utils/common";
 
-const ToplistMobileView: FC<ToplistProps> = ({ users, loading, error, onSelect }) => {
+const ToplistMobileView: FC<ToplistProps> = ({
+  users,
+  primaryLabel = "pont",
+  secondaryLabel = "pont",
+  secondaryPodiumLabel = "",
+  loading,
+  error,
+  onSelect,
+}) => {
   if (loading) {
     return <Loader text="Lista betöltése..." />;
   }
@@ -42,27 +50,36 @@ const ToplistMobileView: FC<ToplistProps> = ({ users, loading, error, onSelect }
           const i = order[idx];
           return (
             <motion.div
-              key={user._id}
+              key={user.id}
               initial={{ height: 0, opacity: 1 }}
               animate={{ height: heights[i], opacity: 1 }}
               transition={{ delay: 0.2 + i * 0.15, type: "spring", stiffness: 60 }}
               className={`flex flex-col items-center justify-end relative 
                 z-10 w-30 ${colors[i]} border-2 ${borderColors[i]} rounded-t-2xl shadow-lg`}
               // style={{ overflow: "hidden" }}
-              onClick={() => onSelect && onSelect(user._id)}
+              onClick={() => onSelect && onSelect(user.id)}
             >
               <div className="absolute -top-18 flex flex-col items-center">
-                <UserDisplay user={user} avatarSize="md" showUsername={false} />
+                <UserDisplay
+                  user={{
+                    _id: user.id,
+                    avatar: user.avatar,
+                    name: user.name,
+                    username: user.username,
+                  }}
+                  avatarSize="md"
+                  showUsername={false}
+                />
                 <div className="font-bold text-sm mt-1 text-center truncate w-24">
                   {user?.name || user.username}
                 </div>
               </div>
               <div className="flex flex-col items-center justify-center h-full w-full pb-1">
                 <div className="font-bold text-lg text-blue-700 flex items-center">
-                  {formatNumber(user.data.profitScore)}
+                  {formatNumber(user.primary)} {secondaryPodiumLabel}
                 </div>
                 <div className="text-[10px] leading-tight text-gray-500">
-                  {formatNumber(user.data.availableScore)} pont
+                  {formatNumber(user.secondary)} {secondaryLabel}
                 </div>
                 <div className="font-bold text-sm text-gray-500 mt-0">#{i + 1}</div>
               </div>
@@ -75,24 +92,33 @@ const ToplistMobileView: FC<ToplistProps> = ({ users, loading, error, onSelect }
       <div className="space-y-1 w-full">
         {others.map((user, i) => (
           <div
-            key={user._id}
+            key={user.id}
             className="flex gap-4 items-center justify-between cursor-pointer hover:bg-gray-700/10 transition-colors p-1 pr-2 rounded"
-            onClick={() => onSelect && onSelect(user._id)}
+            onClick={() => onSelect && onSelect(user.id)}
           >
             <div className="flex items-center gap-3 ">
               <div className="text-gray-400 text-md font-semibold w-5 text-center pb-1">
                 #{i + 4}
               </div>
-              <UserDisplay user={user} avatarSize="sm" showUsername={false} />
+              <UserDisplay
+                user={{
+                  _id: user.id,
+                  avatar: user.avatar,
+                  name: user.name,
+                  username: user.username,
+                }}
+                avatarSize="sm"
+                showUsername={false}
+              />
               <div className="font-medium mb-0">
                 <div>{user?.name || user.username}</div>
                 <div className="text-xs text-gray-400">
-                  {formatNumber(user.data.availableScore)} <span className="text-xs">pont</span>
+                  {formatNumber(user.secondary)} <span className="text-xs">{secondaryLabel}</span>
                 </div>
               </div>
             </div>
             <div className="text-md font-semibold text-green-400">
-              {formatNumber(user.data.profitScore)} <span className="text-xs">pont</span>
+              {formatNumber(user.primary)} <span className="text-xs">{primaryLabel}</span>
             </div>
           </div>
         ))}

@@ -165,7 +165,7 @@ export interface TournamentBracketResponse {
 
 export interface ToplistResponse {
   toplist: User[];
-  roilist: {
+  roiList: {
     avatar: string;
     couponCount: number;
     roi: number;
@@ -174,5 +174,5 @@ export interface ToplistResponse {
     userid: string;
     username: string;
     name: string;
-  };
+  }[];
 }

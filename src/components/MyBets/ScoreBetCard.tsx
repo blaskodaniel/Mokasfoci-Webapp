@@ -2,7 +2,7 @@ import { APP_CONFIG } from "@/config";
 import type { Bet } from "@/models/bet.type";
 import type { Team } from "@/models/team.type";
 import { formatNumber, getCouponStatusInfo } from "@/utils/common";
-import { CouponStatus } from "@/utils/enums";
+import { CouponStatus, MatchStatus } from "@/utils/enums";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { IoTrashOutline } from "react-icons/io5";
@@ -145,7 +145,7 @@ const ScoreBetCard = ({
               <span className="font-medium flex items-center">{renderMatchName()}</span>
             )}
           </div>
-          {bet.status === CouponStatus.active && (
+          {bet.status === CouponStatus.active && bet.matchid?.status !== MatchStatus.playing && (
             <div className="flex items-center gap-3">
               <button onClick={() => onEdit(bet)} className="text-white " title="Módosítás">
                 <MdEdit size={16} />
@@ -161,7 +161,7 @@ const ScoreBetCard = ({
       {/* Perforated separator */}
       <div className="w-0 flex items-center relative h-full">
         <div
-          className="absolute left-[-2px] h-[calc(100%-16px)] w-px border-l-2 
+          className="absolute -left-0.5 h-[calc(100%-16px)] w-px border-l-2 
         border-dashed border-gray-100 dark:border-[#1a1c23] 
         z-20 mix-blend-overlay opacity-50"
         />

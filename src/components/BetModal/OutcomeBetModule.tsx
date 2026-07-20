@@ -12,7 +12,8 @@ import { useGetGroupStandingsById } from "@/hooks/api/useTeams";
 import type { Match } from "@/models/match.type";
 import { useAuth } from "@/hooks/useAuth";
 
-const MIN_BET = 100;
+const MIN_BET = 100; // lépésköz: a tét 100-asra kerekítődik
+const MIN_VALID_BET = 200; // minimum érvényes (leadható) tét
 
 const GROUP_STAGE_TYPES = new Set([
   MatchType.GroupStageRound1,
@@ -68,7 +69,7 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
   }, [maxAllowedScore, editMode, betValue]);
 
   const isValidBet =
-    betValue >= MIN_BET &&
+    betValue >= MIN_VALID_BET &&
     betValue <= maxAllowedScore &&
     selectedOutcome !== null &&
     isExistAllOdds;

@@ -6,7 +6,11 @@ interface BetValueSelectorProps {
   maxAllowedScore: number;
 }
 
-const BetValueSelector: FC<BetValueSelectorProps> = ({ betValue, onChangeBetValue, maxAllowedScore }) => {
+const BetValueSelector: FC<BetValueSelectorProps> = ({
+  betValue,
+  onChangeBetValue,
+  maxAllowedScore,
+}) => {
   return (
     <div className="mt-6 flex-1 sm:flex-none">
       <label className="block text-sm font-medium mb-3 text-center">Feltett tét</label>
@@ -15,8 +19,8 @@ const BetValueSelector: FC<BetValueSelectorProps> = ({ betValue, onChangeBetValu
           type="button"
           aria-label="Csökkentés"
           className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-white text-2xl flex items-center justify-center shadow transition disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={() => onChangeBetValue((v) => Math.max(100, v - 100))}
-          disabled={betValue <= 100}
+          onClick={() => onChangeBetValue((v) => Math.max(200, v - 100))}
+          disabled={betValue <= 200}
         >
           –
         </button>

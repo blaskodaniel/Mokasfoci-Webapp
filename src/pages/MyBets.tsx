@@ -17,6 +17,7 @@ import { useConfig } from "@/hooks/useConfig";
 import useGame from "@/hooks/useGame";
 import { useQueryClient } from "@tanstack/react-query";
 import BetModal from "@/components/BetModal";
+import { AxiosError } from "axios";
 
 const MyBetsPage = () => {
   const queryClient = useQueryClient();
@@ -67,8 +68,12 @@ const MyBetsPage = () => {
         setIsConfirmModalOpen(false);
         setSelectedBet(null);
       },
-      onError: (error) => {
-        console.error("Error deleting bet:", error);
+      onError: (error: unknown) => {
+        if (error instanceof AxiosError) {
+          console.log("Error deleting bet:", error.response?.data?.message || error.message);
+        } else {
+          console.error("Error deleting bet:", error);
+        }
       },
     });
   };
@@ -250,7 +255,8 @@ const MyBetsPage = () => {
       header: "",
       key: "actions",
       render: (coupon) =>
-        coupon.status === CouponStatus.active ? (
+        coupon.status === CouponStatus.active &&
+        coupon.matchid?.status !== MatchStatus.playing ? (
           <div className="flex gap-4">
             <MdEdit className="cursor-pointer" size={15} onClick={() => handleEditRow(coupon)} />
             <IoTrashOutline

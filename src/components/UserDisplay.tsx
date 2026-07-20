@@ -2,7 +2,7 @@ import type { User } from "@/models/user.type";
 import { APP_CONFIG, DEFAULT_AVATAR_URL } from "@/config";
 
 interface UserDisplayProps {
-  user: User;
+  user: Pick<User, "_id" | "username" | "name" | "avatar">;
   showAvatar?: boolean;
   showUsername?: boolean;
   className?: string;

@@ -4,9 +4,9 @@ import type { SortDirection, TableProps } from "./types";
 import { FaLongArrowAltUp } from "react-icons/fa";
 import Loader from "../Loader";
 
-// <T extends Record<string, unknown> – ez egy megkötés (constraint) a T-re:
-// "a T-nek olyan objektumnak kell lennie, aminek string kulcsai vannak, bármilyen értékkel
-const Table = <T extends Record<string, unknown>>({
+// <T extends object> – a T tetszőleges objektum lehet (nem kell index signature).
+// A sortKey szerinti indexeléshez lokálisan Record<string, unknown>-ra kasztolunk.
+const Table = <T extends object>({
   data,
   columns,
   pageSize = 10,
@@ -27,8 +27,12 @@ const Table = <T extends Record<string, unknown>>({
     const sortColumn = columns.find((col) => col.key === sortKey);
 
     return [...data].sort((a, b) => {
-      const aValue = sortColumn?.valueBySort ? sortColumn.valueBySort(a) : a[sortKey];
-      const bValue = sortColumn?.valueBySort ? sortColumn.valueBySort(b) : b[sortKey];
+      const aValue = sortColumn?.valueBySort
+        ? sortColumn.valueBySort(a)
+        : (a as Record<string, unknown>)[sortKey];
+      const bValue = sortColumn?.valueBySort
+        ? sortColumn.valueBySort(b)
+        : (b as Record<string, unknown>)[sortKey];
 
       // Ha ugyanaz az érték
       if (aValue === bValue) return 0;
