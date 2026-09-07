@@ -141,9 +141,11 @@ const Table = <T extends object>({
   }, [columns]);
 
   return (
-    <div className={`bg-panel-bg border border-primary rounded-md overflow-hidden ${className}`}>
+    <div
+      className={`rounded-tile border border-tile-border bg-[image:var(--tile-bg-gradient)] shadow-tile overflow-hidden ${className}`}
+    >
       {/* Header */}
-      <div className="bg-surface border-b border-primary/50">
+      <div className="bg-white/[0.03] border-b border-tile-border">
         <div
           className="grid gap-2 px-4 py-3"
           style={{
@@ -153,8 +155,8 @@ const Table = <T extends object>({
           {columns.map((column) => (
             <div
               key={column.key}
-              className={`flex items-center gap-1 text-sm font-medium ${column.className} ${
-                column.sortable ? "cursor-pointer hover:text-button-bg-hover transition-colors" : ""
+              className={`flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-text-secondary ${column.className} ${
+                column.sortable ? "cursor-pointer hover:text-white transition-colors" : ""
               }`}
               onClick={() => handleSort(column.key)}
             >
@@ -165,9 +167,9 @@ const Table = <T extends object>({
                     size={12}
                     className={`transition-all duration-200 ${
                       sortKey === column.key && sortDirection === "asc"
-                        ? "rotate-180 text-button-bg-hover"
+                        ? "rotate-180 text-accent-soft"
                         : sortKey === column.key && sortDirection === "desc"
-                          ? "text-button-bg-hover"
+                          ? "text-accent-soft"
                           : "hidden"
                     }`}
                   />
@@ -179,27 +181,27 @@ const Table = <T extends object>({
       </div>
 
       {/* Body */}
-      <div className="relative divide-y divide-primary/20 min-h-[50px]">
+      <div className="relative divide-y divide-tile-border min-h-[50px]">
         {loading && (
           <div className="absolute inset-0 bg-black/50 pt-10 divide-y text-center text-white">
             <Loader text="Táblázat betöltése..." />
           </div>
         )}
-        {error && !loading && <div className="px-4 py-8 text-center text-red-500">{error}</div>}
+        {error && !loading && <div className="px-4 py-8 text-center text-red-400">{error}</div>}
         {!error && currentData.length === 0 ? (
-          <div className="px-4 py-8 text-center text-gray-400">{!loading && emptyMessage}</div>
+          <div className="px-4 py-8 text-center text-text-muted">{!loading && emptyMessage}</div>
         ) : (
           !error &&
           currentData.map((item, index) => (
             <div
               key={index}
-              className="grid gap-2 px-4 py-3 hover:bg-surface/30 transition-colors"
+              className="grid gap-2 px-4 py-3 hover:bg-white/[0.03] transition-colors"
               style={{
                 gridTemplateColumns: gridColumns,
               }}
             >
               {columns.map((column) => (
-                <div key={column.key} className="flex items-center text-sm">
+                <div key={column.key} className="flex items-center text-sm min-w-0">
                   {column.render(item, startIndex + index)}
                 </div>
               ))}
@@ -210,8 +212,8 @@ const Table = <T extends object>({
 
       {/* Footer with Pagination */}
       {totalPages > 1 && (
-        <div className="bg-surface border-t border-primary/50 px-4 py-3 flex items-center justify-between">
-          <div className="text-sm text-gray-400">
+        <div className="bg-white/[0.03] border-t border-tile-border px-4 py-3 flex items-center justify-between">
+          <div className="text-sm text-text-muted">
             Összesen {sortedData.length} {itemLabel}, {totalPages} oldal
           </div>
 
@@ -219,7 +221,7 @@ const Table = <T extends object>({
             <button
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className="p-1 rounded hover:bg-primary/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="p-1 rounded-full hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               <IoChevronBackOutline size={16} />
             </button>
@@ -241,8 +243,10 @@ const Table = <T extends object>({
                   <button
                     key={pageNum}
                     onClick={() => goToPage(pageNum)}
-                    className={`px-2 py-1 text-sm rounded transition-colors ${
-                      currentPage === pageNum ? "bg-primary text-white" : "hover:bg-primary/20"
+                    className={`px-2 py-1 text-sm rounded-full transition-colors ${
+                      currentPage === pageNum
+                        ? "bg-accent/20 text-white border border-accent/40"
+                        : "hover:bg-white/10 text-text-secondary"
                     }`}
                   >
                     {pageNum}
@@ -254,7 +258,7 @@ const Table = <T extends object>({
             <button
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="p-1 rounded hover:bg-primary/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="p-1 rounded-full hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               <IoChevronForwardOutline size={16} />
             </button>

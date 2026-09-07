@@ -1,11 +1,13 @@
 import type { Column } from "@/components/Table/types";
 import { useMyBets } from "@/hooks/api/usePlayers";
-import { getMatchStatusInfo, getMatchTypeText, outcomeText } from "@/utils/common";
+import { formatNumber, getMatchStatusInfo, getMatchTypeText, outcomeText } from "@/utils/common";
 import { CouponType, MatchOutcome, MatchStatus } from "@/utils/enums";
 import { useEffect, useState, useMemo } from "react";
 import { isBettableMatch, useAllMatches } from "@/hooks/api/useMatches";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
+import { IoFootball } from "react-icons/io5";
+import { motion, AnimatePresence } from "framer-motion";
 import Calendar from "@/components/Calendar";
 import useResponsive from "@/hooks/useResponsive";
 import MatchesDesktopView from "@/components/Matches/DesktopView.tsx";
@@ -15,11 +17,20 @@ import BetModal from "@/components/BetModal";
 import { useAuth } from "@/hooks/useAuth";
 import { useConfig } from "@/hooks/useConfig";
 import OddsCell from "@/components/Matches/OddsCell";
+import Button from "@/components/Button";
+import { APP_CONFIG } from "@/config";
 
 const MatchesPage = () => {
   const { isDesktop } = useResponsive();
   const { user: currentUser } = useAuth();
   const { config } = useConfig();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const championMinDate = useMemo(
     () => (config?.championStartDate ? new Date(config.championStartDate) : undefined),
@@ -120,51 +131,60 @@ const MatchesPage = () => {
         const canViewDetails = match.status !== MatchStatus.enabled;
 
         return (
-          <div className="flex flex-col">
+          <div className="flex min-w-0 flex-col gap-0.5 py-1">
             {canViewDetails ? (
               <Link
                 to={`/merkozesek/${match._id}`}
-                className="font-semibold text-amber-400 hover:underline"
+                className="truncate font-semibold text-accent-soft transition-colors hover:text-highlight hover:underline"
               >
                 {matchName}
               </Link>
             ) : (
-              <span className="font-semibold text-white">{matchName}</span>
+              <span className="truncate font-semibold text-white">{matchName}</span>
             )}
-            <span className="text-xs text-gray-500 mt-1">{getMatchTypeText(match.type)}</span>
+            <span className="text-[10px] uppercase tracking-wide text-text-muted">
+              {getMatchTypeText(match.type)}
+            </span>
           </div>
         );
       },
       sortable: false,
-      width: "w-4xl",
+      width: "2.5fr",
     },
     {
       header: "Eredmény",
       key: "result",
       render: (match) => (
-        <div className="flex flex-col items-center">
-          <div className="text-sm text-white">
-            {match.status === MatchStatus.finished ? `${match.goalA} - ${match.goalB}` : ""}
-          </div>
+        <div className="flex items-center justify-center">
+          {match.status === MatchStatus.finished ? (
+            <span className="rounded-full border border-white/15 bg-white/10 px-2.5 py-0.5 text-sm font-black tracking-widest text-white">
+              {match.goalA} - {match.goalB}
+            </span>
+          ) : (
+            <span className="text-text-muted">-</span>
+          )}
         </div>
       ),
       sortable: false,
-      width: "w-24",
+      width: "1fr",
+      className: "justify-center",
     },
     {
       header: "Státusz",
       key: "status",
-      render: (match) => (
-        <span
-          className={`${getMatchStatusInfo(match.status).color} px-2 py-1 rounded text-xs ${
-            getMatchStatusInfo(match.status).className
-          }`}
-        >
-          {getMatchStatusInfo(match.status).text}
-        </span>
-      ),
+      render: (match) => {
+        const info = getMatchStatusInfo(match.status);
+        if (!info.text) return <span className="text-text-muted">-</span>;
+        return (
+          <span
+            className={`${info.color} ${info.className} rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide`}
+          >
+            {info.text}
+          </span>
+        );
+      },
       sortable: true,
-      width: "w-24",
+      width: "1fr",
     },
 
     {
@@ -172,73 +192,80 @@ const MatchesPage = () => {
       key: "oddsAwin",
       render: (match) => <OddsCell match={match} outcome={MatchOutcome.home} />,
       sortable: true,
-      width: "w-24",
+      width: "1fr",
     },
     {
       header: "Döntetlen",
       key: "oddsDraw",
       render: (match) => <OddsCell match={match} outcome={MatchOutcome.draw} />,
       sortable: true,
-      width: "w-24",
+      width: "1fr",
     },
     {
       header: "Vendég",
       key: "oddsBwin",
       render: (match) => <OddsCell match={match} outcome={MatchOutcome.away} />,
       sortable: true,
-      width: "w-24",
+      width: "1fr",
     },
     {
       header: "Saját fogadás",
       key: "userbet",
       render: (match) => {
-        if (!match.userbet) {
-          return <span className="text-gray-500 text-xs">-</span>;
+        if (!match.userbet || match.userbet.length === 0) {
+          return <span className="text-text-muted text-xs">-</span>;
         }
 
         const bets = match.userbet;
 
         return (
-          <div className="flex flex-col">
-            {bets.map((betItem) => (
-              <div key={betItem._id} className="flex flex-row gap-3">
-                {betItem.type === CouponType.outcomeBet && (
-                  <span className="text-xs text-blue-400">{outcomeText(betItem, match)}</span>
-                )}
-                {betItem.type === CouponType.scoreBet && (
-                  <span className="text-xs text-blue-400">
-                    {betItem.scoreTeamA} - {betItem.scoreTeamB}
-                  </span>
-                )}
-                <span className="text-xs text-gray-400">Tét: {betItem.amount} pont</span>
-                {/* {match.status === MatchStatus.finished &&
-                  betItem.success &&
-                  betItem.type === CouponType.outcomeBet && (
-                    <span className="text-xs text-green-400">
-                      Nyeremény:{potentialWinnings(betItem.amount, betItem.odds)} pont
+          <div className="flex flex-col gap-2 py-1">
+            {bets.map((betItem) => {
+              const isOutcome = betItem.type === CouponType.outcomeBet;
+              const team =
+                isOutcome && betItem.outcome === MatchOutcome.home
+                  ? match.teamA
+                  : isOutcome && betItem.outcome === MatchOutcome.away
+                    ? match.teamB
+                    : undefined;
+              const label = isOutcome
+                ? outcomeText(betItem, match)
+                : `${betItem.scoreTeamA} - ${betItem.scoreTeamB}`;
+
+              return (
+                <div key={betItem._id} className="flex items-center gap-2">
+                  {team?.flag && (
+                    <img
+                      src={`${APP_CONFIG.FLAG_PATH}${team.flag}`}
+                      alt={team.name}
+                      className="h-5 w-5 shrink-0 rounded-full border border-white/10 object-cover"
+                    />
+                  )}
+                  <div className="flex flex-col leading-tight">
+                    <span className="text-sm font-bold text-white">{label}</span>
+                    <span className="text-[10px] font-semibold text-badge-amber">
+                      Tét: {formatNumber(betItem.amount)} pont
                     </span>
-                  )} */}
-                {/* {match.status === MatchStatus.finished && !betItem.success && (
-                  <span className="text-xs text-red-400">Vesztett</span>
-                )} */}
-              </div>
-            ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         );
       },
       sortable: false,
-      width: "w-4xl",
+      width: "2fr",
     },
     {
       header: "Dátum",
       key: "date",
       render: (match) => (
-        <span className="text-gray-400 text-xs">
+        <span className="text-text-secondary text-xs">
           {match.date && format(new Date(match.date), "MMM dd HH:mm")}
         </span>
       ),
       sortable: true,
-      width: "w-32",
+      width: "1fr",
     },
     {
       header: "",
@@ -249,55 +276,81 @@ const MatchesPage = () => {
         const hasEnoughScore = currentUser && currentUser.data.availableScore > 99;
 
         if (!match?.teamA || !match?.teamB || !match?.date) {
-          return;
+          return null;
         }
 
         // Ha van fogadás és a mérkőzés aktív
         if (hasUserBet && isMatchEnabled) {
           return (
-            <div
+            <Button
+              variant="secondary"
+              size="sm"
+              text="Módosítás"
+              className="w-full"
               onClick={() => {
                 setSelectedMatch(match);
                 setIsBetModalOpen(true);
               }}
-              className="px-2 py-1 rounded-md text-center text-xs bg-button-secondary-bg hover:bg-button-secondary-bg-hover cursor-pointer"
-            >
-              Fogadás módosítása
-            </div>
+            />
           );
         }
 
         // Ha nincs fogadás, van elég pont és a mérkőzés aktív
         if (!hasUserBet && hasEnoughScore && isBettableMatch(match)) {
           return (
-            <div
+            <Button
+              variant="cta"
+              size="sm"
+              text="Fogadás"
+              className="w-full"
               onClick={() => {
                 setSelectedMatch(match);
                 setIsBetModalOpen(true);
               }}
-              className="px-2 py-1 rounded-md text-center bg-button-light
-               hover:bg-button-light-hover cursor-pointer text-xs"
-            >
-              Fogadok a mérkőzésre
-            </div>
+            />
           );
         }
 
         // Minden más esetben üres
         return null;
       },
-      width: "w-24",
+      width: "w-32",
+      className: "justify-center",
     },
   ];
+  const isCollapsed = !isDesktop && scrolled;
+
   return (
     <div>
-      <div className="text-white text-center sm:text-left text-xl sm:text-2xl pb-2">Mérkőzések</div>
-      <Calendar
-        onDateSelect={(date) => setSelectedDate(date)}
-        selectedDate={selectedDate}
-        minDate={championMinDate}
-        maxDate={championMaxDate}
-      />
+      <div
+        className={
+          !isDesktop
+            ? "sticky top-12 z-30 -mx-1 bg-secondary/95 px-1 pt-2 backdrop-blur-sm"
+            : ""
+        }
+      >
+        <AnimatePresence initial={false}>
+          {!isCollapsed && (
+            <motion.h1
+              key="title"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="flex items-center justify-center gap-2 overflow-hidden text-xl font-bold text-white pb-2 sm:justify-start sm:text-2xl"
+            >
+              <IoFootball className="text-accent-soft" />
+              Mérkőzések
+            </motion.h1>
+          )}
+        </AnimatePresence>
+        <Calendar
+          onDateSelect={(date) => setSelectedDate(date)}
+          selectedDate={selectedDate}
+          minDate={championMinDate}
+          maxDate={championMaxDate}
+        />
+      </div>
       {isDesktop && (
         <section>
           <MatchesDesktopView

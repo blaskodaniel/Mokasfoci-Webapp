@@ -3,6 +3,9 @@ import { useState } from "react";
 import { AxiosError } from "axios";
 import type { ApiError } from "@/utils/apiError";
 import Api from "@/services/service";
+import AuthCard from "@/components/ui/AuthCard";
+import AuthInput from "@/components/ui/AuthInput";
+import Button from "@/components/Button";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -47,76 +50,48 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center bg-cover bg-center px-3 sm:px-5">
-      <div className="p-8 w-full max-w-md flex flex-col gap-6 h-fit mt-20">
-        <h2 className="text-2xl font-bold text-center text-text-primary mb-4">
-          Jelszó megváltoztatása
-        </h2>
-        {/* <img
-          src={AppLogo}
-          alt="WatchTogether Logo"
-          className="h-25 mx-auto"
-          onClick={() => navigate("/login")}
-        /> */}
-
-        {!success ? (
-          <>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="username" className="text-sm font-medium text-white-700">
-                Új jelszó*
-              </label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-                placeholder="Új jelszó"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="confirmPassword" className="text-sm font-medium text-white-700">
-                Új jelszó megint*
-              </label>
-              <input
-                type="password"
-                id="confirmPassword"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-                placeholder="Új jelszó megint"
-              />
-            </div>
-            {error && <div className="text-red-600 text-sm text-center">{error}</div>}
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="bg-button-light text-white font-semibold py-2 rounded hover:bg-button-light-hover transition"
-            >
-              Mentés
-            </button>
-          </>
-        ) : (
-          <div className="text-center text-green-500 text-xl">
-            <div className="font-semibold">Sikeresen megváltoztattad a jelszavad!</div>
-            <div className="text-sm text-gray-500 pt-3">
-              Mostmár bejelentkezhetsz az új jelszavaddal.
-            </div>
-            <div
-              onClick={navigateHandler}
-              className="text-white text-center cursor-pointer mt-5 rounded-3xl
-               bg-button-light px-4 py-2 hover:bg-button-light-hover transition inline-block"
-            >
-              Bejelentkezés
-            </div>
+    <AuthCard title="Jelszó megváltoztatása">
+      {!success ? (
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <AuthInput
+            label="Új jelszó"
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            placeholder="Új jelszó"
+          />
+          <AuthInput
+            label="Új jelszó megint"
+            id="confirmPassword"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            placeholder="Új jelszó megint"
+          />
+          {error && <div className="text-center text-sm text-red-400">{error}</div>}
+          <Button
+            type="submit"
+            variant="cta"
+            text="Mentés"
+            loading={isLoading}
+            className="w-full mt-2"
+          />
+        </form>
+      ) : (
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className="text-lg font-semibold text-badge-success">
+            Sikeresen megváltoztattad a jelszavad!
           </div>
-        )}
-
-        {isLoading && <p>Loading...</p>}
-      </div>
-    </div>
+          <div className="text-sm text-text-secondary">
+            Mostmár bejelentkezhetsz az új jelszavaddal.
+          </div>
+          <Button variant="cta" text="Bejelentkezés" onClick={navigateHandler} className="w-full mt-1" />
+        </div>
+      )}
+    </AuthCard>
   );
 };
 

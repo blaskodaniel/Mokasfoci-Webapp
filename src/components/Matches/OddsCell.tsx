@@ -31,27 +31,34 @@ const OddsCell = ({ match, outcome }: OddsCellProps) => {
     isThisBet && currentOdds != null && betOdds != null && betOdds !== currentOdds;
   const oddsWentUp = oddsChanged && currentOdds! > betOdds!;
 
+  const chipClass = `inline-flex min-w-[3.25rem] items-center justify-center rounded-md px-2 py-1
+    text-sm font-black tabular-nums transition-colors ${
+      isThisBet
+        ? "border border-badge-amber/40 bg-badge-amber/15 text-badge-amber shadow-[0_0_10px_-2px_rgba(245,165,36,0.6)]"
+        : "border border-white/10 bg-white/5 text-white"
+    }`;
+
+  if (currentOdds == null) {
+    return <span className="text-text-muted">-</span>;
+  }
+
   if (oddsChanged) {
     return (
-      <span className="flex flex-col items-center gap-0.5 leading-none text-white font-semibold">
-        <span className="flex items-center gap-1">
+      <span className="inline-flex flex-col items-center gap-0.5 leading-none">
+        <span className={`${chipClass} flex items-center gap-1`}>
           {currentOdds!.toFixed(2)}
           {oddsWentUp ? (
-            <IoArrowUp className="text-green-400 text-[10px]" />
+            <IoArrowUp className="text-badge-success text-[10px]" />
           ) : (
-            <IoArrowDown className="text-red-400 text-[10px]" />
+            <IoArrowDown className="text-badge-live text-[10px]" />
           )}
         </span>
-        <span className="text-[10px] font-normal text-gray-500">({betOdds!.toFixed(2)})</span>
+        <span className="text-[10px] font-normal text-text-muted">({betOdds!.toFixed(2)})</span>
       </span>
     );
   }
 
-  return (
-    <span className={`${isThisBet ? "text-white font-semibold" : "text-gray-400"}`}>
-      {currentOdds?.toFixed(2) ?? "-"}
-    </span>
-  );
+  return <span className={chipClass}>{currentOdds.toFixed(2)}</span>;
 };
 
 export default OddsCell;

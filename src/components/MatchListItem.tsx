@@ -70,8 +70,7 @@ const MatchListItem = ({
   return (
     <div
       onClick={() => onRowClick?.(match)}
-      className="
-     hover:bg-gray-700/10 transition-colors cursor-pointer"
+      className="rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
     >
       <div className="flex justify-between items-center">
         <div className="text-white/50 text-xs px-1 text-right italic bg-button-bg/20 rounded-md">
@@ -123,9 +122,14 @@ const MatchListItem = ({
           {isBettableMatch(match) && (
             <div
               onClick={() => onSelectMatch && onSelectMatch(match)}
-              className={`px-2 py-2 rounded-md text-center 
-                ${isUserBet ? "bg-button-secondary-bg" : "bg-button-light"}  
-              cursor-pointer text-xs`}
+              className={`px-3 py-1.5 rounded-full text-center font-semibold transition-transform
+                hover:-translate-y-0.5 active:translate-y-0
+                ${
+                  isUserBet
+                    ? "bg-button-secondary-bg hover:bg-button-secondary-bg-hover"
+                    : "bg-[image:var(--gradient-cta)]"
+                }
+              cursor-pointer text-xs text-white`}
             >
               {isUserBet ? "Módosít" : "Fogadás"}
             </div>

@@ -13,8 +13,9 @@ const useResponsive = () => {
 
   const isMobile = width < breakPoints.sm;
   const isDesktop = width >= breakPoints.sm;
+  const isTablet = width >= breakPoints.sm && width < breakPoints.lg;
 
-  return { isMobile, isDesktop };
+  return { isMobile, isDesktop, isTablet, width };
 };
 
 export default useResponsive;

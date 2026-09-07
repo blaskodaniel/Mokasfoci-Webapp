@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { format, addDays, startOfWeek, isSameDay, differenceInCalendarDays } from "date-fns";
 import { hu } from "date-fns/locale";
-import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+import { IoChevronBack, IoChevronForward, IoAppsOutline } from "react-icons/io5";
+import useResponsive from "@/hooks/useResponsive";
 
 interface CalendarProps {
   onDateSelect?: (date: Date | undefined) => void;
@@ -11,6 +12,7 @@ interface CalendarProps {
 }
 
 const Calendar = ({ onDateSelect, selectedDate, minDate, maxDate }: CalendarProps) => {
+  const { isMobile } = useResponsive();
   const sliderRef = useRef<HTMLDivElement>(null);
 
   const [isDragging, setIsDragging] = useState(false);
@@ -132,82 +134,109 @@ const Calendar = ({ onDateSelect, selectedDate, minDate, maxDate }: CalendarProp
     }
   };
 
+  const showingAll = !selectedDate;
+
   return (
-    <div className="bg-panel-bg border border-primary/20 rounded-lg p-1 max-w-lg mx-auto mb-3">
+    <div
+      className={
+        isMobile
+          ? "w-full py-2"
+          : "mx-auto mb-3 max-w-2xl rounded-tile border border-tile-border bg-[image:var(--tile-bg-gradient)] p-2.5 shadow-tile"
+      }
+    >
       {/* Navigation Header */}
-      <div></div>
-      <div className="flex items-center justify-between mb-1">
+      <div className="mb-2 flex items-center justify-between">
         <button
           onClick={() => jumpWeeks(-1)}
-          className="p-1 hover:bg-surface-hover rounded-lg transition-colors"
+          className={`rounded-full text-text-secondary transition-colors hover:bg-white/10 hover:text-white ${
+            isMobile ? "border border-white/15 bg-white/5 p-2 active:bg-white/15" : "p-1"
+          }`}
           aria-label="Previous week"
         >
-          <IoChevronBack className="text-white" size={20} />
+          <IoChevronBack size={18} />
         </button>
 
-        <div className="text-sm text-gray-400 hover:text-white transition-colors capitalize font-medium">
+        <div className="text-sm font-semibold capitalize text-text-secondary">
           {format(visibleMonth, "MMMM", { locale: hu })}
         </div>
 
         <button
           onClick={() => jumpWeeks(1)}
-          className="p-1 hover:bg-surface-hover rounded-lg transition-colors"
+          className={`rounded-full text-text-secondary transition-colors hover:bg-white/10 hover:text-white ${
+            isMobile ? "border border-white/15 bg-white/5 p-2 active:bg-white/15" : "p-1"
+          }`}
           aria-label="Next week"
         >
-          <IoChevronForward className="text-white" size={20} />
+          <IoChevronForward size={18} />
         </button>
       </div>
 
-      {/* Slider container (Continuous scroll) */}
-      <div
-        ref={sliderRef}
-        onScroll={handleScroll}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleDragEnd}
-        onMouseLeave={handleDragEnd}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleDragEnd}
-        className={`flex overflow-x-hidden hide-scrollbar cursor-grab active:cursor-grabbing ${
-          isDragging ? "select-none" : ""
-        }`}
-        style={{ gap: `${gap}px` }}
-      >
-        {days.map((day) => {
-          const isToday = isSameDay(day, today);
-          const isSelected = selectedDate && isSameDay(day, selectedDate);
-          const dayName = format(day, "EEE", { locale: hu }).toUpperCase();
-          const dayNumber = format(day, "d");
+      <div className="flex items-stretch gap-1.5">
+        {/* "Összes mérkőzés" – egyértelműen jelzi, ha nincs nap kiválasztva */}
+        <button
+          onClick={() => onDateSelect?.(undefined)}
+          title="Összes mérkőzés megjelenítése"
+          className={`flex shrink-0 flex-col items-center justify-center gap-1 rounded-lg px-2.5 py-1 transition-all cursor-pointer ${
+            showingAll
+              ? "bg-[image:var(--gradient-cta)] text-white shadow-[0_0_12px_-2px_rgba(107,75,255,0.6)]"
+              : "border border-white/10 bg-white/5 text-text-secondary hover:bg-white/10 hover:text-white"
+          }`}
+        >
+          <IoAppsOutline size={14} />
+          <span className="text-[10px] font-bold uppercase tracking-wide">Mind</span>
+        </button>
 
-          return (
-            <div
-              key={day.toISOString()}
-              className="shrink-0"
-              style={{ width: `calc((100% - ${gap * (itemsPerView - 1)}px) / ${itemsPerView})` }}
-            >
-              <button
-                onClick={() => handleDateClick(day)}
-                className={`
-                  w-full flex flex-col items-center justify-center py-1 rounded-lg
-                  transition-all cursor-pointer
-                  ${
-                    isSelected
-                      ? "bg-accent text-white"
-                      : isToday
-                        ? "bg-accent/20 text-accent-soft border border-accent/40"
-                        : "bg-surface hover:bg-surface-hover text-gray-400"
-                  }
-                `}
+        {/* Slider container (Continuous scroll) */}
+        <div
+          ref={sliderRef}
+          onScroll={handleScroll}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleDragEnd}
+          onMouseLeave={handleDragEnd}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleDragEnd}
+          className={`flex flex-1 overflow-x-hidden hide-scrollbar cursor-grab active:cursor-grabbing ${
+            isDragging ? "select-none" : ""
+          }`}
+          style={{ gap: `${gap}px` }}
+        >
+          {days.map((day) => {
+            const isToday = isSameDay(day, today);
+            const isSelected = selectedDate && isSameDay(day, selectedDate);
+            const dayName = format(day, "EEE", { locale: hu }).toUpperCase();
+            const dayNumber = format(day, "d");
+
+            return (
+              <div
+                key={day.toISOString()}
+                className="shrink-0"
+                style={{ width: `calc((100% - ${gap * (itemsPerView - 1)}px) / ${itemsPerView})` }}
               >
-                <span className="text-xs font-medium mb-1">{dayName}</span>
-                <span className={`text-sm font-bold ${isSelected || isToday ? "text-white" : ""}`}>
-                  {dayNumber}
-                </span>
-              </button>
-            </div>
-          );
-        })}
+                <button
+                  onClick={() => handleDateClick(day)}
+                  className={`
+                    w-full flex flex-col items-center justify-center py-1 rounded-lg
+                    transition-all cursor-pointer
+                    ${
+                      isSelected
+                        ? "bg-[image:var(--gradient-cta)] text-white shadow-[0_0_12px_-2px_rgba(107,75,255,0.6)]"
+                        : isToday
+                          ? "bg-accent/15 text-accent-soft border border-accent/40"
+                          : "bg-white/5 hover:bg-white/10 text-text-secondary border border-transparent"
+                    }
+                  `}
+                >
+                  <span className="text-xs font-medium mb-1">{dayName}</span>
+                  <span className={`text-sm font-bold ${isSelected || isToday ? "text-white" : ""}`}>
+                    {dayNumber}
+                  </span>
+                </button>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

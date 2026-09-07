@@ -6,6 +6,8 @@ import type { MatchWithUserBet } from "./Matches/types";
 import useGame from "@/hooks/useGame";
 import UnknownFlag from "./UnknownFlag";
 import { IoArrowUp, IoArrowDown } from "react-icons/io5";
+import { motion } from "framer-motion";
+import Badge from "./ui/Badge";
 
 interface MatchCardProps {
   match: MatchWithUserBet;
@@ -63,20 +65,21 @@ const MatchCard = ({ match, onClick, className, flagSize = "large", badge }: Mat
   };
 
   return (
-    <div
-      className={`w-full sm:w-100 bg-black/20 rounded-lg flex flex-col gap-4 
-      cursor-pointer hover:bg-black/30 transition-colors relative ${className || defaultWrapperClass}`}
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -3 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className={`w-full rounded-tile border border-tile-border bg-[image:var(--tile-bg-gradient)]
+      shadow-tile flex flex-col gap-4 cursor-pointer hover:border-tile-border-hover hover:shadow-tile-hover
+      transition-[border-color,box-shadow] relative ${className || defaultWrapperClass}`}
       onClick={() => onClick?.(match)}
     >
       {badge && (
-        <div
-          className="absolute top-0 right-0 bg-amber-500/20 px-2.5 py-1 rounded-bl-lg 
-            border border-amber-500/30 flex items-center justify-center"
-        >
-          <span className="text-[9px] leading-none text-amber-500 font-bold text-center">
-            {badge}
-          </span>
-        </div>
+        <Badge variant="amber" className="absolute top-2.5 right-2.5">
+          {badge}
+        </Badge>
       )}
       <div className="flex">
         <div className="flex-1 flex flex-col justify-center items-center gap-4">
@@ -144,7 +147,7 @@ const MatchCard = ({ match, onClick, className, flagSize = "large", badge }: Mat
           {renderOdds(MatchOutcome.away, match.oddsBwin)}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

@@ -2,6 +2,9 @@
 @import "tailwindcss";
 
 @theme {
+  /* Egyedi breakpoint a fejléc nav feliratainak (1390px alatt csak ikonok) */
+  --breakpoint-nav: 1390px;
+
   --font-montserrat: "Montserrat", sans-serif;
   --font-family-montserrat: var(--font-montserrat);
 
@@ -42,6 +45,29 @@
   --color-button-bg-hover: #2ea36a;
   --color-button-secondary-bg: #6b4bff;
   --color-button-secondary-bg-hover: #5a3eda;
+
+  /* 🎮 Tile / Card UI (FM26-ihletésű) */
+  --tile-bg-gradient: linear-gradient(180deg, #14182a 0%, #0c0f1c 100%);
+  --color-tile-border: rgba(255, 255, 255, 0.06);
+  --color-tile-border-hover: rgba(139, 107, 255, 0.45);
+  --radius-tile: 1.1rem;
+  --shadow-tile: 0 1px 0 0 rgba(255, 255, 255, 0.03) inset;
+  --shadow-tile-hover: 0 12px 28px -12px rgba(107, 75, 255, 0.5);
+
+  /* Gradiens CTA (Continue-gomb hangulat) */
+  --gradient-cta: linear-gradient(90deg, var(--color-accent) 0%, var(--color-highlight) 100%);
+  --gradient-cta-hover: linear-gradient(90deg, var(--color-accent-soft) 0%, var(--color-highlight) 100%);
+
+  /* Badge / pill színek */
+  --color-badge-live: #ff3b5c;
+  --color-badge-live-bg: rgba(255, 59, 92, 0.14);
+  --color-badge-live-border: rgba(255, 59, 92, 0.4);
+  --color-badge-amber: #f5a524;
+  --color-badge-amber-bg: rgba(245, 165, 36, 0.14);
+  --color-badge-amber-border: rgba(245, 165, 36, 0.35);
+  --color-badge-success: #35d68e;
+  --color-badge-success-bg: rgba(53, 214, 142, 0.14);
+  --color-badge-success-border: rgba(53, 214, 142, 0.35);
 }
 
 @layer base {
@@ -90,5 +116,22 @@
 
   .animate-progress {
     animation: progress linear forwards;
+  }
+
+  /* Élő meccs pulzáló pötty */
+  @keyframes live-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      box-shadow: 0 0 0 0 rgba(255, 59, 92, 0.55);
+    }
+    50% {
+      opacity: 0.7;
+      box-shadow: 0 0 0 4px rgba(255, 59, 92, 0);
+    }
+  }
+
+  .animate-live-pulse {
+    animation: live-pulse 1.6s ease-in-out infinite;
   }
 }

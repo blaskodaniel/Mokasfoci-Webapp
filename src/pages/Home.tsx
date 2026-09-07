@@ -1,6 +1,8 @@
 import MatchCard from "@/components/MatchCard";
 import MatchListItem from "@/components/MatchListItem";
-import Panel from "@/components/Panel";
+import Tile from "@/components/ui/Tile";
+import Badge from "@/components/ui/Badge";
+import { IoRadioOutline, IoTimeOutline } from "react-icons/io5";
 import {
   useUpcomingMatches,
   useRecentMatches,
@@ -28,7 +30,8 @@ import { MatchType } from "@/utils/enums";
 const HomePage = () => {
   const { config } = useConfig();
   const navigate = useNavigate();
-  const { isMobile } = useResponsive();
+  const { isMobile, isTablet } = useResponsive();
+  const upcomingItemsPerView = isMobile ? 1 : isTablet ? 2 : 3;
   const queryClient = useQueryClient();
   const [selectedMatch, setSelectedMatch] = useState<MatchWithUserBet | null>(null);
   const [isBetModalOpen, setIsBetModalOpen] = useState(false);
@@ -94,9 +97,12 @@ const HomePage = () => {
         </section>
       )}
       <section className="mt-6 mb-5">
-        <h1 className="text-2xl font-bold text-white px-4 hidden sm:block">Hamarosan játszák</h1>
+        <h1 className="text-2xl font-bold text-white px-4 hidden sm:flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-accent" />
+          Hamarosan játszák
+        </h1>
         <section className="mt-6 px-4">
-          <Slider itemsPerView={isMobile ? 1 : 3} gap={16}>
+          <Slider itemsPerView={upcomingItemsPerView} gap={16}>
             {upcomingMatchesWithBets
               ?.slice(0, upcomingMatchesLength)
               .map((match: MatchWithUserBet) => {
@@ -128,66 +134,80 @@ const HomePage = () => {
         </section>
       </section>
 
-      <div className="flex flex-col md:flex-row gap-3 px-1 sm:px-4 mb-3">
-        <Panel
-          title="Folyamatban lévő meccsek"
-          className="flex-1"
-          wrapperClassName="p-1"
-          loading={liveMatchesLoading}
-          error={liveMatchesError?.message ? "Error loading live matches" : undefined}
-        >
-          {liveMatches && liveMatches.length > 0 && (
-            <div className="px-1 py-3">
-              {liveMatches.map((match: Match) => (
-                <MatchListItem
-                  key={match._id}
-                  match={match}
-                  onSelectMatch={(m) => {
-                    setSelectedMatch(m as MatchWithUserBet);
-                    setIsBetModalOpen(true);
-                  }}
-                  displayStatusBadge
-                  onRowClick={(match: Match) => {
-                    navigate(`/merkozesek/${match._id}`);
-                  }}
-                />
-              ))}
-            </div>
-          )}
-          {liveMatches && liveMatches.length === 0 && (
-            <div className="p-4 text-gray-500 text-xs text-center">
-              Most éppen nincs futó mérkőzés{" "}
-            </div>
-          )}
-        </Panel>
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-3 px-1 sm:px-4 mb-3 items-start">
+        <div className="md:col-span-5">
+          <Tile
+            title="Folyamatban lévő meccsek"
+            titleIcon={<IoRadioOutline />}
+            accent="success"
+            headerRight={
+              liveMatches && liveMatches.length > 0 ? (
+                <Badge variant="live" dot>
+                  Élő
+                </Badge>
+              ) : undefined
+            }
+            loading={liveMatchesLoading}
+            error={liveMatchesError?.message ? "Error loading live matches" : undefined}
+          >
+            {liveMatches && liveMatches.length > 0 && (
+              <div className="px-2 pb-3 space-y-1">
+                {liveMatches.map((match: Match) => (
+                  <MatchListItem
+                    key={match._id}
+                    match={match}
+                    onSelectMatch={(m) => {
+                      setSelectedMatch(m as MatchWithUserBet);
+                      setIsBetModalOpen(true);
+                    }}
+                    displayStatusBadge
+                    onRowClick={(match: Match) => {
+                      navigate(`/merkozesek/${match._id}`);
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+            {liveMatches && liveMatches.length === 0 && (
+              <div className="p-4 text-text-muted text-xs text-center">
+                Most éppen nincs futó mérkőzés
+              </div>
+            )}
+          </Tile>
+        </div>
 
-        <ToplistWidget showHeader={false} />
+        <div className="md:col-span-3">
+          <ToplistWidget showHeader={false} />
+        </div>
 
-        <Panel
-          title="Legutóbbi eredmények"
-          className="flex-1"
-          loading={recentLoading}
-          error={recentError?.message ? "Error loading recent results" : undefined}
-        >
-          {recentMatches && recentMatches.length > 0 && (
-            <div className="p-2">
-              {recentMatches.slice(0, 5).map((match: Match) => (
-                <Link
-                  to={`/merkozesek/${match._id}`}
-                  key={match._id}
-                  className="block mb-2 last:mb-0 border-b last:border-0 border-gray-700/30"
-                >
-                  <MatchListItem match={match} />
-                </Link>
-              ))}
-            </div>
-          )}
-          {recentMatches && recentMatches.length === 0 && (
-            <div className="p-4 text-gray-500 text-xs text-center">
-              Még nem játszottak le mérkőzést{" "}
-            </div>
-          )}
-        </Panel>
+        <div className="md:col-span-4">
+          <Tile
+            title="Legutóbbi eredmények"
+            titleIcon={<IoTimeOutline />}
+            accent="accent"
+            loading={recentLoading}
+            error={recentError?.message ? "Error loading recent results" : undefined}
+          >
+            {recentMatches && recentMatches.length > 0 && (
+              <div className="px-2 pb-2 space-y-1">
+                {recentMatches.slice(0, 5).map((match: Match) => (
+                  <Link
+                    to={`/merkozesek/${match._id}`}
+                    key={match._id}
+                    className="block last:mb-0 border-b last:border-0 border-tile-border"
+                  >
+                    <MatchListItem match={match} />
+                  </Link>
+                ))}
+              </div>
+            )}
+            {recentMatches && recentMatches.length === 0 && (
+              <div className="p-4 text-text-muted text-xs text-center">
+                Még nem játszottak le mérkőzést
+              </div>
+            )}
+          </Tile>
+        </div>
       </div>
 
       {selectedMatch && (

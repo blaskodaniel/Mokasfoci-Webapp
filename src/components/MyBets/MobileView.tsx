@@ -21,7 +21,7 @@ const MyBetsMobileView = ({ bets, onEdit, onDelete }: MyBetsMobileViewProps) => 
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <AnimatePresence mode="sync" initial={false}>
         {bets.map((bet, index) => {
           const hasFavoriteTeam = userFavoriteTeam(bet.matchid);
@@ -36,12 +36,6 @@ const MyBetsMobileView = ({ bets, onEdit, onDelete }: MyBetsMobileViewProps) => 
               : bet.totalWin;
           const profit =
             bet.status === CouponStatus.closed && bet.success ? winnings - bet.amount : 0;
-          const bgColor =
-            bet.status === CouponStatus.active
-              ? "bg-panel-bg"
-              : bet.status === CouponStatus.closed && bet.success
-                ? "bg-green-900/20"
-                : "bg-red-900/20";
 
           const outcomeText =
             bet.outcome === MatchOutcome.home
@@ -66,7 +60,6 @@ const MyBetsMobileView = ({ bets, onEdit, onDelete }: MyBetsMobileViewProps) => 
                 onEdit={onEdit}
                 onDelete={onDelete}
                 hasFavoriteTeam={hasFavoriteTeam}
-                bgColor={bgColor}
                 canViewDetails={canViewDetails}
                 shouldShowPotentialWinnings={shouldShowPotentialWinnings}
                 winnings={winnings}
@@ -86,7 +79,6 @@ const MyBetsMobileView = ({ bets, onEdit, onDelete }: MyBetsMobileViewProps) => 
                 winnings={bet.totalWin}
                 onDelete={onDelete}
                 hasFavoriteTeam={hasFavoriteTeam}
-                bgColor={bgColor}
                 canViewDetails={canViewDetails}
               />
             );

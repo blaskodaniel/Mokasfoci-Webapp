@@ -5,6 +5,9 @@ import Api from "@/services/service";
 import { ApiError } from "@/utils/apiError";
 import { useConfig } from "@/hooks/useConfig";
 import { IoEye, IoEyeOff } from "react-icons/io5";
+import AuthCard from "@/components/ui/AuthCard";
+import AuthInput from "@/components/ui/AuthInput";
+import Button from "@/components/Button";
 
 const Login: React.FC = () => {
   const { login, refreshMe } = useAuth();
@@ -32,72 +35,64 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center bg-cover bg-center px-3 sm:px-5">
-      <form
-        onSubmit={handleSubmit}
-        className="px-4 py-4 sm:p-8 w-full max-w-md flex flex-col gap-6 h-fit mt-20"
-      >
-        <img src="/logo.png" alt="WatchTogether Logo" className="h-20 mx-auto " />
-        <h2 className="text-2xl font-bold text-center text-text-primary mb-4">Bejelentkezés</h2>
-
-        <div className="flex flex-col gap-2">
-          <label htmlFor="username" className="text-sm font-medium text-white-700">
-            Felhasználónév
-          </label>
-          <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            className="text-white border border-gray-300/20 rounded px-3 py-2
-            focus:outline-none focus:ring-2 focus:ring-purple-400"
-            placeholder="Felhasználónév"
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <label htmlFor="password" className="text-sm font-medium text-white-700">
-            Jelszó
-          </label>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full text-white border border-gray-300/20 rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-purple-400"
-              placeholder="Jelszó"
-            />
+    <AuthCard title="Bejelentkezés">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <AuthInput
+          label="Felhasználónév"
+          id="username"
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+          placeholder="Felhasználónév"
+        />
+        <AuthInput
+          label="Jelszó"
+          id="password"
+          type={showPassword ? "text" : "password"}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          placeholder="Jelszó"
+          rightElement={
             <button
               type="button"
+              tabIndex={-1}
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+              className="text-text-muted hover:text-white transition-colors"
             >
               {showPassword ? <IoEyeOff size={18} /> : <IoEye size={18} />}
             </button>
-          </div>
-        </div>
-        {errorMessage && <p className="text-red-500 text-sm text-center">{errorMessage}</p>}
-        <button
+          }
+        />
+        {errorMessage && <p className="text-center text-sm text-red-400">{errorMessage}</p>}
+        <Button
           type="submit"
-          className="bg-button-light text-white font-semibold py-2 rounded hover:bg-button-light-hover 
-          transition cursor-pointer"
+          variant="cta"
+          text="Bejelentkezés"
           disabled={isSubmitting}
-        >
-          Bejelentkezés
-        </button>
+          loading={isSubmitting}
+          loadingText="Bejelentkezés..."
+          className="w-full mt-2"
+        />
+      </form>
+      <div className="mt-6 flex flex-col items-center gap-2 text-sm">
         {config?.enabledRegistration && (
-          <Link to="/regisztracio" className="text-text-primary text-center">
+          <Link
+            to="/regisztracio"
+            className="text-accent-soft hover:text-highlight transition-colors font-medium"
+          >
             Regisztráció
           </Link>
         )}
-        <Link to="/forgot-password" className="text-text-muted text-center text-xs">
+        <Link
+          to="/forgot-password"
+          className="text-text-muted text-xs hover:text-text-secondary transition-colors"
+        >
           Elfelejtettem a jelszavam
         </Link>
-        {isSubmitting && <p>Loading...</p>}
-      </form>
-    </div>
+      </div>
+    </AuthCard>
   );
 };
 

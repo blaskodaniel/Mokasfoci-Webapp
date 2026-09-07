@@ -25,7 +25,7 @@ const Layout = () => {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen overflow-y-auto bg-secondary">
+    <div className="flex flex-col min-h-screen bg-secondary">
       {/* Header */}
       <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
       {isMobile && <MobileMenu isOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />}

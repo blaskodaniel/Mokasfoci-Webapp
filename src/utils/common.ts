@@ -8,28 +8,33 @@ export const getCouponStatusInfo = (
   switch (status) {
     case CouponStatus.active:
       return {
-        color: "bg-neutral-600",
+        color: "bg-accent/15 text-accent-soft border border-accent/40",
         text: "Játékban",
         className: "",
-        selectedColor: "bg-neutral-700",
+        selectedColor: "bg-accent/25 text-white border border-accent/50",
       };
     case CouponStatus.inactive:
-      return { color: "bg-gray-600", text: "Inaktív", className: "", selectedColor: "bg-gray-500" };
+      return {
+        color: "bg-white/5 text-text-muted border border-white/10",
+        text: "Inaktív",
+        className: "",
+        selectedColor: "bg-white/15 text-white border border-white/20",
+      };
     case CouponStatus.closed:
       return {
-        color: "bg-yellow-700",
+        color: "bg-badge-amber-bg text-badge-amber border border-badge-amber-border",
         text: "Lezárt",
         className: "",
-        selectedColor: "bg-yellow-600",
+        selectedColor: "bg-badge-amber text-primary border border-badge-amber",
       };
     case CouponStatus.inprogress:
       return {
-        color: "bg-red-600",
+        color: "bg-badge-live-bg text-badge-live border border-badge-live-border",
         text: "Játékban",
         className: "animate-pulse",
       };
     default:
-      return { color: "bg-yellow-600", text: "Ismeretlen" };
+      return { color: "bg-badge-amber-bg text-badge-amber border border-badge-amber-border", text: "Ismeretlen" };
   }
 };
 
@@ -40,15 +45,22 @@ export const getMatchStatusInfo = (
     case MatchStatus.enabled:
       return { color: "", text: "", className: "" };
     case MatchStatus.finished:
-      return { color: "bg-gray-600", text: "Vége", className: "" };
+      return {
+        color: "bg-white/5 text-text-muted border border-white/10",
+        text: "Vége",
+        className: "",
+      };
     case MatchStatus.playing:
       return {
-        color: "bg-red-600",
+        color: "bg-badge-live-bg text-badge-live border border-badge-live-border",
         text: "LIVE",
-        className: "animate-pulse text-white",
+        className: "animate-pulse",
       };
     default:
-      return { color: "bg-yellow-600", text: "Ismeretlen" };
+      return {
+        color: "bg-badge-amber-bg text-badge-amber border border-badge-amber-border",
+        text: "Ismeretlen",
+      };
   }
 };
 

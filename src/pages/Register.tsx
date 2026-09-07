@@ -7,6 +7,8 @@ import Button from "@/components/Button";
 import { IoIosCheckmarkCircle } from "react-icons/io";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import { useConfig } from "@/hooks/useConfig";
+import AuthCard from "@/components/ui/AuthCard";
+import AuthInput from "@/components/ui/AuthInput";
 
 const Register: React.FC = () => {
   const { config } = useConfig();
@@ -63,131 +65,108 @@ const Register: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex justify-center bg-cover bg-center px-3 sm:px-5">
-      <form onSubmit={handleSubmit} className="p-4 w-full max-w-md flex flex-col gap-4 h-fit mt-10">
-        <h2 className="text-2xl font-bold text-center text-text-primary mb-4">Regisztráció</h2>
-        <div className="flex flex-col gap-2">
-          <label htmlFor="username" className="text-sm font-medium text-white-700">
-            Felhasználónév
-          </label>
-          <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            className="text-white border border-gray-300/20  rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            placeholder="Felhasználónév"
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <label htmlFor="email" className="text-sm font-medium text-white-700">
-            Email cím
-          </label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="text-white border border-gray-300/20  rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            placeholder="Email cím"
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <label htmlFor="password" className="text-sm font-medium text-white-700">
-            Jelszó
-          </label>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full text-white border border-gray-300/20 rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Jelszó"
-            />
+    <AuthCard title="Regisztráció">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <AuthInput
+          label="Felhasználónév"
+          id="username"
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+          placeholder="Felhasználónév"
+        />
+        <AuthInput
+          label="Email cím"
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          placeholder="Email cím"
+        />
+        <AuthInput
+          label="Jelszó"
+          id="password"
+          type={showPassword ? "text" : "password"}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          placeholder="Jelszó"
+          rightElement={
             <button
               type="button"
+              tabIndex={-1}
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+              className="text-text-muted hover:text-white transition-colors"
             >
               {showPassword ? <IoEyeOff size={18} /> : <IoEye size={18} />}
             </button>
-          </div>
-        </div>
-        <div className="flex flex-col gap-2">
-          <label htmlFor="confirmPassword" className="text-sm font-medium text-white-700">
-            Jelszó megerősítése
-          </label>
-          <div className="relative">
-            <input
-              type={showConfirmPassword ? "text" : "password"}
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              className="w-full text-white border border-gray-300/20 rounded px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Jelszó megerősítése"
-            />
+          }
+        />
+        <AuthInput
+          label="Jelszó megerősítése"
+          id="confirmPassword"
+          type={showConfirmPassword ? "text" : "password"}
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          placeholder="Jelszó megerősítése"
+          rightElement={
             <button
               type="button"
+              tabIndex={-1}
               onClick={() => setShowConfirmPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+              className="text-text-muted hover:text-white transition-colors"
             >
               {showConfirmPassword ? <IoEyeOff size={18} /> : <IoEye size={18} />}
             </button>
-          </div>
-        </div>
+          }
+        />
         {config?.enabledInvitation && (
-          <div className="flex flex-col gap-2">
-            <label htmlFor="invitationCode" className="text-sm font-medium text-white-700">
-              Meghívó kód
-            </label>
-            <input
-              type="text"
-              id="invitationCode"
-              value={invitationCode}
-              onChange={(e) => setInvitationCode(e.target.value)}
-              required
-              className="text-white border border-gray-300/20  rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Meghívó kód"
-            />
-          </div>
+          <AuthInput
+            label="Meghívó kód"
+            id="invitationCode"
+            type="text"
+            value={invitationCode}
+            onChange={(e) => setInvitationCode(e.target.value)}
+            required
+            placeholder="Meghívó kód"
+          />
         )}
-        {error && <div className="text-red-600 text-sm text-center">{error}</div>}
-        <button
+        {error && <div className="text-center text-sm text-red-400">{error}</div>}
+        <Button
           type="submit"
-          className="bg-button-light text-white font-semibold py-2 rounded hover:bg-button-light-hover transition"
-        >
-          Regisztráció
-        </button>
-        <Link to="/login" className="text-text-primary hover:underline text-center">
+          variant="cta"
+          text="Regisztráció"
+          loading={loading}
+          className="w-full mt-2"
+        />
+      </form>
+      <div className="mt-6 text-center text-sm">
+        <Link to="/login" className="text-accent-soft hover:text-highlight transition-colors font-medium">
           Bejelentkezés
         </Link>
-        {loading && <div className="text-center text-gray-600">Loading...</div>}
-      </form>
+      </div>
 
-      <Modal isOpen={isModalOpen} className="min-w-[300px] max-w-md bg-white p-4">
-        <div className="flex flex-col gap-2">
-          <div className="flex justify-center">
-            <IoIosCheckmarkCircle size={40} className="text-green-700" />
-          </div>
-          <div className="text-center text-2xl text-green-700">Sikeres regisztráció!</div>
-          <div className="text-center text-gray-600 text-sm mt-3 mb-3">
-            Most már bejelentkezhetsz.
-          </div>
-          <div className="flex justify-center">
-            <Button
-              className="bg-button-bg px-4 py-2 rounded hover:bg-primary-700 transition"
-              text="Bejelentkezés"
-              onClick={() => navigate("/login")}
-            />
-          </div>
+      <Modal
+        isOpen={isModalOpen}
+        position="center"
+        className="w-full max-w-sm rounded-tile border border-tile-border bg-[image:var(--tile-bg-gradient)] p-6"
+      >
+        <div className="flex flex-col items-center gap-2 text-center">
+          <IoIosCheckmarkCircle size={40} className="text-badge-success" />
+          <div className="text-xl font-bold text-text-primary">Sikeres regisztráció!</div>
+          <div className="text-sm text-text-secondary mb-2">Most már bejelentkezhetsz.</div>
+          <Button
+            variant="cta"
+            text="Bejelentkezés"
+            onClick={() => navigate("/login")}
+            className="w-full mt-1"
+          />
         </div>
       </Modal>
-    </div>
+    </AuthCard>
   );
 };
 

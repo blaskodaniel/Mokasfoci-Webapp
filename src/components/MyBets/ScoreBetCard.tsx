@@ -8,12 +8,12 @@ import { motion } from "framer-motion";
 import { IoTrashOutline } from "react-icons/io5";
 import { MdEdit } from "react-icons/md";
 import { Link } from "react-router-dom";
+import FavoriteTeamBadge from "@/components/Matches/FavoriteTeamBadge";
 
 interface ScoreBetCardProps {
   bet: Bet;
   index: number;
   hasFavoriteTeam?: Team;
-  bgColor?: string;
   profit: number;
   winnings: number;
   canViewDetails: boolean;
@@ -26,6 +26,7 @@ const ScoreBetCard = ({
   index,
   canViewDetails,
   winnings,
+  hasFavoriteTeam,
   onEdit,
   onDelete,
 }: ScoreBetCardProps) => {
@@ -37,7 +38,7 @@ const ScoreBetCard = ({
     <span className="flex items-center gap-1.5 truncate">
       <span className="truncate">{bet.matchid?.teamA?.name || ""}</span>
       {hasResult ? (
-        <span className="bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-widest text-gray-700 dark:text-gray-300 shrink-0">
+        <span className="bg-white/10 border border-white/15 px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-widest text-text-secondary shrink-0">
           {bet.matchid?.goalA} - {bet.matchid?.goalB}
         </span>
       ) : (
@@ -47,16 +48,16 @@ const ScoreBetCard = ({
     </span>
   );
 
-  let stripClasses = "bg-amber-500 text-white";
+  let stripClasses = "bg-badge-amber text-primary";
   let statusText = "Várható";
   let bottomValue = `+${formatNumber(winnings)}`;
 
   if (bet.status === CouponStatus.closed) {
     if (bet.success) {
-      stripClasses = "bg-emerald-500 text-white";
+      stripClasses = "bg-badge-success text-primary";
       statusText = "Nyert";
     } else {
-      stripClasses = "bg-rose-500 text-white";
+      stripClasses = "bg-badge-live text-white";
       statusText = "Vesztett";
       bottomValue = "";
     }
@@ -71,16 +72,16 @@ const ScoreBetCard = ({
       }}
       exit={{ opacity: 0, transition: { duration: 0.12 } }}
       key={bet._id}
-      className="group flex w-full rounded-lg overflow-hidden 
-      shadow-sm bg-white dark:bg-[#1a1c23] border border-gray-200 
-      dark:border-gray-800 hover:shadow-md transition-all relative min-h-[100px]"
+      className="group flex w-full rounded-tile overflow-hidden
+      shadow-tile bg-[image:var(--tile-bg-gradient)] border border-tile-border
+      hover:border-tile-border-hover transition-all relative min-h-[100px]"
     >
       {/* Left Content */}
       <div className="flex flex-col flex-1 relative pl-3 pr-2 py-1.5">
         {/* Badge */}
         <div className="absolute top-0 right-0">
           <span
-            className={`text-[10px] px-2 py-2 rounded-bl-lg uppercase font-bold 
+            className={`text-[10px] px-2 py-2 rounded-bl-lg uppercase font-bold
                 tracking-wider`}
           >
             {statusInfo.text}
@@ -91,10 +92,10 @@ const ScoreBetCard = ({
         <div className="flex flex-1 items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="flex gap-1 italic">
-              <span className="text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wide">
+              <span className="text-xs text-text-muted font-medium tracking-wide">
                 {bet.date ? format(new Date(bet.date), "MMM.dd") : ""}
               </span>
-              <span className="text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wide">
+              <span className="text-xs text-text-muted font-medium tracking-wide">
                 {bet.date ? format(new Date(bet.date), "HH:mm") : ""}
               </span>
             </div>
@@ -103,41 +104,54 @@ const ScoreBetCard = ({
 
         {/* Middle: Teams & Score */}
         <div className="flex flex-2 items-center justify-between">
-          <div
-            className="font-bold text-gray-800 dark:text-gray-100 uppercase 
-          tracking-tight text-base sm:text-lg flex items-center"
-          >
-            {/* <span>{bet.matchid?.teamA?.tla || bet.matchid?.teamA?.name}</span> */}
-            <img
-              src={`${APP_CONFIG.FLAG_PATH}${bet.matchid?.teamA?.flag}`}
-              alt="Flag"
-              className="w-5 h-5 rounded-full object-cover shadow-sm border border-gray-100 dark:border-gray-700"
-            />
-            <span className="mx-2 text-xl font-black text-amber-500">
+          <div className="font-bold text-white uppercase tracking-tight text-base sm:text-lg flex items-center">
+            <div className="relative shrink-0">
+              <img
+                src={`${APP_CONFIG.FLAG_PATH}${bet.matchid?.teamA?.flag}`}
+                alt="Flag"
+                className="w-5 h-5 rounded-full object-cover shadow-sm border border-white/10"
+              />
+              {hasFavoriteTeam?._id === bet.matchid?.teamA?._id && (
+                <FavoriteTeamBadge
+                  team={hasFavoriteTeam}
+                  variant="star"
+                  className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-[#0e111b] rounded-full p-[1px]"
+                />
+              )}
+            </div>
+            <span className="mx-2 text-xl font-black text-badge-amber">
               {bet.scoreTeamA} - {bet.scoreTeamB}
             </span>
-            {/* <span>{bet.matchid?.teamB?.tla || bet.matchid?.teamB?.name}</span> */}
-            <img
-              src={`${APP_CONFIG.FLAG_PATH}${bet.matchid?.teamB?.flag}`}
-              alt="Flag"
-              className="w-5 h-5 rounded-full object-cover shadow-sm border border-gray-100 dark:border-gray-700"
-            />
+            <div className="relative shrink-0">
+              <img
+                src={`${APP_CONFIG.FLAG_PATH}${bet.matchid?.teamB?.flag}`}
+                alt="Flag"
+                className="w-5 h-5 rounded-full object-cover shadow-sm border border-white/10"
+              />
+              {hasFavoriteTeam?._id === bet.matchid?.teamB?._id && (
+                <FavoriteTeamBadge
+                  team={hasFavoriteTeam}
+                  variant="star"
+                  className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-[#0e111b] rounded-full p-[1px]"
+                />
+              )}
+            </div>
           </div>
 
           {bet.status === CouponStatus.closed && (
             <div className="flex flex-col items-end">
-              <span className="text-amber-500 text-lg font-black">x{bet.odds?.toFixed(2)}</span>
+              <span className="text-badge-amber text-lg font-black">x{bet.odds?.toFixed(2)}</span>
             </div>
           )}
         </div>
 
         {/* Bottom*/}
         <div className="flex flex-1 items-center justify-between">
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate max-w-[85%]">
+          <div className="text-xs text-text-muted mt-1 truncate max-w-[85%]">
             {canViewDetails ? (
               <Link
                 to={`/merkozesek/${bet.matchid?._id}`}
-                className="hover:text-amber-500 transition-colors font-medium relative hover:underline underline-offset-2 flex items-center"
+                className="hover:text-badge-amber transition-colors font-medium relative hover:underline underline-offset-2 flex items-center"
               >
                 {renderMatchName()}
               </Link>
@@ -150,7 +164,7 @@ const ScoreBetCard = ({
               <button onClick={() => onEdit(bet)} className="text-white " title="Módosítás">
                 <MdEdit size={16} />
               </button>
-              <button onClick={() => onDelete(bet)} className="text-gray-400 " title="Törlés">
+              <button onClick={() => onDelete(bet)} className="text-text-muted " title="Törlés">
                 <IoTrashOutline size={16} />
               </button>
             </div>
@@ -160,11 +174,7 @@ const ScoreBetCard = ({
 
       {/* Perforated separator */}
       <div className="w-0 flex items-center relative h-full">
-        <div
-          className="absolute -left-0.5 h-[calc(100%-16px)] w-px border-l-2 
-        border-dashed border-gray-100 dark:border-[#1a1c23] 
-        z-20 mix-blend-overlay opacity-50"
-        />
+        <div className="absolute -left-0.5 h-[calc(100%-16px)] w-px border-l-2 border-dashed border-tile-border z-20 opacity-60" />
       </div>
 
       {/* Right Ticket Strip */}
