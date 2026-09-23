@@ -26,33 +26,34 @@ function ToplistTypeSwitcher({
 
   const description = toplistType === ToplistType.netscore ? NET_SCORE_DESC : ROI_DESC;
   return (
-    <div className="flex flex-col sm:flex-row sm:items-start sm:gap-4 py-3 px-3">
-      {/* Leírás - desktopon bal oldalon, mindig látszik */}
-      {!isMobile && <div className="flex-1 text-xs text-gray-400 italic">{description}</div>}
+    <div className="mb-4 flex flex-col gap-3 rounded-tile border border-tile-border bg-[image:var(--tile-bg-gradient)] p-3 shadow-tile sm:flex-row sm:items-center sm:justify-between">
+      {!isMobile && <div className="max-w-2xl text-xs leading-5 text-text-muted">{description}</div>}
 
       {/* TABS */}
       <div className="w-full sm:max-w-md">
-        <div className="flex w-full bg-tertiary rounded-lg p-1">
+        <div className="flex w-full rounded-full border border-white/10 bg-white/5 p-1">
           <button
+            type="button"
             onClick={() => {
               setToplistType(ToplistType.netscore);
             }}
-            className={`flex-1 py-2 text-xs sm:text-sm font-medium rounded-md transition-all ${
+            className={`flex-1 rounded-full py-2 text-xs font-bold transition-all sm:text-sm ${
               toplistType === ToplistType.netscore
-                ? "bg-primary text-white shadow-sm"
-                : "text-gray-400 hover:text-white"
+                ? "bg-[image:var(--gradient-cta)] text-white shadow-[0_4px_14px_-4px_rgba(107,75,255,0.6)]"
+                : "text-text-muted hover:text-text-primary"
             }`}
           >
             Összpontszám szerint
           </button>
           <button
+            type="button"
             onClick={() => {
               setToplistType(ToplistType.roi);
             }}
-            className={`flex-1 py-2 text-xs sm:text-sm font-medium rounded-md transition-all ${
+            className={`flex-1 rounded-full py-2 text-xs font-bold transition-all sm:text-sm ${
               toplistType === ToplistType.roi
-                ? "bg-primary text-white shadow-sm"
-                : "text-gray-400 hover:text-white"
+                ? "bg-[image:var(--gradient-cta)] text-white shadow-[0_4px_14px_-4px_rgba(107,75,255,0.6)]"
+                : "text-text-muted hover:text-text-primary"
             }`}
           >
             Megtérülés szerint
@@ -66,8 +67,7 @@ function ToplistTypeSwitcher({
               type="button"
               onClick={() => setIsDescOpen((prev) => !prev)}
               aria-expanded={isDescOpen}
-              className="flex items-center gap-1 text-xs text-gray-400
-                 hover:text-white transition-colors px-3 mt-2 underline underline-offset-2"
+              className="mt-2 flex items-center gap-1 px-2 text-xs text-text-muted transition-colors hover:text-text-primary"
             >
               <IoInformationCircleOutline className="text-sm" />
               Információ a listáról
@@ -82,7 +82,7 @@ function ToplistTypeSwitcher({
                   transition={{ duration: 0.2, ease: "easeInOut" }}
                   className="overflow-hidden"
                 >
-                  <div className="text-xs text-gray-400 mb-2 italic px-3 pt-1">{description}</div>
+                  <div className="px-2 pb-1 pt-2 text-xs leading-5 text-text-muted">{description}</div>
                 </motion.div>
               )}
             </AnimatePresence>

@@ -176,3 +176,13 @@ export const formatPoints = (
   const formatted = formatNumber(points, compact);
   return showUnit ? `${formatted} pont` : formatted;
 };
+
+/**
+ * Találati arány (%) a lezárt (nyert + vesztett) fogadások alapján.
+ * null, ha még nincs egyetlen lezárt fogadás sem.
+ */
+export const getWinRatePercent = (wins?: number, losses?: number): number | null => {
+  const settled = (wins ?? 0) + (losses ?? 0);
+  if (settled === 0) return null;
+  return Math.round(((wins ?? 0) / settled) * 100);
+};
