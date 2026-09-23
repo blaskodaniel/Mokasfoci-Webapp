@@ -43,7 +43,7 @@ const PopupContainer = () => {
   }
 
   return (
-    <div className="fixed top-4 left-4 z-50 space-y-3 pointer-events-none">
+    <div className="pointer-events-none fixed inset-x-3 top-3 z-50 flex flex-col items-stretch gap-3 sm:inset-x-auto sm:right-5 sm:top-4 sm:w-96">
       {popups.map((popup, index) => (
         <PopupItem
           key={popup.id}

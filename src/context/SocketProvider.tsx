@@ -58,7 +58,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       showInfo(getNotificationTitle(notification.type), {
         description: notification.text || "Nézd meg a harang ikonra kattintva!",
         autoClose: true,
-        duration: 5000,
+        duration: 2500,
       });
 
       queryClient.invalidateQueries({ queryKey: ["notifications"] });

@@ -134,6 +134,7 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
             groupName={groupStandings.name}
             size="sm"
             groupId={groupStandings.id}
+            variant="modal"
           />
         </section>
       )}

@@ -15,32 +15,36 @@ interface PopupItemProps {
 }
 
 const defaultIcons: Record<PopupItemType["type"], ReactNode> = {
-  success: <IoCheckmarkCircleOutline size={24} className="text-green-400" />,
-  error: <IoCloseCircleOutline size={24} className="text-red-400" />,
-  warning: <IoWarningOutline size={24} className="text-yellow-400" />,
-  info: <IoInformationCircleOutline size={24} className="text-blue-400" />,
+  success: <IoCheckmarkCircleOutline size={22} />,
+  error: <IoCloseCircleOutline size={22} />,
+  warning: <IoWarningOutline size={22} />,
+  info: <IoInformationCircleOutline size={22} />,
 };
 
 const typeStyles = {
   success: {
-    bg: "bg-green-900/20 border-green-500/30",
-    accent: "bg-green-500",
-    text: "text-green-100",
+    accent: "bg-badge-success",
+    icon: "border-badge-success-border bg-badge-success-bg text-badge-success",
+    badge: "border-badge-success-border bg-badge-success-bg text-badge-success",
+    label: "SIKERES",
   },
   error: {
-    bg: "bg-red-900/20 border-red-500/30",
-    accent: "bg-red-500",
-    text: "text-red-100",
+    accent: "bg-badge-live",
+    icon: "border-badge-live-border bg-badge-live-bg text-badge-live",
+    badge: "border-badge-live-border bg-badge-live-bg text-badge-live",
+    label: "HIBA",
   },
   warning: {
-    bg: "bg-yellow-900/20 border-yellow-500/30",
-    accent: "bg-yellow-500",
-    text: "text-yellow-100",
+    accent: "bg-badge-amber",
+    icon: "border-badge-amber-border bg-badge-amber-bg text-badge-amber",
+    badge: "border-badge-amber-border bg-badge-amber-bg text-badge-amber",
+    label: "FIGYELMEZTETÉS",
   },
   info: {
-    bg: "bg-blue-900/20 border-blue-500/30",
-    accent: "bg-blue-500",
-    text: "text-blue-100",
+    accent: "bg-accent-soft",
+    icon: "border-accent/40 bg-accent/15 text-accent-soft",
+    badge: "border-accent/40 bg-accent/15 text-accent-soft",
+    label: "INFORMÁCIÓ",
   },
 };
 
@@ -63,29 +67,28 @@ export const PopupItem = ({ popup, onClose, index }: PopupItemProps) => {
   };
 
   const baseClasses = `
-    relative w-70 md:w-96 max-w-sm backdrop-blur-sm rounded-lg border shadow-lg
-    transform transition-all duration-500 ease-out pointer-events-auto
-    ${styles.bg} ${styles.text}
+    relative w-full overflow-hidden rounded-tile border border-tile-border
+    bg-[image:var(--tile-bg-gradient)] shadow-tile pointer-events-auto
+    transition-[transform,opacity] duration-300 ease-out
   `;
 
   const animationClasses = isRemoving
-    ? "-translate-x-full opacity-0 scale-95"
+    ? "translate-x-6 opacity-0"
     : isVisible
-      ? "translate-x-0 opacity-100 scale-100"
-      : "-translate-x-full opacity-0 scale-95";
+      ? "translate-x-0 opacity-100"
+      : "translate-x-6 opacity-0";
 
   return (
     <div
       className={`${baseClasses} ${animationClasses}`}
-      style={{
-        transformOrigin: "left center",
-      }}
+      role={popup.type === "error" ? "alert" : "status"}
     >
-      {/* Progress bar */}
+      <div className={`absolute inset-y-0 left-0 w-1 ${styles.accent}`} />
+
       {popup.autoClose && popup.duration && (
-        <div className="absolute top-0 left-0 h-1 bg-gray-700 rounded-t-lg overflow-hidden">
+        <div className="absolute inset-x-0 bottom-0 h-0.5 bg-white/5">
           <div
-            className={`h-full ${styles.accent} transform origin-left animate-progress`}
+            className={`h-full origin-left ${styles.accent} animate-progress`}
             style={{
               animation: `progress ${popup.duration}ms linear forwards`,
             }}
@@ -93,36 +96,41 @@ export const PopupItem = ({ popup, onClose, index }: PopupItemProps) => {
         </div>
       )}
 
-      <div className="p-4">
+      <div className="p-4 pl-5">
         <div className="flex items-start gap-3">
-          {/* Icon */}
-          <div className="shrink-0 mt-0.5">{icon}</div>
+          <div className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full border ${styles.icon}`}>
+            {icon}
+          </div>
 
-          {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="font-semibold text-sm leading-5">{popup.title}</div>
+            <div className="mb-1.5 flex items-center gap-2">
+              <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold tracking-[0.12em] ${styles.badge}`}>
+                {styles.label}
+              </span>
+            </div>
+            <div className="text-sm font-bold leading-5 text-text-primary">{popup.title}</div>
 
             {popup.subtitle && (
-              <div className="text-xs text-gray-300 mt-1">{popup.subtitle}</div>
+              <div className="mt-1 text-xs text-text-secondary">{popup.subtitle}</div>
             )}
 
             {popup.description && (
-              <div className="text-xs text-gray-400 mt-2 leading-4">{popup.description}</div>
+              <div className="mt-2 text-xs leading-5 text-text-secondary">{popup.description}</div>
             )}
 
-            {/* Actions */}
             {popup.actions && popup.actions.length > 0 && (
               <div className="flex gap-2 mt-3">
                 {popup.actions.map((action, actionIndex) => (
                   <button
                     key={actionIndex}
+                    type="button"
                     onClick={action.onClick}
                     className={`
-                      px-3 py-1.5 text-xs font-medium rounded-md transition-colors
+                      rounded-md px-3 py-1.5 text-xs font-bold transition-colors
                       ${
                         action.variant === "primary"
-                          ? `${styles.accent} text-white hover:opacity-80`
-                          : "bg-gray-700 text-gray-200 hover:bg-gray-600"
+                          ? "bg-[image:var(--gradient-cta)] text-white hover:bg-[image:var(--gradient-cta-hover)]"
+                          : "border border-tile-border bg-white/5 text-text-secondary hover:bg-white/10 hover:text-text-primary"
                       }
                     `}
                   >
@@ -133,12 +141,13 @@ export const PopupItem = ({ popup, onClose, index }: PopupItemProps) => {
             )}
           </div>
 
-          {/* Close button */}
           <button
+            type="button"
             onClick={handleClose}
-            className="shrink-0 p-1 rounded-full hover:bg-white/10 transition-colors"
+            aria-label="Értesítés bezárása"
+            className="shrink-0 rounded-full p-1 text-text-muted transition-colors hover:bg-white/10 hover:text-text-primary"
           >
-            <IoCloseOutline size={18} className="text-gray-300" />
+            <IoCloseOutline size={18} />
           </button>
         </div>
       </div>

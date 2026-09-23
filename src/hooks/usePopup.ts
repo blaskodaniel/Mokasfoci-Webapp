@@ -30,7 +30,7 @@ export const usePopup = () => {
     (options: ShowPopupOptions) => {
       const popupData: Omit<PopupItem, "id"> = {
         type: "info",
-        duration: 3000,
+        duration: 2000,
         autoClose: true,
         ...options,
       };
@@ -61,14 +61,14 @@ export const usePopup = () => {
 
   const showError = useCallback(
     (title: string, options?: Omit<ShowPopupOptions, "title" | "type">) => {
-      showPopup({ title, type: "error", duration: 5000, ...options });
+      showPopup({ title, type: "error", duration: 3000, ...options });
     },
     [showPopup]
   );
 
   const showWarning = useCallback(
     (title: string, options?: Omit<ShowPopupOptions, "title" | "type">) => {
-      showPopup({ title, type: "warning", duration: 4000, ...options });
+      showPopup({ title, type: "warning", duration: 2500, ...options });
     },
     [showPopup]
   );

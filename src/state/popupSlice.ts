@@ -37,7 +37,7 @@ const popupSlice = createSlice({
     ) => {
       const popup: PopupItem = {
         id: `popup_${Date.now()}_${Math.random()}`,
-        duration: 3000,
+        duration: 2000,
         autoClose: true,
         ...action.payload,
       };

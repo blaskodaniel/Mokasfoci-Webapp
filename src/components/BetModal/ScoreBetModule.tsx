@@ -91,44 +91,63 @@ const ScoreBetModule = ({
 
       <BetValueSelector betValue={betValue} onChangeBetValue={setBetValue} maxAllowedScore={maxAllowedScore} />
 
-      <div className="my-4 space-y-2 rounded-tile border border-tile-border bg-white/5 p-3 text-sm">
-        <div className="mb-2 flex items-center justify-between">
-          <div className="font-semibold text-text-secondary">Nyerési lehetőségek:</div>
+      <section className="my-4 overflow-hidden rounded-tile border border-tile-border bg-black/20">
+        <div className="flex items-center justify-between border-b border-tile-border bg-white/[0.03] px-3 py-2.5">
+          <div>
+            <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-text-secondary">
+              Nyerési lehetőségek
+            </div>
+            <div className="mt-0.5 text-[10px] text-text-muted">A kiválasztott tét alapján</div>
+          </div>
           <button
+            type="button"
             onClick={() => setShowHelp(true)}
-            className="cursor-pointer text-xs text-accent-soft underline transition-colors hover:text-highlight"
+            className="rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1 text-[10px] font-bold text-accent-soft transition-colors hover:border-accent/60 hover:bg-accent/20"
           >
             Hogyan működik?
           </button>
         </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span>🎯</span>
-            <span className="text-text-muted">{exactMatchOdds}x - Telitalálat:</span>
-          </div>
-          <div className="font-bold text-badge-success">
-            {formatNumber(betValue * exactMatchOdds)} pont
-          </div>
+        <div className="space-y-1.5 p-2">
+          {[
+            {
+              label: "Telitalálat",
+              odds: exactMatchOdds,
+              tone: "border-badge-success-border bg-badge-success-bg text-badge-success",
+            },
+            {
+              label: "Gólkülönbség",
+              odds: goalDifferenceOdds,
+              tone: "border-badge-amber-border bg-badge-amber-bg text-badge-amber",
+            },
+            {
+              label: "Kimenetel",
+              odds: outcomeOdds,
+              tone: "border-accent/40 bg-accent/15 text-accent-soft",
+            },
+          ].map(({ label, odds, tone }, index) => (
+            <div
+              key={label}
+              className="flex items-center justify-between rounded-lg border border-transparent px-2.5 py-2 transition-colors hover:border-tile-border hover:bg-white/[0.03]"
+            >
+              <div className="flex items-center gap-2.5">
+                <span className={`flex size-6 items-center justify-center rounded-md border text-[10px] font-black ${tone}`}>
+                  {index + 1}
+                </span>
+                <div>
+                  <div className="text-xs font-semibold text-text-secondary">{label}</div>
+                  <div className="text-[10px] text-text-muted">{odds}x szorzó</div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className={`text-sm font-black tabular-nums ${tone.split(" ").at(-1)}`}>
+                  {formatNumber(betValue * odds)}
+                </div>
+                <div className="text-[10px] text-text-muted">pont</div>
+              </div>
+            </div>
+          ))}
         </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span>↕️</span>
-            <span className="text-text-muted">{goalDifferenceOdds}x - Gólkülönbség:</span>
-          </div>
-          <div className="font-bold text-badge-amber">
-            {formatNumber(betValue * goalDifferenceOdds)} pont
-          </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span>✅</span>
-            <span className="text-text-muted">{outcomeOdds}x - Kimenetel:</span>
-          </div>
-          <div className="font-bold text-accent-soft">
-            {formatNumber(betValue * outcomeOdds)} pont
-          </div>
-        </div>
-      </div>
+      </section>
 
       <div className="sticky bottom-0 -mx-4 mt-4 border-t border-tile-border bg-[image:var(--tile-bg-gradient)] px-4 py-3">
         <Button
