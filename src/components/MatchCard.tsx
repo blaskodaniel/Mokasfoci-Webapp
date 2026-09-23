@@ -68,7 +68,6 @@ const MatchCard = ({ match, onClick, className, flagSize = "large", badge }: Mat
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -3 }}
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
       className={`w-full rounded-tile border border-tile-border bg-[image:var(--tile-bg-gradient)]
