@@ -28,36 +28,40 @@ const ScoreInputSelector: FC<ScoreInputSelectorProps> = ({
     }
   };
 
+  const inputClass =
+    "w-16 h-14 sm:w-20 sm:h-16 text-center text-3xl font-black text-white bg-white/5 " +
+    "rounded-tile border border-tile-border focus:border-accent focus:ring-2 focus:ring-accent/30 " +
+    "focus:outline-none transition-colors [appearance:textfield] " +
+    "[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
+
   return (
-    <div className="flex justify-center items-center gap-4 py-4">
+    <div className="flex items-center justify-center gap-4 py-2">
       <div className="flex flex-col items-center gap-2">
-        <label className="text-sm font-medium text-gray-400">{match.teamA?.tla || "Hazai"}</label>
+        <label className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+          {match.teamA?.tla || "Hazai"}
+        </label>
         <input
           type="number"
           value={homeScore}
           onChange={handleHomeChange}
-          className="w-16 h-12 text-center text-2xl font-bold bg-secondary 
-          rounded-lg border border-gray-600 focus:border-green-500 
-          focus:outline-none transition-colors [appearance:textfield] 
-          [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          className={inputClass}
           placeholder="0"
           min="0"
           max="99"
         />
       </div>
 
-      <span className="text-2xl font-bold text-gray-500 mt-6">-</span>
+      <span className="mt-6 text-2xl font-bold text-text-muted">-</span>
 
       <div className="flex flex-col items-center gap-2">
-        <label className="text-sm font-medium text-gray-400">{match.teamB?.tla || "Vendég"}</label>
+        <label className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+          {match.teamB?.tla || "Vendég"}
+        </label>
         <input
           type="number"
           value={awayScore}
           onChange={handleAwayChange}
-          className="w-16 h-12 text-center text-2xl font-bold bg-secondary 
-          rounded-lg border border-gray-600 focus:border-green-500 
-          focus:outline-none transition-colors [appearance:textfield] 
-          [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          className={inputClass}
           placeholder="0"
           min="0"
           max="99"

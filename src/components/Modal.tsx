@@ -26,34 +26,37 @@ const Modal: React.FC<ModalProps> = ({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
           exit={{ opacity: 0 }}
-          className={`fixed inset-0 bg-black/80 bg-opacity-10 flex justify-center z-50 
+          className={`fixed inset-0 bg-black/80 flex justify-center z-50
           ${position === "center" ? "items-center p-4" : "items-start pt-0 sm:pt-5"}`}
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className={`shadow-lg relative flex flex-col w-full h-full sm:h-auto sm:max-h-[calc(100vh-2rem)] sm:rounded-lg ${className}`}
+            transition={{ duration: 0.3 }}
+            className={`shadow-lg relative flex flex-col w-full h-full sm:h-auto sm:max-h-[calc(100vh-2rem)] overflow-hidden sm:rounded-lg ${className}`}
           >
             {title && (
-              <div
-                className={`flex ${title ? "justify-between" : "justify-end"} items-center mb-4`}
-              >
-                {title && <h2 className="text-lg font-semibold">{title}</h2>}
+              <div className="flex items-center justify-between px-4 pt-4 pb-2">
+                <h2 className="text-base font-bold text-white">{title}</h2>
               </div>
             )}
 
             {onClose && (
-              <IoCloseOutline
-                color="white"
-                size={20}
+              <button
+                type="button"
                 onClick={onClose}
-                className="absolute top-5 right-5 text-gray-600 hover:text-gray-800 cursor-pointer"
-              />
+                aria-label="Bezárás"
+                className="absolute top-3 right-3 z-10 rounded-full bg-black/40 p-1.5
+                  text-white/70 transition-colors hover:bg-black/60 hover:text-white cursor-pointer"
+              >
+                <IoCloseOutline size={20} />
+              </button>
             )}
 
-            <div className="sm:flex-1 sm:min-h-0 sm:overflow-y-auto">{children}</div>
+            <div className="flex-1 min-h-0 overflow-y-auto">{children}</div>
           </motion.div>
         </motion.div>
       )}

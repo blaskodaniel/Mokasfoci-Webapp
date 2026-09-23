@@ -11,6 +11,7 @@ import GroupStandings from "../Widgets/GroupStandings";
 import { useGetGroupStandingsById } from "@/hooks/api/useTeams";
 import type { Match } from "@/models/match.type";
 import { useAuth } from "@/hooks/useAuth";
+import { IoStar } from "react-icons/io5";
 
 const MIN_BET = 100; // lépésköz: a tét 100-asra kerekítődik
 const MIN_VALID_BET = 200; // minimum érvényes (leadható) tét
@@ -89,8 +90,9 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
   return (
     <>
       {isFavoriteTeam && (
-        <div className="text-center text-xs text-green-600">
-          Kedvenc csapatod játszik! Minden odds-ra plusz {config?.favoritTeamFactor}x szorzó jár
+        <div className="mb-3 flex items-center justify-center gap-1.5 rounded-full border border-badge-amber-border bg-badge-amber-bg px-3 py-1.5 text-center text-xs font-semibold text-badge-amber">
+          <IoStar size={12} />
+          Kedvenc csapatod játszik! Minden odds-ra +{config?.favoritTeamFactor}x szorzó jár
         </div>
       )}
 
@@ -110,9 +112,9 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
       />
 
       {isValidBet && (
-        <div className="flex justify-center items-center gap-2 mt-3">
-          <div className="text-md">Várható nyereményed: </div>
-          <div className="font-bold text-md text-green-500">
+        <div className="mt-4 flex items-center justify-between rounded-tile border border-tile-border bg-white/5 px-4 py-3">
+          <span className="text-sm text-text-secondary">Várható nyereményed</span>
+          <span className="text-lg font-black text-badge-success">
             {formatNumber(
               potentialWinnings(
                 betValue,
@@ -120,8 +122,8 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
                 isFavoriteTeam ? config?.favoritTeamFactor : 1
               )
             )}
-            <span className="pl-1 text-base font-normal text-gray-400">pont</span>
-          </div>
+            <span className="pl-1 text-xs font-normal text-text-muted">pont</span>
+          </span>
         </div>
       )}
 
@@ -136,11 +138,11 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
         </section>
       )}
 
-      {/* Mobile: Sticky button at bottom, Desktop: Regular button */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-quaternary sm:sticky sm:bottom-0 sm:px-0 sm:pb-0 sm:pt-3 sm:bg-primary sm:mt-3">
+      <div className="sticky bottom-0 -mx-4 mt-4 border-t border-tile-border bg-[image:var(--tile-bg-gradient)] px-4 py-3">
         <Button
-          text={editMode ? "Mentés" : "LÉTREHOZÁS"}
+          text={editMode ? "Mentés" : "Fogadás létrehozása"}
           subText={subText}
+          variant="cta"
           onClick={() => {
             if (!selectedOutcome) return;
             const oddsGotWorse =
@@ -154,9 +156,7 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
               onSave(betValue, selectedOutcome, editMode);
             }
           }}
-          className={`${
-            editMode ? "bg-blue-600 hover:bg-blue-700" : "bg-green-600 hover:bg-green-700"
-          } w-full py-3 sm:py-2`}
+          className="w-full"
           disabled={!isValidBet || loading || (userScore < 99 && !editMode)}
           loading={loading}
         />
@@ -171,7 +171,7 @@ const OutcomeBetModule: FC<OutcomeBetModuleProps> = ({
           if (selectedOutcome) onSave(betValue, selectedOutcome, editMode);
         }}
         onCancel={() => setIsOddsConfirmOpen(false)}
-        confirmClassName="bg-orange-600 hover:bg-orange-700"
+        confirmClassName="bg-badge-amber text-primary hover:brightness-110"
       />
     </>
   );

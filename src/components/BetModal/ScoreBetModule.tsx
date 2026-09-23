@@ -91,54 +91,54 @@ const ScoreBetModule = ({
 
       <BetValueSelector betValue={betValue} onChangeBetValue={setBetValue} maxAllowedScore={maxAllowedScore} />
 
-      <div className="bg-secondary/50 rounded-lg p-3 my-4 space-y-2 text-sm border border-white/5">
-        <div className="flex justify-between items-center mb-2">
-          <div className="font-semibold text-gray-300">Nyerési lehetőségek:</div>
+      <div className="my-4 space-y-2 rounded-tile border border-tile-border bg-white/5 p-3 text-sm">
+        <div className="mb-2 flex items-center justify-between">
+          <div className="font-semibold text-text-secondary">Nyerési lehetőségek:</div>
           <button
             onClick={() => setShowHelp(true)}
-            className="text-xs text-blue-400 hover:text-blue-300 underline cursor-pointer transition-colors"
+            className="cursor-pointer text-xs text-accent-soft underline transition-colors hover:text-highlight"
           >
             Hogyan működik?
           </button>
         </div>
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span>🎯</span>
-            <span className="text-gray-400">{exactMatchOdds}x - Telitalálat:</span>
+            <span className="text-text-muted">{exactMatchOdds}x - Telitalálat:</span>
           </div>
-          <div className="font-bold text-green-400">
+          <div className="font-bold text-badge-success">
             {formatNumber(betValue * exactMatchOdds)} pont
           </div>
         </div>
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span>↕️</span>
-            <span className="text-gray-400">{goalDifferenceOdds}x - Gólkülönbség:</span>
+            <span className="text-text-muted">{goalDifferenceOdds}x - Gólkülönbség:</span>
           </div>
-          <div className="font-bold text-yellow-400">
+          <div className="font-bold text-badge-amber">
             {formatNumber(betValue * goalDifferenceOdds)} pont
           </div>
         </div>
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span>✅</span>
-            <span className="text-gray-400">{outcomeOdds}x - Kimenetel:</span>
+            <span className="text-text-muted">{outcomeOdds}x - Kimenetel:</span>
           </div>
-          <div className="font-bold text-blue-400">{formatNumber(betValue * outcomeOdds)} pont</div>
+          <div className="font-bold text-accent-soft">
+            {formatNumber(betValue * outcomeOdds)} pont
+          </div>
         </div>
       </div>
 
-      {/* Mobile: Sticky button at bottom, Desktop: Regular button */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-quaternary sm:sticky sm:bottom-0 sm:px-0 sm:pb-0 sm:pt-3 sm:bg-primary sm:mt-3">
+      <div className="sticky bottom-0 -mx-4 mt-4 border-t border-tile-border bg-[image:var(--tile-bg-gradient)] px-4 py-3">
         <Button
-          text={editMode ? "Mentés" : "LÉTREHOZÁS"}
+          text={editMode ? "Mentés" : "Fogadás létrehozása"}
           subText={subText}
+          variant="cta"
           onClick={() =>
             isValidBet && onSave(betValue, Number(homeScore), Number(awayScore), editMode)
           }
-          className={`${
-            editMode ? "bg-blue-600 hover:bg-blue-700" : "bg-green-600 hover:bg-green-700"
-          } w-full py-3 sm:py-2`}
+          className="w-full"
           disabled={!isValidBet || loading || (userScore < 99 && !editMode)}
           loading={loading}
         />

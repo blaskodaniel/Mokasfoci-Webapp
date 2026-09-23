@@ -14,11 +14,11 @@ const HelpModal: FC<HelpModalProps> = ({ isOpen, onClose, title, children }) => 
       isOpen={isOpen}
       onClose={onClose}
       title={title}
-      className="bg-secondary text-white p-6 rounded-xl border border-white/10 shadow-2xl 
+      className="bg-[image:var(--tile-bg-gradient)] text-white p-6 rounded-tile border border-tile-border shadow-tile
       max-w-lg w-full h-auto! mx-4 sm:mx-auto"
       position="center"
     >
-      <div className="text-sm leading-relaxed text-gray-300 max-h-[80vh] overflow-y-auto pr-2 custom-scrollbar">
+      <div className="text-sm leading-relaxed text-text-secondary max-h-[80vh] overflow-y-auto pr-2 custom-scrollbar">
         {children}
       </div>
     </Modal>

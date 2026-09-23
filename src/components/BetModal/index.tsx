@@ -74,44 +74,47 @@ const BetModal: FC<BetModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={"Fogadás"}
-      className="sm:w-[455px] bg-primary px-4 py-3 sm:mx-3"
+      className="sm:w-[560px] bg-[image:var(--tile-bg-gradient)] sm:mx-3 sm:rounded-tile sm:border sm:border-tile-border sm:shadow-tile"
       onAfterClose={onAfterClose}
     >
-      <div className="flex flex-col gap-2 mt-2 flex-1 sm:flex-none">
+      <MatchTeamsPanel match={match} />
+
+      <div className="flex flex-col gap-2 px-4 pb-4">
         {/* TABS */}
         {!hideTabbar && (
-          <div className="flex w-full mb-4 bg-tertiary rounded-lg p-1">
+          <div className="mb-2 flex w-full gap-1.5 rounded-full border border-white/10 bg-white/5 p-1">
             <button
+              type="button"
+              disabled={disableTabs?.includes(CouponType.outcomeBet)}
               onClick={() => {
                 if (disableTabs?.includes(CouponType.outcomeBet)) return;
                 setActiveTab(CouponType.outcomeBet);
               }}
-              className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
+              className={`flex-1 rounded-full py-2 text-sm font-bold transition-all disabled:cursor-not-allowed disabled:opacity-30 ${
                 activeTab === CouponType.outcomeBet
-                  ? "bg-primary text-white shadow-sm"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-[image:var(--gradient-cta)] text-white shadow-[0_4px_14px_-4px_rgba(107,75,255,0.6)]"
+                  : "text-text-secondary hover:bg-white/5 hover:text-white"
               }`}
             >
               1 X 2
             </button>
             <button
+              type="button"
+              disabled={disableTabs?.includes(CouponType.scoreBet)}
               onClick={() => {
                 if (disableTabs?.includes(CouponType.scoreBet)) return;
                 setActiveTab(CouponType.scoreBet);
               }}
-              className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
+              className={`flex-1 rounded-full py-2 text-sm font-bold transition-all disabled:cursor-not-allowed disabled:opacity-30 ${
                 activeTab === CouponType.scoreBet
-                  ? "bg-primary text-white shadow-sm"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-[image:var(--gradient-cta)] text-white shadow-[0_4px_14px_-4px_rgba(107,75,255,0.6)]"
+                  : "text-text-secondary hover:bg-white/5 hover:text-white"
               }`}
             >
               Pontos eredmény
             </button>
           </div>
         )}
-
-        <MatchTeamsPanel match={match} />
 
         {activeTab === CouponType.outcomeBet ? (
           <OutcomeBetModule

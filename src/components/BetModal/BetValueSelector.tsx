@@ -12,25 +12,32 @@ const BetValueSelector: FC<BetValueSelectorProps> = ({
   maxAllowedScore,
 }) => {
   return (
-    <div className="mt-6 flex-1 sm:flex-none">
-      <label className="block text-sm font-medium mb-3 text-center">Feltett tét</label>
-      <div className="flex justify-center items-center gap-4">
+    <div className="mt-5">
+      <label className="mb-3 block text-center text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+        Feltett tét
+      </label>
+      <div className="flex items-center justify-center gap-3">
         <button
           type="button"
           aria-label="Csökkentés"
-          className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-white text-2xl flex items-center justify-center shadow transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full
+            border border-white/10 bg-white/5 text-2xl text-white transition
+            hover:bg-white/10 active:scale-95 disabled:cursor-not-allowed disabled:opacity-30 disabled:active:scale-100"
           onClick={() => onChangeBetValue((v) => Math.max(200, v - 100))}
           disabled={betValue <= 200}
         >
           –
         </button>
-        <span className="text-2xl font-bold min-w-[70px] text-center bg-gray-800 rounded-lg px-4 py-2 border border-gray-600 select-none">
-          {betValue} <span className="text-base font-normal text-gray-400">pont</span>
+        <span className="min-w-[120px] select-none rounded-tile border border-tile-border bg-white/5 px-5 py-2.5 text-center">
+          <span className="text-2xl font-black text-white">{betValue}</span>{" "}
+          <span className="text-sm font-normal text-text-muted">pont</span>
         </span>
         <button
           type="button"
           aria-label="Növelés"
-          className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-white text-2xl flex items-center justify-center shadow transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full
+            border border-white/10 bg-white/5 text-2xl text-white transition
+            hover:bg-white/10 active:scale-95 disabled:cursor-not-allowed disabled:opacity-30 disabled:active:scale-100"
           onClick={() => onChangeBetValue((v) => Math.min(maxAllowedScore, v + 100))}
           disabled={betValue + 100 > Math.min(2000, maxAllowedScore)}
         >
